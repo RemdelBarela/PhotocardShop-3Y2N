@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "PhotocardShop3y2n",
+    "slug": "PhotocardShop3y2n",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.melfx.rn2024s"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
