@@ -15,6 +15,10 @@ function authJwt() {
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },
                 {
+                    url: /\/api\/v1\/photos(.*)/,
+                    methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
+                },
+                {
                     url: /\/api\/v1\/categories(.*)/,
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },
@@ -39,7 +43,5 @@ async function isRevoked(req, payload, done) {
     }
     done();
 }
-
-
 
 module.exports = authJwt

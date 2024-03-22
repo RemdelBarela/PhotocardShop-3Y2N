@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import Orders from "../Screens/Admin/Orders"
 import Products from "../Screens/Admin/Products"
 import ProductForm from "../Screens/Admin/ProductForm"
+import Photos from "../Screens/Admin/Photo/Photos"
 import Categories from "../Screens/Admin/Categories"
 
 const Stack = createStackNavigator();
@@ -17,6 +18,13 @@ const AdminNavigator= () => {
                 component={Products}
                 options={{
                     title: "Products"
+                }}
+            />
+             <Stack.Screen 
+                name="Photos"
+                component={Photos}
+                options={{
+                    title: "Photos"
                 }}
             />
             <Stack.Screen name="Categories" component={Categories} />
