@@ -50,7 +50,7 @@ const ListPhoto = ({ item, index, deletePhoto }) => {
 
                         <EasyButton
                             medium
-                            PhotoForm
+                            secondary
                             onPress={() => [navigation.navigate("PhotoForm", { item }),
                             setModalVisible(false)
                             ]}
