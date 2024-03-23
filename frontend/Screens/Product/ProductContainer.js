@@ -6,8 +6,6 @@ import { Ionicons, SmallCloseIcon } from "@expo/vector-icons";
 
 import ProductList from "./ProductList";
 import SearchedProduct from "./SearchedProduct";
-import Banner from "../../Shared/Banner";
-import CategoryFilter from "./CategoryFilter";
 import axios from "axios";
 import baseURL from "../../assets/common/baseurl";
 // const data = require('../../assets/data/products.json')
@@ -98,34 +96,6 @@ const ProductContainer = () => {
         setFocus(false);
     }
 
-    // const changeCtg = (ctg) => {
-    //     console.log(ctg)
-    //     {
-    //         ctg === "all"
-    //             ? [setProductsCtg(initialState), setActive(true)]
-    //             : [
-    //                 setProductsCtg(
-    //                     products.filter((i) => i.category.$oid === ctg),
-    //                     setActive(true)
-    //                 ),
-    //             ];
-    //     }
-    // };
-    const changeCtg = (ctg) => {
-        console.log(ctg)
-        {
-            ctg === "all"
-                ? [setProductsCtg(initialState), setActive(true)]
-                : [
-                    setProductsCtg(
-                        products.filter((i) => (i.category !== null && i.category.id) === ctg ),
-                        setActive(true)
-                    ),
-                ];
-        }
-    };
-    console.log(products)
-
     return (
         
             <Center>
@@ -150,18 +120,6 @@ const ProductContainer = () => {
                     />
                 ) : (
                     <ScrollView>
-                        <View>
-                            <Banner />
-                        </View>
-                        <View >
-                            <CategoryFilter
-                                categories={categories}
-                                categoryFilter={changeCtg}
-                                productsCtg={productsCtg}
-                                active={active}
-                                setActive={setActive}
-                            />
-                        </View>
                         {productsCtg.length > 0 ? (
                                 <View style={styles.listContainer}>
                                     {productsCtg.map((item) => {

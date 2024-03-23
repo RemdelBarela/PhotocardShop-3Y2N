@@ -154,10 +154,6 @@ const DrawerNavigator = () => {
       >
         <Drawer.Screen
           name="Home"
-          options={{
-            drawerLabel: 'Home',
-            title: 'Home Screen',
-          }}
           component={Main}
         />
         <Drawer.Screen name="Products" component={Main} initialParams={{ screen: 'Products' }} />
