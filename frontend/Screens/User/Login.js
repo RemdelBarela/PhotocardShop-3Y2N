@@ -1,6 +1,6 @@
 import Input from "../../Shared/Form/Input";
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Switch } from 'react-native'
 import FormContainer from "../../Shared/Form/FormContainer";
 import Error from '../../Shared/Error'
 import { Button } from "native-base";
@@ -9,17 +9,23 @@ import { useNavigation } from '@react-navigation/native';
 import { loginUser } from '../../Context/Actions/Auth.actions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import EasyButton from "../../Shared/StyledComponents/EasyButton";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 const Login = (props) => {
+    const [mode, setMode] = useState('login');
+   
     const context = useContext(AuthGlobal)
     const navigation = useNavigation()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState("")
+
     useEffect(() => {
         if (context.stateUser.isAuthenticated === true) {
             navigation.navigate("User Profile")
         }
     }, [context.stateUser.isAuthenticated])
+
     const handleSubmit = () => {
         const user = {
             email,
@@ -33,6 +39,7 @@ const Login = (props) => {
             console.log("error")
         }
     }
+
     AsyncStorage.getAllKeys((err, keys) => {
         AsyncStorage.multiGet(keys, (error, stores) => {
             stores.map((result, i, store) => {
@@ -41,53 +48,122 @@ const Login = (props) => {
             });
         });
     });
+    const toggleMode = () => {
+        // Toggle between login and registration screens
+        mode === 'Register' ? navigation.navigate("Register") : navigation.navigate("Register");
+    };
+
     return (
-        <FormContainer>
-            <Input
-                placeholder={"Enter email"}
-                name={"email"}
-                id={"email"}
-                value={email}
-                onChangeText={(text) => setEmail(text.toLowerCase())}
-            />
-            <Input
-                placeholder={"Enter Password"}
-                name={"password"}
-                id={"password"}
-                secureTextEntry={true}
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-            />
-            <View style={styles.buttonGroup}>
-                {error ? <Error message={error} /> : null}
-                {/* <Button variant={"ghost"} onPress={() => handleSubmit()}>Login</Button> */}
-                <EasyButton
-                    large
-                    primary
-                    onPress={() => handleSubmit()}
-                ><Text style={{ color: "white" }}>Login</Text>
-                </EasyButton>
+        <KeyboardAwareScrollView
+            viewIsInsideTabBar={true}
+            extraHeight={50}
+            enableOnAndroid={true}
+        >
+            <View style={styles.app}>
+                <View style={styles.formBlockWrapper} />
+                <View style={[styles.formBlock, mode === 'register' ? styles.isSignup : styles.isLogin]}>
+                    <View style={styles.formBlockHeader}>
+                             <Input
+                                placeholder={"Enter email"}
+                                name={"email"}
+                                id={"email"}
+                                value={email}
+                                onChangeText={(text) => setEmail(text.toLowerCase())}
+                            />
+                            <Input
+                                placeholder={"Enter Password"}
+                                name={"password"}
+                                id={"password"}
+                                secureTextEntry={true}
+                                value={password}
+                                onChangeText={(text) => setPassword(text)}
+                            /> 
+                             <EasyButton x-l primary onPress={() =>  register()}>
+                            <Text style={{ color: 'white' }}>Register</Text>
+                        </EasyButton>
+                            <View style={styles.formBlockToggleBlock}>
+                                <Text>Already have an account? Click here</Text>
+                                <Switch
+                                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                    thumbColor={mode === 'register' ? "#f5dd4b" : "#f4f3f4"}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={toggleMode}
+                                    value={mode === 'register'}
+                                />
+                            </View> 
+                    </View>
+                </View>
             </View>
-            <View style={[{ marginTop: 40 }, styles.buttonGroup]}>
-                <Text style={styles.middleText}>Dont' Have an Account yet?</Text>
-                <EasyButton
-                    large
-                    secondary
-                    onPress={() => navigation.navigate("Register")}
-                ><Text style={{ color: "white" }}>Register</Text>
-                </EasyButton>
-            </View>
-        </FormContainer>
+        </KeyboardAwareScrollView>
     )
 }
+
 const styles = StyleSheet.create({
     buttonGroup: {
         width: "80%",
         alignItems: "center",
     },
-    middleText: {
+    app: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    formBlockWrapper: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    isLogin: {
+        opacity: 0.92,
+        backgroundColor: '#2C497F',
+    },
+    isSignup: {
+        opacity: 0.94,
+        backgroundColor: '#433B7C',
+    },
+    formBlock: {
+        position: 'relative',
+        margin: 100,
+        width: 285,
+        padding: 25,
+        height: 300,
+        backgroundColor: 'rgba(255, 255, 255, .13)',
+        borderRadius: 8,
+        color: '#fff',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 16,
+        },
+        shadowOpacity: 0.07,
+        shadowRadius: 9,
+        elevation: 10,
+    },
+    formBlockHeader: {
         marginBottom: 20,
-        alignSelf: "center",
+    },
+    formBlockToggleBlock: {
+        position: 'relative',
+    },
+    formGroupLogin: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+    },
+    formGroupSignup: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+    },
+    socialButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
     },
 });
-export default Login
+
+export default Login;

@@ -21,14 +21,13 @@ const Input = (props) => {
 
 const styles = StyleSheet.create({
     input: {
-        width: '80%',
-        height: 60,
-        backgroundColor: 'white',
-        margin: 10,
-        borderRadius: 20,
-        padding: 10,
-        borderWidth: 2,
-        borderColor: 'orange'
+        fontSize: 15,
+        color: '#fff',
+        width: '100%',
+        padding: 14,
+        marginBottom: 15,
+        backgroundColor: 'rgba(255,255,255,.25)',
+        borderRadius: 8,
     },
 });
 
