@@ -17,7 +17,6 @@ import Error from "../../../Shared/Error"
 
 import Icon from "react-native-vector-icons/FontAwesome"
 import Toast from "react-native-toast-message"
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from "axios"
 import * as ImagePicker from "expo-image-picker"
 import { useNavigation } from "@react-navigation/native"

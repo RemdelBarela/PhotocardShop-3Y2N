@@ -23,6 +23,8 @@ import ProductContainer from "../Screens/Product/ProductContainer";
 import 'react-native-gesture-handler';
 import Login from "../Screens/User/Login";
 import Main from "./Main";
+import Materials from "./MaterialNavigator"
+
 import Cart from "../Screens/Cart/Cart";
 import Products from "../Screens/Admin/Products";
 import AdminNavigator from "./AdminNavigator";
@@ -161,7 +163,7 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="Cart" component={Main} initialParams={{ screen: 'Cart' }} />
         <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/>
         <Drawer.Screen name="PHOTOS" component={Main}  initialParams={{ screen: 'Photos' }}/>
-        <Drawer.Screen name="MATERIALS" component={Main}  initialParams={{ screen: 'Materials' }}/>
+        <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
 
       </Drawer.Navigator>
     </Box>
