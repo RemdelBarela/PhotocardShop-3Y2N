@@ -7,20 +7,20 @@ import {
     StyleSheet,
     Dimensions,
     RefreshControl,
-} from "react-native";
 
+} from "react-native";
 import { Input, VStack, Heading, Box } from "native-base"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useFocusEffect } from "@react-navigation/native"
 import { Searchbar } from 'react-native-paper';
-import ListItem from "./ListItem"
-
 import axios from "axios"
-import baseURL from "../../assets/common/baseurl"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
-import EasyButton from "../../Shared/StyledComponents/EasyButton";
 import { useNavigation } from "@react-navigation/native"
+
+import ListMaterial from "./ListMaterial"
+import baseURL from "../../../assets/common/baseurl"
+import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
 const Materials = (props) => {
 
@@ -30,6 +30,7 @@ const Materials = (props) => {
     const [token, setToken] = useState();
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation()
+
     const ListHeader = () => {
         return (
             <View
@@ -37,25 +38,22 @@ const Materials = (props) => {
                 style={styles.listHeader}
             >
                 <View style={styles.headerItem}></View>
-                {/* <View style={styles.headerItem}>
-                    <Text style={{ fontWeight: '600' }}>Brand</Text>
-                </View> */}
                 <View style={styles.headerItem}>
-                    <Text style={{ fontWeight: '600' }}>Name</Text>
-                </View>
-                {/* <View style={styles.headerItem}>
-                    <Text style={{ fontWeight: '600' }}>Category</Text>
-                </View> */}
-                <View style={styles.headerItem}>
-                    <Text style={{ fontWeight: '600' }}>Price</Text>
+                    <Text style={{ fontWeight: '600' }}>NAME</Text>
                 </View>
                 <View style={styles.headerItem}>
-                    <Text style={{ fontWeight: '600' }}>Images</Text>
+                    <Text style={{ fontWeight: '600' }}>PRICE</Text>
+                </View>
+                <View style={styles.headerItem}>
+                    <Text style={{ fontWeight: '600' }}>IMAGES</Text>
+                </View>
+                <View style={styles.headerItem}>
+                    <Text style={{ fontWeight: '600' }}>STOCK</Text>
                 </View>
             </View>
-            
         )
     }
+
     const searchMaterial = (text) => {
         if (text === "") {
             setMaterialFilter(materialList)
@@ -123,39 +121,25 @@ const Materials = (props) => {
     return (
         <Box flex={1}>
             <View style={styles.buttonContainer}>
-                <EasyButton
-                    secondary
-                    medium
-                    onPress={() => navigation.navigate("Orders")}
-                >
-                    <Icon name="shopping-bag" size={18} color="white" />
-                    <Text style={styles.buttonText}>Orders</Text>
-                </EasyButton>
+                
                 <EasyButton
                     secondary
                     medium
                     onPress={() => navigation.navigate("MaterialForm")}
                 >
                     <Icon name="plus" size={18} color="white" />
-                    <Text style={styles.buttonText}>Materials</Text>
+                    <Text style={styles.buttonText}> MATERIAL </Text>
                 </EasyButton>
-                {/* <EasyButton
-                    secondary
-                    medium
-                    onPress={() => navigation.navigate("Categories")}
-                >
-                    <Icon name="plus" size={18} color="white" />
-                    <Text style={styles.buttonText}>Categories</Text>
-                </EasyButton> */}
             </View>
+
             <Searchbar width="80%"
-                placeholder="Search"
+                placeholder="Search Material Name"
                 onChangeText={(text) => searchMaterial(text)}
             //   value={searchQuery}
             />
             {loading ? (
                 <View style={styles.spinner}>
-                    <ActivityIndicator size="large" color="red" />
+                    <ActivityIndicator size="x-large" color="black" />
                 </View>
             ) : (<FlatList
                 refreshControl={
@@ -164,7 +148,7 @@ const Materials = (props) => {
                 ListHeaderComponent={ListHeader}
                 data={materialFilter}
                 renderItem={({ item, index }) => (
-                    <ListItem
+                    <ListMaterial
                         item={item}
                         index={index}
                         deleteMaterial={deleteMaterial}

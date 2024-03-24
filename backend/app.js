@@ -36,6 +36,7 @@ app.use(`${api}/products`, productsRoutes);
 
 app.use(`${api}/users`, usersRoutes);
 app.use(`${api}/photos`, photosRoutes);
+app.use(`${api}/materials`, materialsRoutes);
 
 app.use(`${api}/orders`, ordersRoutes);
 
