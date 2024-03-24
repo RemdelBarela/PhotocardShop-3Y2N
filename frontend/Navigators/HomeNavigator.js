@@ -17,15 +17,10 @@ function MyStack() {
             <Stack.Screen 
                 name='Product Detail'
                 component={SingleProduct}
-                // options={{
-                //     headerShown: false,
-                // }}
             />
-           
         </Stack.Navigator>
     )
 }
-
 export default function HomeNavigator() {
     return <MyStack />;
 }

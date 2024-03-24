@@ -84,8 +84,7 @@ const ProductContainer = () => {
     }
 
     return (
-    <View style={styles.container}>
-   
+ <> 
             <VStack w="100%" space={5} alignSelf="center">
                 <Input
                     onFocus={openList}
@@ -109,19 +108,19 @@ const ProductContainer = () => {
                 <ScrollView>
                      
                         {productsCtg.length > 0 ? (
-                     <View
-                     style={[
-                       {
-                         flex: 1,
-                         flexDirection: "row",
-                         marginTop: SIZES.padding,
-                         borderTopLeftRadius: 30,
-                         borderTopRightRadius: 30,
-                         backgroundColor: COLORS.white,
-                       },
-                       styles.recentSearchShadow,
-                     ]}
-                   >
+                          <View
+                          style={[
+                              {
+                                  flex: 1,
+                                  flexDirection: "row",
+                                  marginTop: SIZES.padding,
+                                  borderTopLeftRadius: 30,
+                                  borderTopRightRadius: 30,
+                                  backgroundColor: COLORS.white,
+                              },
+                              styles.recentSearchShadow,
+                          ]}
+                      >
                               {productsCtg.map((item) => {
                                     return (
                                         <ProductList
@@ -141,7 +140,7 @@ const ProductContainer = () => {
                 </ScrollView>
 
             )}
-       </View>
+       </>
 
     )
 }

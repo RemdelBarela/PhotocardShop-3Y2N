@@ -25,6 +25,7 @@ const productsRoutes = require("./routes/products");
 
 const usersRoutes = require("./routes/users");
 const photosRoutes = require("./routes/photos");
+const materialsRoutes = require("./routes/materials");
 
 const ordersRoutes = require("./routes/orders");
 
