@@ -78,7 +78,7 @@ const Login = (props) => {
                                 value={password}
                                 onChangeText={(text) => setPassword(text)}
                             /> 
-                             <EasyButton x-l primary onPress={() =>  register()}>
+                             <EasyButton x-l primary onPress={() =>  handleSubmit()}>
                             <Text style={{ color: 'white' }}>Register</Text>
                         </EasyButton>
                             <View style={styles.formBlockToggleBlock}>
