@@ -31,18 +31,9 @@ const storage = multer.diskStorage({
 const uploadOptions = multer({ storage: storage });
 
 router.get(`/`, async (req, res) =>{
-    // localhost:3000/api/v1/products?categories=2342342,234234
     console.log(req.query)
     let filter = {};
     const materialList = await Material.find(filter);
-    // if(req.query.categories)
-    // {
-    //      filter = {category: req.query.categories.split(',')}
-    // }
-
-    // const materialList = await Material.find(filter).populate('category');
-
-    // console.log(materialList.category)
 
     if(!materialList) {
         res.status(500).json({success: false})
@@ -60,9 +51,7 @@ router.get(`/:id`, async (req, res) =>{
     res.send(material);
 })
 
-router.post(`/`, uploadOptions.single('image'), async (req, res) => {
-    // const category = await Category.findById(req.body.category);
-    // if (!category) return res.status(400).send('Invalid Category');
+router.post(`/new`, uploadOptions.single('image'), async (req, res) => {
 
     const file = req.file;
     if (!file) return res.status(400).send('No image in the request');
@@ -71,16 +60,10 @@ router.post(`/`, uploadOptions.single('image'), async (req, res) => {
     const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
     let material = new Material({
         name: req.body.name,
-        // description: req.body.description,
-        // richDescription: req.body.richDescription,
-        price: req.body.price,
-        image: `${basePath}${fileName}`, // "http://localhost:3000/public/upload/image-2323232"
-        // brand: req.body.brand,
-        // category: req.body.category,
+         price: req.body.price,
+        image: `${basePath}${fileName}`, 
         countInStock: req.body.countInStock,
-        // rating: req.body.rating,
-        // numReviews: req.body.numReviews,
-        // isFeatured: req.body.isFeatured
+        
     });
 
     material = await material.save();
@@ -117,16 +100,9 @@ router.put('/:id', uploadOptions.single('image'), async (req, res) => {
         req.params.id,
         {
             name: req.body.name,
-            // description: req.body.description,
-            // richDescription: req.body.richDescription,
             price: req.body.price,
             image: imagepath,
-            // brand: req.body.brand,
-            // category: req.body.category,
-            countInStock: req.body.countInStock,
-            // rating: req.body.rating,
-            // numReviews: req.body.numReviews,
-            // isFeatured: req.body.isFeatured
+           countInStock: req.body.countInStock,
         },
         { new: true }
     );
@@ -159,41 +135,6 @@ router.get(`/get/count`, async (req, res) =>{
     });
 })
 
-router.get(`/get/featured/:count`, async (req, res) =>{
-    const count = req.params.count ? req.params.count : 0
-    const materials = await Material.find({isFeatured: true}).limit(+count);
 
-    if(!materials) {
-        res.status(500).json({success: false})
-    } 
-    res.send(materials);
-})
-
-router.put('/gallery-images/:id', uploadOptions.array('images', 10), async (req, res) => {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send('Invalid Material Id');
-    }
-    const files = req.files;
-    let imagesPaths = [];
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-
-    if (files) {
-        files.map((file) => {
-            imagesPaths.push(`${basePath}${file.filename}`);
-        });
-    }
-
-    const material = await Material.findByIdAndUpdate(
-        req.params.id,
-        {
-            images: imagesPaths
-        },
-        { new: true }
-    );
-        
-    if (!material) return res.status(500).send('the gallery cannot be updated!');
-
-    res.send(material);
-});
 
 module.exports=router;
