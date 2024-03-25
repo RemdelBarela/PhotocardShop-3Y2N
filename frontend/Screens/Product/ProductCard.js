@@ -20,7 +20,7 @@ import { images, COLORS, SIZES, FONTS } from "./constants";
 var { width } = Dimensions.get("window");
 
 const ProductCard = (props) => {
-    const { name, price, image, countInStock } = props;
+    const { name, description, image } = props;
     const dispatch = useDispatch()
     return (
         <>
@@ -48,14 +48,31 @@ const ProductCard = (props) => {
           }}
         >   
         
-             <Text  >
+             <Text  style={styles.boldText}>
                 {(name.length && name.length > 15) ? name.substring(0, 15 - 3)
                     + '...' : name
                 }
             </Text>
-            <Text style={[styles.price, FONTS.h3]}>${price}</Text>
+            <Text style={[styles.description, FONTS.h5]}>{description}</Text>
+            <Text style={styles.detailsText}>CLICK TO VIEW DETAILS</Text>
             </View>
-            {countInStock > 0 ? (
+
+            {/* <Button
+                        title={'Add'}
+                        color={'green'}
+                        onPress={() => {
+                            dispatch(addToCart({ ...props, quantity: 1, })),
+                                Toast.show({
+                                    topOffset: 60,
+                                    type: "success",
+                                    text1: `${name} ADDED TO CART`,
+                                    text2: "GO TO YOUR CART TO COMPLETE ORDER"
+                                })
+                        }}
+                    >
+                    </Button> */}
+
+            {/* {countInStock > 0 ? (
                 <View style={{ marginBottom: 60 }}>
                     <Button
                         title={'Add'}
@@ -65,14 +82,14 @@ const ProductCard = (props) => {
                                 Toast.show({
                                     topOffset: 60,
                                     type: "success",
-                                    text1: `${name} added to Cart`,
-                                    text2: "Go to your cart to complete order"
+                                    text1: `${name} ADDED TO CART`,
+                                    text2: "GO TO YOUR CART TO COMPLETE ORDER"
                                 })
                         }}
                     >
                     </Button>
                 </View>
-            ) : <Text style={{ marginTop: 20 }}>Currently Unavailable</Text>}
+            ) : <Text style={{ marginTop: 20 }}>CURRENTLY UNAVAILABLE</Text>} */}
         
           </ >
     )
@@ -80,39 +97,43 @@ const ProductCard = (props) => {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    image: {
+        width: 130,
+        height: 100,
+        marginRight: 10,
+    },
+    card: {
+        flexDirection: 'row',
         width: width / 2 - 20,
         height: width / 1.7,
         padding: 10,
         borderRadius: 10,
         marginTop: 55,
         marginBottom: 5,
-        marginLeft: 10,
+        marginLeft: 15,
         alignItems: 'center',
         elevation: 8,
-        backgroundColor: 'black'
+        backgroundColor: 'black',
     },
-    image: {
-        width: width / 2 - 20 - 10,
-        height: width / 2 - 20 - 30,
-        backgroundColor: 'transparent',
-        position: 'absolute',
-        top: -45
+    boldText: {
+      fontWeight: 'bold',
+      fontSize: 18,
     },
-    card: {
-        marginBottom: 10,
-        height: width / 2 - 20 - 90,
-        backgroundColor: 'transparent',
-        width: width / 2 - 20 - 10
-    },
-    title: {
-        fontWeight: "bold",
-        fontSize: 14,
-        textAlign: 'center'
-    },
-    price: {
+    description: {
         fontSize: 20,
-        color: 'orange',
-        marginTop: 10
+        color: 'black',
+        marginTop: 5,
+    },
+    detailsText: {
+      fontSize: 10,
+      color: 'white',
+      textAlign: 'center',
+      marginTop: 10,
+      backgroundColor: 'black',
     },
     container: {
         flex: 1,

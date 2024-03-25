@@ -13,7 +13,11 @@ import { Ionicons, SmallCloseIcon } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { images, COLORS, SIZES, FONTS } from "./constants";
 import ProductList from "./ProductList";
+
 import SearchedProduct from "./SearchedProduct";
+
+// import ListPhoto from "../Admin/Photo/ListPhoto";
+
 import axios from "axios";
 import baseURL from "../../assets/common/baseurl";
 
@@ -32,9 +36,9 @@ const ProductContainer = () => {
             () => {
                 setFocus(false);
                 setActive(-1);
-                // Products
+    
                 axios
-                    .get(`${baseURL}products`)
+                    .get(`${baseURL}photos`)
                     .then((res) => {
                         setProducts(res.data);
                         setProductsFiltered(res.data);
@@ -47,14 +51,14 @@ const ProductContainer = () => {
                     })
 
                 // Categories
-                axios
-                    .get(`${baseURL}categories`)
-                    .then((res) => {
-                        setCategories(res.data)
-                    })
-                    .catch((error) => {
-                        console.log('Api categories call error', error)
-                    })
+                // axios
+                //     .get(`${baseURL}categories`)
+                //     .then((res) => {
+                //         setCategories(res.data)
+                //     })
+                //     .catch((error) => {
+                //         console.log('Api categories call error', error)
+                //     })
 
                 return () => {
                     setProducts([]);
@@ -109,32 +113,37 @@ const ProductContainer = () => {
                 <ScrollView>
                      
                         {productsCtg.length > 0 ? (
-                     <View
-                     style={[
-                       {
-                         flex: 1,
-                         flexDirection: "row",
-                         marginTop: SIZES.padding,
-                         borderTopLeftRadius: 30,
-                         borderTopRightRadius: 30,
-                         backgroundColor: COLORS.white,
-                       },
-                       styles.recentSearchShadow,
-                     ]}
-                   >
+                //      <View
+                //      style={[
+                //        {
+                //          flex: 1,
+                //          flexDirection: "row",
+                //          marginTop: SIZES.padding,
+                //          borderTopLeftRadius: 30,
+                //          borderTopRightRadius: 30,
+                //          backgroundColor: COLORS.white,
+                //        },
+                //        styles.recentSearchShadow,
+                //      ]}
+                //    >
+                <View style={styles.listContainer}>
                               {productsCtg.map((item) => {
                                     return (
-                                        <ProductList
-                                            // navigation={props.navigation}
-                                            key={item._id.$oid}
-                                            item={item}
-                                        />
+                                        // <ProductList
+                                        //     // navigation={props.navigation}
+                                        //     key={item._id.$oid} 
+                                        //     item={item}
+                                        //     // containerStyle={styles.productListItem}
+                                        // />
+                                        <View key={item._id.$oid} style={styles.productListItem}>
+                                        <ProductList item={item} />
+                                    </View>
                                     )
                                 })}
                             </View>
                         ) : (
                             <View style={[styles.center, { height: height / 2 }]}>
-                                <Text>No products found</Text>
+                                <Text>NO PRODUCTS FOUND</Text>
                             </View>
                         )}
                      
@@ -152,13 +161,17 @@ const styles = StyleSheet.create({
         backgroundColor: "gainsboro",
     },
     listContainer: {
-        height: height,
-        width: width,
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "flex-start",
         flexWrap: "wrap",
-        backgroundColor: "gainsboro",
+        flexDirection: "row",
+        marginTop: SIZES.padding,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        backgroundColor: "white",
+        margin: 10,
+    },
+    productListItem: {
+        width: "100%",
+        // marginBottom: SIZES.padding,
     },
     center: {
         justifyContent: 'center',
