@@ -28,7 +28,6 @@ const ProductCard = (props) => {
  <View
           style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
         >   
-        
               <Image
             source={{
                 uri: image ?
@@ -53,8 +52,8 @@ const ProductCard = (props) => {
                     + '...' : name
                 }
             </Text>
-            <Text style={[styles.description, FONTS.h5]}>{description}</Text>
-            <Text style={styles.detailsText}>CLICK TO VIEW DETAILS</Text>
+            <Text style={[styles.description]}>{description}</Text>
+            {/* <Text style={styles.detailsText}>VIEW DETAILS</Text> */}
             </View>
 
             {/* <Button
@@ -103,8 +102,8 @@ const styles = StyleSheet.create({
     },
     image: {
         width: 130,
-        height: 100,
-        marginRight: 10,
+        height: 130,
+        marginRight: 20,
     },
     card: {
         flexDirection: 'row',
@@ -121,19 +120,14 @@ const styles = StyleSheet.create({
     },
     boldText: {
       fontWeight: 'bold',
-      fontSize: 18,
+      fontSize: 25,
+      marginLeft: 5,
     },
     description: {
-        fontSize: 20,
+        fontSize: 16,
         color: 'black',
-        marginTop: 5,
-    },
-    detailsText: {
-      fontSize: 10,
-      color: 'white',
-      textAlign: 'center',
-      marginTop: 10,
-      backgroundColor: 'black',
+        marginTop: 10,
+        marginLeft: 5,
     },
     container: {
         flex: 1,

@@ -206,7 +206,6 @@ const ProductList = (props) => {
   )
 }
 
-
 const style = StyleSheet.create({
   container: {
     flex: 1,

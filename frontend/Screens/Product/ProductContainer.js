@@ -16,8 +16,6 @@ import ProductList from "./ProductList";
 
 import SearchedProduct from "./SearchedProduct";
 
-// import ListPhoto from "../Admin/Photo/ListPhoto";
-
 import axios from "axios";
 import baseURL from "../../assets/common/baseurl";
 
@@ -111,30 +109,10 @@ const ProductContainer = () => {
                 />
             ) : (
                 <ScrollView>
-                     
-                        {productsCtg.length > 0 ? (
-                //      <View
-                //      style={[
-                //        {
-                //          flex: 1,
-                //          flexDirection: "row",
-                //          marginTop: SIZES.padding,
-                //          borderTopLeftRadius: 30,
-                //          borderTopRightRadius: 30,
-                //          backgroundColor: COLORS.white,
-                //        },
-                //        styles.recentSearchShadow,
-                //      ]}
-                //    >
+                    {productsCtg.length > 0 ? (
                 <View style={styles.listContainer}>
                               {productsCtg.map((item) => {
                                     return (
-                                        // <ProductList
-                                        //     // navigation={props.navigation}
-                                        //     key={item._id.$oid} 
-                                        //     item={item}
-                                        //     // containerStyle={styles.productListItem}
-                                        // />
                                         <View key={item._id.$oid} style={styles.productListItem}>
                                         <ProductList item={item} />
                                     </View>
@@ -171,7 +149,6 @@ const styles = StyleSheet.create({
     },
     productListItem: {
         width: "100%",
-        // marginBottom: SIZES.padding,
     },
     center: {
         justifyContent: 'center',

@@ -8,28 +8,28 @@ const SingleProduct = ({ route }) => {
     // console.log(item)
     const [availability, setAvailability] = useState('')
     const [availabilityText, setAvailabilityText] = useState("")
-    useEffect(() => {
-        if (item.countInStock === 0) {
-            setAvailability(<TrafficLight unavailable></TrafficLight>);
-            setAvailabilityText("Unvailable")
-        } else if (item.countInStock <= 5) {
-            setAvailability(<TrafficLight limited></TrafficLight>);
-            setAvailabilityText("Limited Stock")
-        } else {
-            setAvailability(<TrafficLight available></TrafficLight>);
-            setAvailabilityText("Available")
-        }
+    // useEffect(() => {
+    //     if (item.countInStock === 0) {
+    //         setAvailability(<TrafficLight unavailable></TrafficLight>);
+    //         setAvailabilityText("Unvailable")
+    //     } else if (item.countInStock <= 5) {
+    //         setAvailability(<TrafficLight limited></TrafficLight>);
+    //         setAvailabilityText("Limited Stock")
+    //     } else {
+    //         setAvailability(<TrafficLight available></TrafficLight>);
+    //         setAvailabilityText("Available")
+    //     }
 
-        return () => {
-            setAvailability(null);
-            setAvailabilityText("");
-        }
-    }, [])
+    //     return () => {
+    //         setAvailability(null);
+    //         setAvailabilityText("");
+    //     }
+    // }, [])
+
     return (
         <Center flexGrow={1}>
             <ScrollView style={{ marginBottom: 80, padding: 5 }}>
                 <View>
-                    
                     <Image
                         source={{
                             uri: item.image ? item.image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
@@ -37,27 +37,26 @@ const SingleProduct = ({ route }) => {
                         resizeMode="contain"
                         style={styles.image}
                     />
-
                 </View> 
-                <View style={styles.contentContainer}>
-                    <Heading style={styles.contentHeader} size='xl'>{item.name}</Heading>
-                    <Text style={styles.contentText}>{item.brand}</Text>
-                </View>
                 <View style={styles.availabilityContainer}>
-                    <View style={styles.availability}>
-                        <Text style={{ marginRight: 10 }}>
+                    {/* <View style={styles.availability}>
+                        <Text>
                             Availability: {availabilityText}
                         </Text>
                         {availability}
-                    </View>
-                    <Text>{item.description}</Text>
+                    </View> */}
+                <View style={styles.contentContainer}>
+                    <Heading style={styles.contentHeader} size='xl'>{item.name}</Heading>
+                    {/* <Text style={styles.contentText}>{item.brand}</Text> */}
+                    <Text>Photo Description: {item.description}</Text>
+                </View>
+                
                 </View>
                 <EasyButton
                     primary
                     medium
                 >
-
-                    <Text style={{ color: "white" }}> Add</Text>
+                    <Text style={{color: "white" }}>ADD TO CART</Text>
                 </EasyButton>
             </ScrollView>
         </Center >
@@ -68,7 +67,6 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
         height: '100%',
-
     },
     imageContainer: {
         backgroundColor: 'white',
@@ -76,18 +74,19 @@ const styles = StyleSheet.create({
         margin: 0
     },
     image: {
+        marginTop: -50,
         width: '100%',
         height: undefined,
         aspectRatio: 1
     },
     contentContainer: {
-        marginTop: 20,
+        marginTop: -50,
         justifyContent: 'center',
         alignItems: 'center'
     },
     contentHeader: {
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
     },
     contentText: {
         fontSize: 18,
@@ -107,6 +106,7 @@ const styles = StyleSheet.create({
         color: 'red'
     },
     availabilityContainer: {
+        marginTop:20,
         marginBottom: 20,
         alignItems: "center"
     },
