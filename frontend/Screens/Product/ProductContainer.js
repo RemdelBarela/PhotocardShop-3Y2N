@@ -62,7 +62,7 @@ const ProductContainer = () => {
                     setProducts([]);
                     setProductsFiltered([]);
                     setFocus();
-                    setCategories([]);
+                    // setCategories([]);
                     setActive();
                     setInitialState();
                 };

@@ -3,11 +3,59 @@ import { Image, View, StyleSheet, Text, ScrollView, Button } from "react-native"
 import { Left, Right, Container, H1, Center, Heading } from 'native-base'
 import EasyButton from "../../Shared/StyledComponents/EasyButton"
 import TrafficLight from '../../Shared/StyledComponents/TrafficLight'
+import axios from 'axios';
+import baseURL from "../../assets/common/baseurl";
+// import { RadioButton } from "@react-native-paper/radio-button"; // Import RadioButton
+import { TouchableOpacity } from 'react-native';
+
 const SingleProduct = ({ route }) => {
     const [item, setItem] = useState(route.params.item);
     // console.log(item)
     const [availability, setAvailability] = useState('')
     const [availabilityText, setAvailabilityText] = useState("")
+    const [materials, setMaterials] = useState([]);
+
+    useEffect(() => {
+        // Fetch materials when component mounts
+        axios
+            .get(`${baseURL}materials`)
+            .then((res) => {
+                // Ensure that res.data is an array before setting materials
+                if (Array.isArray(res.data)) {
+                    setMaterials(res.data);
+                } else {
+                    console.error('Materials data is not an array:', res.data);
+                }
+            })
+            .catch((error) => {
+                console.log('Error fetching materials:', error);
+            });
+    }, []);
+    
+    // axios
+    //     .get(`${baseURL}materials`)
+    //     .then((res) => {
+    //     setMaterials(res.data)
+    //     })
+    //     .catch((error) => {
+    //     console.log('Api materials call error', error)
+    //     })
+
+    // const [materials, setMaterials] = useState([]);
+
+    // useEffect(() => {
+    //     fetchMaterialsForProduct(item.id);
+    // }, [item]);
+
+    // const fetchMaterialsForProduct = async (productId) => {
+    //     try {
+    //         const response = await axios.get(`${baseURL}products/${productId}/materials`);
+    //         setMaterials(response.data);
+    //     } catch (error) {
+    //         console.error("Error fetching materials:", error);
+    //     }
+    // };
+
     // useEffect(() => {
     //     if (item.countInStock === 0) {
     //         setAvailability(<TrafficLight unavailable></TrafficLight>);
@@ -50,7 +98,20 @@ const SingleProduct = ({ route }) => {
                     {/* <Text style={styles.contentText}>{item.brand}</Text> */}
                     <Text>Photo Description: {item.description}</Text>
                 </View>
-                
+                <Text>Materials:</Text>
+                <ScrollView>
+                    {materials.map((material, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={{ flexDirection: 'row', alignItems: 'center' }}
+                            onPress={() => setMaterials(material.id)}
+                        >
+                            <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, marginRight: 10, borderColor: materials === material.id ? 'blue' : 'gray' }} />
+                            <Text>{material.name}</Text>
+                            <Text>{material.description}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
                 </View>
                 <EasyButton
                     primary
