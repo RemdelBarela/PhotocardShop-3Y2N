@@ -24,8 +24,6 @@ const ProductList = (props) => {
 
   const navigation = useNavigation();
 
-
-  
   function renderSizes() {
     const materials = ["Matt Soft", "Gel", "Paper"];
     return materials.map((item, index) => {
@@ -65,6 +63,7 @@ const ProductList = (props) => {
     });
   }
   console.log(selectedItem);
+
   return (
     <View style={{    shadowColor: '#000',
     shadowOffset: {
@@ -75,7 +74,8 @@ const ProductList = (props) => {
     shadowRadius: 4.65,
     elevation: 6,  margin:5,borderRadius: 10 ,padding:20, flex: 1, paddingBottom: SIZES.padding }}>
       <TouchableOpacity
-        style={{ flex: 1, flexDirection: "row" }}
+        style={{ margin:10, marginBottom: -10, flex: 1, flexDirection: "row" }}
+        
     //       onPress={() => {
     //         setSelectedItem(  {  item });
     //     setShowAddToCartModal(true);
@@ -86,8 +86,6 @@ const ProductList = (props) => {
         <ProductCard {...item} />
 
       </TouchableOpacity>
-
-
 
       {selectedItem && (
         <Modal
@@ -118,8 +116,6 @@ const ProductList = (props) => {
             >
               <View>
                 <Image
-
-                
                   source={selectedItem.image}
                   resizeMode="contain"
                   style={{
@@ -138,8 +134,6 @@ const ProductList = (props) => {
               >
                 {selectedItem.name}
               </Text>
-
-
               
               <Text
                 style={{
@@ -211,7 +205,6 @@ const ProductList = (props) => {
     </View>
   )
 }
-
 
 const style = StyleSheet.create({
   container: {

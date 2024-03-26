@@ -3,33 +3,81 @@ import { Image, View, StyleSheet, Text, ScrollView, Button } from "react-native"
 import { Left, Right, Container, H1, Center, Heading } from 'native-base'
 import EasyButton from "../../Shared/StyledComponents/EasyButton"
 import TrafficLight from '../../Shared/StyledComponents/TrafficLight'
+import axios from 'axios';
+import baseURL from "../../assets/common/baseurl";
+// import { RadioButton } from "@react-native-paper/radio-button"; // Import RadioButton
+import { TouchableOpacity } from 'react-native';
+
 const SingleProduct = ({ route }) => {
     const [item, setItem] = useState(route.params.item);
     // console.log(item)
     const [availability, setAvailability] = useState('')
     const [availabilityText, setAvailabilityText] = useState("")
-    useEffect(() => {
-        if (item.countInStock === 0) {
-            setAvailability(<TrafficLight unavailable></TrafficLight>);
-            setAvailabilityText("Unvailable")
-        } else if (item.countInStock <= 5) {
-            setAvailability(<TrafficLight limited></TrafficLight>);
-            setAvailabilityText("Limited Stock")
-        } else {
-            setAvailability(<TrafficLight available></TrafficLight>);
-            setAvailabilityText("Available")
-        }
+    const [materials, setMaterials] = useState([]);
 
-        return () => {
-            setAvailability(null);
-            setAvailabilityText("");
-        }
-    }, [])
+    useEffect(() => {
+        // Fetch materials when component mounts
+        axios
+            .get(`${baseURL}materials`)
+            .then((res) => {
+                // Ensure that res.data is an array before setting materials
+                if (Array.isArray(res.data)) {
+                    setMaterials(res.data);
+                } else {
+                    console.error('Materials data is not an array:', res.data);
+                }
+            })
+            .catch((error) => {
+                console.log('Error fetching materials:', error);
+            });
+    }, []);
+    
+    // axios
+    //     .get(`${baseURL}materials`)
+    //     .then((res) => {
+    //     setMaterials(res.data)
+    //     })
+    //     .catch((error) => {
+    //     console.log('Api materials call error', error)
+    //     })
+
+    // const [materials, setMaterials] = useState([]);
+
+    // useEffect(() => {
+    //     fetchMaterialsForProduct(item.id);
+    // }, [item]);
+
+    // const fetchMaterialsForProduct = async (productId) => {
+    //     try {
+    //         const response = await axios.get(`${baseURL}products/${productId}/materials`);
+    //         setMaterials(response.data);
+    //     } catch (error) {
+    //         console.error("Error fetching materials:", error);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (item.countInStock === 0) {
+    //         setAvailability(<TrafficLight unavailable></TrafficLight>);
+    //         setAvailabilityText("Unvailable")
+    //     } else if (item.countInStock <= 5) {
+    //         setAvailability(<TrafficLight limited></TrafficLight>);
+    //         setAvailabilityText("Limited Stock")
+    //     } else {
+    //         setAvailability(<TrafficLight available></TrafficLight>);
+    //         setAvailabilityText("Available")
+    //     }
+
+    //     return () => {
+    //         setAvailability(null);
+    //         setAvailabilityText("");
+    //     }
+    // }, [])
+
     return (
         <Center flexGrow={1}>
             <ScrollView style={{ marginBottom: 80, padding: 5 }}>
                 <View>
-                    
                     <Image
                         source={{
                             uri: item.image ? item.image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
@@ -37,27 +85,39 @@ const SingleProduct = ({ route }) => {
                         resizeMode="contain"
                         style={styles.image}
                     />
-
                 </View> 
-                <View style={styles.contentContainer}>
-                    <Heading style={styles.contentHeader} size='xl'>{item.name}</Heading>
-                    <Text style={styles.contentText}>{item.brand}</Text>
-                </View>
                 <View style={styles.availabilityContainer}>
-                    <View style={styles.availability}>
-                        <Text style={{ marginRight: 10 }}>
+                    {/* <View style={styles.availability}>
+                        <Text>
                             Availability: {availabilityText}
                         </Text>
                         {availability}
-                    </View>
-                    <Text>{item.description}</Text>
+                    </View> */}
+                <View style={styles.contentContainer}>
+                    <Heading style={styles.contentHeader} size='xl'>{item.name}</Heading>
+                    {/* <Text style={styles.contentText}>{item.brand}</Text> */}
+                    <Text>Photo Description: {item.description}</Text>
+                </View>
+                <Text>Materials:</Text>
+                <ScrollView>
+                    {materials.map((material, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={{ flexDirection: 'row', alignItems: 'center' }}
+                            onPress={() => setMaterials(material.id)}
+                        >
+                            <View style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, marginRight: 10, borderColor: materials === material.id ? 'blue' : 'gray' }} />
+                            <Text>{material.name}</Text>
+                            <Text>{material.description}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
                 </View>
                 <EasyButton
                     primary
                     medium
                 >
-
-                    <Text style={{ color: "white" }}> Add</Text>
+                    <Text style={{color: "white" }}>ADD TO CART</Text>
                 </EasyButton>
             </ScrollView>
         </Center >
@@ -68,7 +128,6 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
         height: '100%',
-
     },
     imageContainer: {
         backgroundColor: 'white',
@@ -76,18 +135,19 @@ const styles = StyleSheet.create({
         margin: 0
     },
     image: {
+        marginTop: -50,
         width: '100%',
         height: undefined,
         aspectRatio: 1
     },
     contentContainer: {
-        marginTop: 20,
+        marginTop: -50,
         justifyContent: 'center',
         alignItems: 'center'
     },
     contentHeader: {
         fontWeight: 'bold',
-        marginBottom: 20
+        marginBottom: 20,
     },
     contentText: {
         fontSize: 18,
@@ -107,6 +167,7 @@ const styles = StyleSheet.create({
         color: 'red'
     },
     availabilityContainer: {
+        marginTop:20,
         marginBottom: 20,
         alignItems: "center"
     },
