@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -6,56 +6,48 @@ import {
     StyleSheet,
     TouchableOpacity,
     Platform
-} from "react-native"
+} from "react-native";
+import FormContainer from "../../../Shared/Form/FormContainer";
+import Input from "../../../Shared/Form/Input";
+import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
-import FormContainer from "../../../Shared/Form/FormContainer"
-import Input from "../../../Shared/Form/Input"
-import EasyButton from "../../../Shared/StyledComponents/EasyButton"
+import baseURL from "../../../assets/common/baseurl";
+import Error from "../../../Shared/Error";
 
-import baseURL from "../../../assets/common/baseurl"
-import Error from "../../../Shared/Error"
-
-import Icon from "react-native-vector-icons/FontAwesome"
-import Toast from "react-native-toast-message"
-import axios from "axios"
-import * as ImagePicker from "expo-image-picker"
-import { useNavigation } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/FontAwesome";
+import Toast from "react-native-toast-message";
+import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
 import mime from "mime";
 
 const PhotoForm = (props) => {
-
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [images, setImages] = useState([]);
-    const [mainImage, setMainImage] = useState();
+    const [error, setError] = useState('');
+    const [photo, setPhoto] = useState(null);
     const [token, setToken] = useState();
-    const [error, setError] = useState();
-    const [item, setItem] = useState(null);
 
     let navigation = useNavigation()
 
     useEffect(() => {
         if (!props.route.params) {
-            setItem(null);
+            setPhoto(null);
         } else {
-            setItem(props.route.params.item);
-            setName(props.route.params.item.name);
-            setDescription(props.route.params.item.description);
-            setMainImage(props.route.params.item.image);
-            setImage(props.route.params.item.image);
+            setName(props.route.params.photo.name);
+            setDescription(props.route.params.photo.description);
+            setImages(props.route.params.photo.image);
         }
-
         (async () => {
             if (Platform.OS !== "web") {
-                const {
-                    status,
-                } = await ImagePicker.requestCameraPermissionsAsync();
-                if (status !== "GRANTED") {
-                    alert("APOLOGIES, BUT IN ORDER TO PROCEED, WE REQUIRE PERMISSION TO ACCESS YOUR CAMERA ROLL!")
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== "granted") {
+                    alert("Apologies, but in order to proceed, we require permission to access your camera roll!");
                 }
             }
         })();
-    }, [])
+    }, []);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -63,45 +55,47 @@ const PhotoForm = (props) => {
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
-            multiple: true, // Enable multiple image selection
         });
-    
+
         if (!result.canceled) {
-            // Update images state with selected images
-            setImages(result.assets.map(asset => asset.uri));
+            const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
+            setImages([...images, ...selectedImages]);
         }
-    }
+    };
+
+    const removeImage = (id) => {
+        setImages(images.filter((image) => image.id !== id));
+    };
+
     const addPhoto = () => {
-        if (
-            name === "" ||
-            description === ""
-        ) {
-            setError("KINDLY COMPLETE THE FORM ACCURATELY.")
+        if (name === '' || description === '') {
+            setError('Please complete the form accurately.');
+            return;
         }
 
         let formData = new FormData();
-        // const newImageUri = "file:///" + image.split("file:/").join("");
-
         formData.append("name", name);
         formData.append("description", description);
         images.forEach((image, index) => {
-            formData.append(`image${index}`, {
-                uri: "file:///" + image.split("file:/").join(""),
-                type: mime.getType(image),
-                name: `image${index}.${mime.getExtension(mime.getType(image))}`,
+            formData.append(`image`, {  // Update 'image' here
+                uri: image.uri,
+                type: mime.getType(image.uri),
+                name: `image${index}.${mime.getExtension(mime.getType(image.uri))}`,
             });
         });
 
+        console.log(formData)
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${token}`
             }
-        }
-        if (item !== null) {
-            console.log(item)
+        };
+
+        if (photo !== null) {
+            console.log(photo)
             axios
-                .put(`${baseURL}photos/${item.id}`, formData, config)
+                .put(`${baseURL}photos/${photo.id}`, formData, config)
                 .then((res) => {
                     if (res.status === 200 || res.status === 201) {
                         Toast.show({
@@ -124,123 +118,130 @@ const PhotoForm = (props) => {
                     })
                 })
         } else {
-            axios
-                .post(`${baseURL}photos/new`, formData, config)
+            axios.post(`${baseURL}photos/new`, formData, config)
                 .then((res) => {
+                    console.log('Response:', res);
                     if (res.status === 200 || res.status === 201) {
                         Toast.show({
                             topOffset: 60,
                             type: "success",
-                            text1: "NEW PHOTO ADDED",
+                            text1: "New photo added",
                             text2: ""
                         });
                         setTimeout(() => {
+                            console.log('Navigating to Photos screen');
                             navigation.navigate("Photos");
-                        }, 500)
+                            console.log('Navigation complete');
+                        }, 500);
+                    } else {
+                        console.log('Unexpected response status:', res.status);
                     }
                 })
                 .catch((error) => {
-                    console.log(error)
+                    console.log('Error:', error);
                     Toast.show({
                         topOffset: 60,
                         type: "error",
-                        text1: "SOMETHING WENT WRONG",
-                        text2: "PLEASE TRY AGAIN"
-                    })
-                })
-
-        }
-
-    }
+                        text1: "Something went wrong",
+                        text2: "Please try again"
+                    });
+                })};
+    };
 
     return (
         <FormContainer title="ADD PHOTO">
             <View style={styles.imageContainer}>
-            <Image style={styles.image} source={{ uri: mainImage.toString() }} />
-                <TouchableOpacity
-                    onPress={pickImage}
-                    style={styles.imagePicker}>
-                    <Icon style={{ color: "white" }} name="camera" />
+                {images.map((image) => (
+                    <View key={image.id}>
+                        <Image style={styles.image} source={{ uri: image.uri }} />
+                        <TouchableOpacity onPress={() => removeImage(image.id)} style={styles.removeButton}>
+                            <Text style={styles.removeButtonText}>Remove</Text>
+                        </TouchableOpacity>
+                    </View>
+                ))}
+                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    <Icon name="camera" size={24} color="white" />
                 </TouchableOpacity>
             </View>
-
             <View style={styles.label}>
                 <Text style={{ textDecorationLine: "underline" }}>NAME</Text>
             </View>
             <Input
-                placeholder="NAME"
+                placeholder="Name"
                 name="name"
                 id="name"
                 value={name}
                 onChangeText={(text) => setName(text)}
             />
-            
             <View style={styles.label}>
                 <Text style={{ textDecorationLine: "underline" }}>DESCRIPTION</Text>
             </View>
             <Input
-                placeholder="DESCRIPTION"
+                placeholder="Description"
                 name="description"
                 id="description"
                 value={description}
                 onChangeText={(text) => setDescription(text)}
             />
-            
             {error ? <Error message={error} /> : null}
             <View style={styles.buttonContainer}>
                 <EasyButton
                     large
                     primary
                     onPress={() => addPhoto()}
-                ><Text style={styles.buttonText}>CONFIRM</Text>
+                >
+                    <Text style={styles.buttonText}>CONFIRM</Text>
                 </EasyButton>
             </View>
-            
         </FormContainer>
-    )
-}
-
+    );
+};
 
 const styles = StyleSheet.create({
+    imageContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        marginBottom: 20,
+    },
+    image: {
+        width: 100,
+        height: 100,
+        margin: 5,
+    },
+    imagePicker: {
+        width: 100,
+        height: 100,
+        margin: 5,
+        backgroundColor: "grey",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    removeButton: {
+        position: "absolute",
+        top: 5,
+        right: 5,
+        backgroundColor: "red",
+        padding: 5,
+        borderRadius: 10,
+        zIndex: 1,
+    },
+    removeButtonText: {
+        color: "white",
+    },
     label: {
         width: "80%",
-        marginTop: 10
+        marginTop: 10,
     },
     buttonContainer: {
         width: "80%",
         marginBottom: 80,
         marginTop: 20,
-        alignItems: "center"
+        alignItems: "center",
     },
     buttonText: {
-        color: "white"
+        color: "white",
     },
-    imageContainer: {
-        width: 200,
-        height: 200,
-        borderStyle: "solid",
-        borderWidth: 8,
-        padding: 0,
-        justifyContent: "center",
-        borderRadius: 100,
-        borderColor: "#E0E0E0",
-        elevation: 10
-    },
-    image: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 100
-    },
-    imagePicker: {
-        position: "absolute",
-        right: 5,
-        bottom: 5,
-        backgroundColor: "grey",
-        padding: 8,
-        borderRadius: 100,
-        elevation: 20
-    }
 })
-
 
 export default PhotoForm;

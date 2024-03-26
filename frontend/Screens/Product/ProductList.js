@@ -115,13 +115,20 @@ const ProductList = (props) => {
               }}
             >
               <View>
-                <Image
-                  source={selectedItem.image}
-                  resizeMode="contain"
-                  style={{
-                    width: "100%",
-                    height: 170,
-                  }}
+                <FlatList
+                  horizontal
+                  data={selectedItem.images}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <Image
+                      source={{ uri: item }}
+                      resizeMode="contain"
+                      style={{
+                        width: "100%",
+                        height: 170,
+                      }}
+                    />
+                  )}
                 />
               </View>
               <Text
@@ -257,4 +264,4 @@ const style = StyleSheet.create({
   },
 });
 
-export default ProductList
+export default ProductList;

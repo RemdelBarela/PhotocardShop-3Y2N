@@ -27,7 +27,42 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadOptions = multer({ storage: storage }).array('images', 10); // Adjust for multiple files
+const uploadOptions = multer({ storage: storage }).array('image', 10); // Update to handle multiple files
+
+router.post(`/new`, (req, res) => {
+    console.log(req.files)
+
+    uploadOptions(req, res, async (err) => {
+        if (err) {
+            // Handle upload error
+        } else {
+            const files = req.files;
+            if (!files || files.length === 0) {
+                return res.status(400).send('NO IMAGES IN THE REQUEST');
+            }
+
+            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+            let photoPaths = [];
+            files.forEach(file => {
+                const fileName = file.filename;
+                photoPaths.push(`${basePath}${fileName}`);
+            });
+
+            const newPhoto = new Photo({
+                name: req.body.name,
+                description: req.body.description,
+                image: photoPaths
+            });
+
+            try {
+                const savedPhoto = await newPhoto.save();
+                res.status(201).send(savedPhoto);
+            } catch (error) {
+                // Handle error
+            }
+        }
+    });
+});
 
 router.get(`/`, async (req, res) =>{
     
@@ -50,38 +85,6 @@ router.get(`/:id`, async (req, res) =>{
     res.send(photo);
 })
 
-router.post(`/new`, (req, res) => {
-    uploadOptions(req, res, async (err) => {
-        if (err) {
-            // Handle upload error
-        } else {
-            const files = req.files;
-            if (!files || files.length === 0) {
-                return res.status(400).send('NO IMAGES IN THE REQUEST');
-            }
-
-            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-            let photoPaths = [];
-            files.forEach(file => {
-                const fileName = file.filename;
-                photoPaths.push(`${basePath}${fileName}`);
-            });
-
-            let photos = [];
-            for (let i = 0; i < photoPaths.length; i++) {
-                let photo = new Photo({
-                    name: req.body.name,
-                    description: req.body.description,
-                    image: photoPaths[i]
-                });
-                photo = await photo.save();
-                photos.push(photo);
-            }
-
-            res.send(photos);
-        }
-    });
-});
 
 // router.put('/:id', uploadOptions.single('image'), async (req, res) => {
 

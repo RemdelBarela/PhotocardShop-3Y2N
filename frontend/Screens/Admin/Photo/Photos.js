@@ -125,19 +125,22 @@ const Photos = (props) => {
                         <DataTable.Title>IMAGES</DataTable.Title>
                     </DataTable.Header>
 
-                    {photoList.map((item, index) => (
+                    {photoFilter.map((item, index) => (
                         <DataTable.Row key={index}>
                             <DataTable.Cell>{item.name}</DataTable.Cell>
                             <DataTable.Cell>{item.description}</DataTable.Cell>
                             <DataTable.Cell>
-                            <Image
-                                source={{
-                                    uri: item.image ? item.image : null
-                                }}
-                                resizeMode="contain"
-                                style={styles.image}
-                                onError={() => console.log("Error loading image")}
-                            />                       
+                            {item.image.map((imageUrl, idx) => (
+                                <Image
+                                    key={idx}
+                                    source={{
+                                        uri: imageUrl ? imageUrl : null
+                                    }}
+                                    resizeMode="contain"
+                                    style={styles.image}
+                                    onError={() => console.log("Error loading image")}
+                                />
+                            ))}
                             </DataTable.Cell>
                         </DataTable.Row>
                     ))}
@@ -174,7 +177,12 @@ const styles = StyleSheet.create({
     buttonText: {
         marginLeft: 4,
         color: 'white'
-    }
+    },
+    image: {
+        width: 50, // Adjust image width as needed
+        height: 50, // Adjust image height as needed
+        marginRight: 5, // Add margin between images
+    },
 })
 
 export default Photos;

@@ -31,60 +31,20 @@ const SingleProduct = ({ route }) => {
                 console.log('Error fetching materials:', error);
             });
     }, []);
-    
-    // axios
-    //     .get(`${baseURL}materials`)
-    //     .then((res) => {
-    //     setMaterials(res.data)
-    //     })
-    //     .catch((error) => {
-    //     console.log('Api materials call error', error)
-    //     })
-
-    // const [materials, setMaterials] = useState([]);
-
-    // useEffect(() => {
-    //     fetchMaterialsForProduct(item.id);
-    // }, [item]);
-
-    // const fetchMaterialsForProduct = async (productId) => {
-    //     try {
-    //         const response = await axios.get(`${baseURL}products/${productId}/materials`);
-    //         setMaterials(response.data);
-    //     } catch (error) {
-    //         console.error("Error fetching materials:", error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     if (item.countInStock === 0) {
-    //         setAvailability(<TrafficLight unavailable></TrafficLight>);
-    //         setAvailabilityText("Unvailable")
-    //     } else if (item.countInStock <= 5) {
-    //         setAvailability(<TrafficLight limited></TrafficLight>);
-    //         setAvailabilityText("Limited Stock")
-    //     } else {
-    //         setAvailability(<TrafficLight available></TrafficLight>);
-    //         setAvailabilityText("Available")
-    //     }
-
-    //     return () => {
-    //         setAvailability(null);
-    //         setAvailabilityText("");
-    //     }
-    // }, [])
-
+ 
     return (
         <Center flexGrow={1}>
             <ScrollView style={{ marginBottom: 80, padding: 5 }}>
-                <View>
-                    <Image
-                        source={{
-                            uri: item.image ? item.image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
-                        }}
-                        resizeMode="contain"
-                        style={styles.image}
-                    />
+                <View style={styles.imageContainer}>
+                    {/* Display multiple images */}
+                    {item.images.map((imageUrl, index) => (
+                        <Image
+                            key={index}
+                            source={{ uri: imageUrl }}
+                            resizeMode="contain"
+                            style={styles.image}
+                        />
+                    ))}
                 </View> 
                 <View style={styles.availabilityContainer}>
                     {/* <View style={styles.availability}>

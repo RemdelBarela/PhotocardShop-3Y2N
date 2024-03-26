@@ -9,12 +9,8 @@ const photoSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
-        type: String,
-        default: ''
-    },
     image: [{
-        type: String
+        type: String,
     }],
     dateCreated: {
         type: Date,

@@ -1,110 +1,43 @@
-import React from 'react'
+import React from 'react';
 import {
     StyleSheet,
     View,
     Dimensions,
     Image,
     Text,
-    Button,
     FlatList,
-    TouchableOpacity, 
-    Modal,
-    TextStyle,
-    StyleProp,
-} from 'react-native'
-import { addToCart } from '../../Redux/Actions/cartActions'
-import { useSelector, useDispatch } from 'react-redux'
-import Toast from 'react-native-toast-message'
-import { BlurView } from "expo-blur";
-import { images, COLORS, SIZES, FONTS } from "./constants";
-var { width } = Dimensions.get("window");
+} from 'react-native';
 
-const ProductCard = (props) => {
-    const { name, description, image } = props;
-    const dispatch = useDispatch()
+const { width } = Dimensions.get('window');
+
+const ProductCard = ({ name, description, images }) => {
     return (
-        <>
-        
- <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >   
-              <Image
-            source={{
-                uri: image ?
-                    image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
-            }} 
-            resizeMode="contain"
-            style={{
-              width: 130,
-              height: 100,
-            }} />
-        </View>
-        <View
-          style={{
-            flex: 1.5,
-            marginLeft: SIZES.radius,
-            justifyContent: "center",
-          }}
-        >   
-        
-             <Text  style={styles.boldText}>
-                {(name.length && name.length > 15) ? name.substring(0, 15 - 3)
-                    + '...' : name
-                }
-            </Text>
-            <Text style={[styles.description]}>{description}</Text>
-            {/* <Text style={styles.detailsText}>VIEW DETAILS</Text> */}
+        <View style={styles.card}>
+            {/* FlatList for rendering multiple images */}
+            <FlatList
+                horizontal
+                data={images}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                    <Image
+                        source={{ uri: item }}
+                        resizeMode="contain"
+                        style={styles.image}
+                    />
+                )}
+            />
+
+            <View style={{ flex: 1.5, marginLeft: 10, justifyContent: 'center' }}>
+                <Text style={styles.boldText}>
+                    {name.length > 15 ? `${name.substring(0, 15)}...` : name}
+                </Text>
+                <Text style={styles.description}>{description}</Text>
             </View>
-
-            {/* <Button
-                        title={'Add'}
-                        color={'green'}
-                        onPress={() => {
-                            dispatch(addToCart({ ...props, quantity: 1, })),
-                                Toast.show({
-                                    topOffset: 60,
-                                    type: "success",
-                                    text1: `${name} ADDED TO CART`,
-                                    text2: "GO TO YOUR CART TO COMPLETE ORDER"
-                                })
-                        }}
-                    >
-                    </Button> */}
-
-            {/* {countInStock > 0 ? (
-                <View style={{ marginBottom: 60 }}>
-                    <Button
-                        title={'Add'}
-                        color={'green'}
-                        onPress={() => {
-                            dispatch(addToCart({ ...props, quantity: 1, })),
-                                Toast.show({
-                                    topOffset: 60,
-                                    type: "success",
-                                    text1: `${name} ADDED TO CART`,
-                                    text2: "GO TO YOUR CART TO COMPLETE ORDER"
-                                })
-                        }}
-                    >
-                    </Button>
-                </View>
-            ) : <Text style={{ marginTop: 20 }}>CURRENTLY UNAVAILABLE</Text>} */}
-        
-          </ >
-    )
-}
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    image: {
-        width: 130,
-        height: 130,
-        marginRight: 20,
-    },
     card: {
         flexDirection: 'row',
         width: width / 2 - 20,
@@ -118,65 +51,20 @@ const styles = StyleSheet.create({
         elevation: 8,
         backgroundColor: 'black',
     },
+    image: {
+        width: 100,
+        height: 100,
+        marginRight: 10,
+    },
     boldText: {
-      fontWeight: 'bold',
-      fontSize: 25,
-      marginLeft: 5,
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: 'white',
     },
     description: {
-        fontSize: 16,
-        color: 'black',
-        marginTop: 10,
-        marginLeft: 5,
+        fontSize: 14,
+        color: 'white',
     },
-    container: {
-        flex: 1,
-        backgroundColor: COLORS.white,
-      },
-      featuredShadow: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 5,
-        },
-        shadowOpacity: 0.29,
-        shadowRadius: 4.65,
-        elevation: 7,
-      },
-      featuredDetails: {
-        position: "absolute",
-        top: 160,
-        left: 30,
-        flexDirection: "column",
-        marginLeft: 25,
-        marginBottom: 8,
-      },
-      recentSearchShadow: {
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 5,
-        },
-        shadowOpacity: 0.29,
-        shadowRadius: 4.65,
-        elevation: 7,
-      },
-      recentSearches: {
-        width: "100%",
-        transform: [{ rotateY: "180deg" }],
-      },
-      blur: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      absolute: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-      },
-})
+});
 
 export default ProductCard;
