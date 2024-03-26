@@ -13,9 +13,6 @@ const MaterialNavigator= () => {
              <Stack.Screen 
                 name="Materials"
                 component={Materials}
-                options={{
-                    title: "Materials"
-                }}
             />
             <Stack.Screen name="MaterialForm" component={MaterialForm} />
 

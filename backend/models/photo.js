@@ -13,7 +13,7 @@ const photoSchema = mongoose.Schema({
         type: String,
         default: ''
     },
-    images: [{
+    image: [{
         type: String
     }],
     dateCreated: {

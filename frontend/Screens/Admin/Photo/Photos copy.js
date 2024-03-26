@@ -7,17 +7,19 @@ import {
     StyleSheet,
     Dimensions,
     RefreshControl,
-    Image
+
 } from "react-native";
-import { Box } from "native-base";
-import { DataTable, Searchbar } from "react-native-paper";
+
+import { Input, VStack, Heading, Box } from "native-base"
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useFocusEffect } from "@react-navigation/native"
+import { Searchbar } from 'react-native-paper';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
 import { useNavigation } from "@react-navigation/native"
 
+import ListPhoto from "./ListPhoto"
 import baseURL from "../../../assets/common/baseurl"
 import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
@@ -30,6 +32,25 @@ const Photos = (props) => {
     const [refreshing, setRefreshing] = useState(false);
     const navigation = useNavigation()
 
+    const ListHeader = () => {
+        return (
+            <View
+                elevation={1}
+                style={styles.listHeader}
+            >
+                <View style={styles.headerItem}></View>
+                <View style={styles.headerItem}>
+                    <Text style={{ fontWeight: '600' }}>NAME</Text>
+                </View>
+                <View style={styles.headerItem}>
+                    <Text style={{ fontWeight: '600' }}>DESCRIPTION</Text>
+                </View>
+                <View style={styles.headerItem}>
+                    <Text style={{ fontWeight: '600' }}>IMAGES</Text>
+                </View>
+            </View>
+        )
+    }
 
     const searchPhoto = (text) => {
         if (text === "") {
@@ -117,32 +138,24 @@ const Photos = (props) => {
                 <View style={styles.spinner}>
                     <ActivityIndicator size="x-large" color="black" />
                 </View>
-            ) : (
-                <DataTable>
-                    <DataTable.Header>
-                        <DataTable.Title>NAME</DataTable.Title>
-                        <DataTable.Title>DESCRIPTION</DataTable.Title>
-                        <DataTable.Title>IMAGES</DataTable.Title>
-                    </DataTable.Header>
+            ) : (<FlatList
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+                ListHeaderComponent={ListHeader}
+                data={photoFilter}
+                renderItem={({ item, index }) => (
+                    <ListPhoto
+                        item={item}
+                        index={index}
+                        deletePhoto={deletePhoto}
 
-                    {photoList.map((item, index) => (
-                        <DataTable.Row key={index}>
-                            <DataTable.Cell>{item.name}</DataTable.Cell>
-                            <DataTable.Cell>{item.description}</DataTable.Cell>
-                            <DataTable.Cell>
-                            <Image
-                                source={{
-                                    uri: item.image ? item.image : null
-                                }}
-                                resizeMode="contain"
-                                style={styles.image}
-                                onError={() => console.log("Error loading image")}
-                            />                       
-                            </DataTable.Cell>
-                        </DataTable.Row>
-                    ))}
-                </DataTable>
-            )}
+                    />
+                )}
+                keyExtractor={(item) => item.id}
+            />)}
+
+
         </Box>
     );
 }

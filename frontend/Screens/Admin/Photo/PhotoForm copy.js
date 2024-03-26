@@ -26,7 +26,7 @@ const PhotoForm = (props) => {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [images, setImages] = useState([]);
+    const [image, setImage] = useState('');
     const [mainImage, setMainImage] = useState();
     const [token, setToken] = useState();
     const [error, setError] = useState();
@@ -59,18 +59,19 @@ const PhotoForm = (props) => {
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
-            quality: 1,
-            multiple: true, // Enable multiple image selection
+            quality: 1
         });
-    
+
         if (!result.canceled) {
-            // Update images state with selected images
-            setImages(result.assets.map(asset => asset.uri));
+            console.log(result)
+            setMainImage(result.assets[0].uri);
+            setImage(result.assets[0].uri);
         }
     }
+    
     const addPhoto = () => {
         if (
             name === "" ||
@@ -80,16 +81,14 @@ const PhotoForm = (props) => {
         }
 
         let formData = new FormData();
-        // const newImageUri = "file:///" + image.split("file:/").join("");
+        const newImageUri = "file:///" + image.split("file:/").join("");
 
         formData.append("name", name);
         formData.append("description", description);
-        images.forEach((image, index) => {
-            formData.append(`image${index}`, {
-                uri: "file:///" + image.split("file:/").join(""),
-                type: mime.getType(image),
-                name: `image${index}.${mime.getExtension(mime.getType(image))}`,
-            });
+        formData.append("image", {
+            uri: newImageUri,
+            type: mime.getType(newImageUri),
+            name: newImageUri.split("/").pop()
         });
 
         const config = {
@@ -156,7 +155,7 @@ const PhotoForm = (props) => {
     return (
         <FormContainer title="ADD PHOTO">
             <View style={styles.imageContainer}>
-            <Image style={styles.image} source={{ uri: mainImage.toString() }} />
+                <Image style={styles.image} source={{ uri: mainImage }} />
                 <TouchableOpacity
                     onPress={pickImage}
                     style={styles.imagePicker}>

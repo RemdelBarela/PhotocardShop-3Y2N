@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadOptions = multer({ storage: storage });
+const uploadOptions = multer({ storage: storage }).array('images', 10); // Adjust for multiple files
 
 router.get(`/`, async (req, res) =>{
     
@@ -50,60 +50,74 @@ router.get(`/:id`, async (req, res) =>{
     res.send(photo);
 })
 
-router.post(`/new`, uploadOptions.single('image'), async (req, res) => {
-    const file = req.file;
-    if (!file) return res.status(400).send('NO IMAGE IN THE REQUEST');
+router.post(`/new`, (req, res) => {
+    uploadOptions(req, res, async (err) => {
+        if (err) {
+            // Handle upload error
+        } else {
+            const files = req.files;
+            if (!files || files.length === 0) {
+                return res.status(400).send('NO IMAGES IN THE REQUEST');
+            }
 
-    const fileName = file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-    let photo = new Photo({
-        name: req.body.name,
-        description: req.body.description,
-        image: `${basePath}${fileName}`
+            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+            let photoPaths = [];
+            files.forEach(file => {
+                const fileName = file.filename;
+                photoPaths.push(`${basePath}${fileName}`);
+            });
+
+            let photos = [];
+            for (let i = 0; i < photoPaths.length; i++) {
+                let photo = new Photo({
+                    name: req.body.name,
+                    description: req.body.description,
+                    image: photoPaths[i]
+                });
+                photo = await photo.save();
+                photos.push(photo);
+            }
+
+            res.send(photos);
+        }
     });
-
-    photo = await photo.save();
-
-    if (!photo) return res.status(500).send('PHOTO UNSUCCESSFULLY CREATED');
-
-    res.send(photo);
 });
 
-router.put('/:id', uploadOptions.single('image'), async (req, res) => {
+// router.put('/:id', uploadOptions.single('image'), async (req, res) => {
 
-    console.log(req.body);
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send('INVALID PHOTO ID');
-    }
+//     console.log(req.body);
+//     if (!mongoose.isValidObjectId(req.params.id)) {
+//         return res.status(400).send('INVALID PHOTO ID');
+//     }
    
-    const photo = await Photo.findById(req.params.id);
-    if (!photo) return res.status(400).send('INVALID PHOTO!');
+//     const photo = await Photo.findById(req.params.id);
+//     if (!photo) return res.status(400).send('INVALID PHOTO!');
 
-    const file = req.file;
-    let imagepath;
+//     const file = req.file;
+//     let imagepath;
 
-    if (file) {
-        const fileName = file.filename;
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-        imagepath = `${basePath}${fileName}`;
-    } else {
-        imagepath = photo.image;
-    }
+//     if (file) {
+//         const fileName = file.filename;
+//         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+//         imagepath = `${basePath}${fileName}`;
+//     } else {
+//         imagepath = photo.image;
+//     }
 
-    const updatedPhoto = await Photo.findByIdAndUpdate(
-        req.params.id,
-        {
-            name: req.body.name,
-            description: req.body.description,
-            image: imagepath,
-        },
-        { new: true }
-    );
+//     const updatedPhoto = await Photo.findByIdAndUpdate(
+//         req.params.id,
+//         {
+//             name: req.body.name,
+//             description: req.body.description,
+//             image: imagepath,
+//         },
+//         { new: true }
+//     );
 
-    if (!updatedPhoto) return res.status(500).send('THE PHOTO CANNOT BE UPDATED!');
+//     if (!updatedPhoto) return res.status(500).send('THE PHOTO CANNOT BE UPDATED!');
 
-    res.send(updatedPhoto);
-});
+//     res.send(updatedPhoto);
+// });
 
 router.delete('/:id', (req, res)=>{
     Photo.findByIdAndRemove(req.params.id).then(photo =>{

@@ -13,9 +13,6 @@ const PhotoNavigator= () => {
              <Stack.Screen 
                 name="Photos"
                 component={Photos}
-                options={{
-                    title: "Photos"
-                }}
             />
             <Stack.Screen name="PhotoForm" component={PhotoForm} />
 
