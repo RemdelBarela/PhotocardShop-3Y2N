@@ -7,7 +7,9 @@ import {
     StyleSheet,
     Dimensions,
     RefreshControl,
-    Image
+    Image,
+    Modal,
+    TouchableOpacity
 } from "react-native";
 import { Box } from "native-base";
 import { DataTable, Searchbar } from "react-native-paper";
@@ -28,6 +30,8 @@ const Photos = (props) => {
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
     const [refreshing, setRefreshing] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
     const navigation = useNavigation()
 
 
@@ -95,6 +99,12 @@ const Photos = (props) => {
             [],
         )
     )
+
+    const handleRowPress = (photo) => {
+        setSelectedPhoto(photo);
+        setModalVisible(true);
+    };
+
     return (
         <Box flex={1}>
             <View style={styles.buttonContainer}>
@@ -113,6 +123,62 @@ const Photos = (props) => {
                 placeholder="Search Photo Name"
                 onChangeText={(text) => searchPhoto(text)}
             />
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(false)
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <TouchableOpacity
+                            underlayColor="#E8E8E8"
+                            onPress={() => {
+                                setModalVisible(false)
+                            }}
+                            style={{
+                                alignSelf: "flex-end",
+                                position: "absolute",
+                                top: 5,
+                                right: 10
+                            }}
+                        >
+                            <Icon name="close" size={20} />
+                        </TouchableOpacity>
+                        {selectedPhoto && (
+                            <>
+                                <Text>{selectedPhoto.name}</Text>
+                                <EasyButton
+                                    medium
+                                    secondary
+                                    onPress={() => {
+                                        navigation.navigate("PhotoForm", { item: selectedPhoto });
+                                        setModalVisible(false);
+                                    }}
+                                    title="Edit"
+                                >
+                                    <Text style={styles.textStyle}>Edit</Text>
+                                </EasyButton>
+                                <EasyButton
+                                    medium
+                                    danger
+                                    onPress={() => {
+                                        deletePhoto(selectedPhoto.id);
+                                        setModalVisible(false);
+                                    }}
+                                    title="Delete"
+                                >
+                                    <Text style={styles.textStyle}>Delete</Text>
+                                </EasyButton>
+                            </>
+                        )}
+                    </View>
+                </View>
+            </Modal>
+
             {loading ? (
                 <View style={styles.spinner}>
                     <ActivityIndicator size="x-large" color="black" />
@@ -124,65 +190,94 @@ const Photos = (props) => {
                         <DataTable.Title>DESCRIPTION</DataTable.Title>
                         <DataTable.Title>IMAGES</DataTable.Title>
                     </DataTable.Header>
-
                     {photoFilter.map((item, index) => (
-                        <DataTable.Row key={index}>
-                            <DataTable.Cell>{item.name}</DataTable.Cell>
-                            <DataTable.Cell>{item.description}</DataTable.Cell>
-                            <DataTable.Cell>
-                            {item.image.map((imageUrl, idx) => (
-                                <Image
-                                    key={idx}
-                                    source={{
-                                        uri: imageUrl ? imageUrl : null
-                                    }}
-                                    resizeMode="contain"
-                                    style={styles.image}
-                                    onError={() => console.log("Error loading image")}
-                                />
-                            ))}
-                            </DataTable.Cell>
-                        </DataTable.Row>
-                    ))}
-                </DataTable>
-            )}
-        </Box>
-    );
-}
-
-const styles = StyleSheet.create({
-    listHeader: {
-        flexDirection: 'row',
-        padding: 5,
-        backgroundColor: 'gainsboro'
-    },
-    headerItem: {
-        margin: 3,
-        width: width / 6
-    },
-    spinner: {
-        height: height / 2,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    container: {
-        marginBottom: 160,
-        backgroundColor: 'white'
-    },
-    buttonContainer: {
-        margin: 20,
-        alignSelf: 'center',
-        flexDirection: 'row'
-    },
-    buttonText: {
-        marginLeft: 4,
-        color: 'white'
-    },
-    image: {
-        width: 50, // Adjust image width as needed
-        height: 50, // Adjust image height as needed
-        marginRight: 5, // Add margin between images
-    },
-})
-
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => handleRowPress(item)}
+                            style={[styles.container, {
+                                backgroundColor: index % 2 == 0 ? "white" : "gainsboro"
+                            }]}
+                            >
+                                <DataTable.Row>
+                                    <DataTable.Cell>{item.name}</DataTable.Cell>
+                                    <DataTable.Cell>{item.description}</DataTable.Cell>
+                                    <DataTable.Cell>
+                                        {item.image.map((imageUrl, idx) => (
+                                            <Image
+                                                key={idx}
+                                                source={{
+                                                    uri: imageUrl ? imageUrl : null
+                                                }}
+                                                resizeMode="contain"
+                                                style={styles.image}
+                                                onError={() => console.log("Error loading image")}
+                                            />
+                                        ))}
+                                    </DataTable.Cell>
+                                </DataTable.Row>
+                            </TouchableOpacity>
+                        ))}
+                    </DataTable>
+                )}
+            </Box>
+        );
+    }
+    
+    const styles = StyleSheet.create({
+        listHeader: {
+            flexDirection: 'row',
+            padding: 5,
+            backgroundColor: 'gainsboro'
+        },
+        headerItem: {
+            margin: 3,
+            width: width / 6
+        },
+        spinner: {
+            height: height / 2,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        container: {
+            marginBottom: 160,
+            backgroundColor: 'white'
+        },
+        buttonContainer: {
+            margin: 20,
+            alignSelf: 'center',
+            flexDirection: 'row'
+        },
+        buttonText: {
+            marginLeft: 4,
+            color: 'white'
+        },
+        image: {
+            width: 50, // Adjust image width as needed
+            height: 50, // Adjust image height as needed
+            marginRight: 5, // Add margin between images
+        },
+        modalView: {
+            margin: 20,
+            backgroundColor: "white",
+            borderRadius: 20,
+            padding: 35,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 2
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5
+        },
+        centeredView: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 22
+        },
+    });
+    
 export default Photos;
+    

@@ -29,6 +29,27 @@ const storage = multer.diskStorage({
 
 const uploadOptions = multer({ storage: storage }).array('image', 10); // Update to handle multiple files
 
+router.get(`/`, async (req, res) =>{
+    
+    console.log(req.query)
+       
+    const photoList = await Photo.find();
+
+    if(!photoList) {
+        res.status(500).json({success: false})
+    } 
+    res.send(photoList);
+})
+
+router.get(`/:id`, async (req, res) =>{
+    const photo = await Photo.findById(req.params.id);
+
+    if(!photo) {
+        res.status(500).json({success: false})
+    } 
+    res.send(photo);
+})
+
 router.post(`/new`, (req, res) => {
     console.log(req.files)
 
@@ -64,63 +85,45 @@ router.post(`/new`, (req, res) => {
     });
 });
 
-router.get(`/`, async (req, res) =>{
-    
-    console.log(req.query)
-       
-    const photoList = await Photo.find();
 
-    if(!photoList) {
-        res.status(500).json({success: false})
-    } 
-    res.send(photoList);
-})
 
-router.get(`/:id`, async (req, res) =>{
+
+router.put('/:id', uploadOptions, async (req, res) => {
+    console.log(req.body);
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).send('INVALID PHOTO ID');
+    }
+
     const photo = await Photo.findById(req.params.id);
+    if (!photo) return res.status(400).send('INVALID PHOTO!');
 
-    if(!photo) {
-        res.status(500).json({success: false})
-    } 
-    res.send(photo);
-})
+    let imagePaths = [];
+    if (req.files && req.files.length > 0) {
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        req.files.forEach(file => {
+            const fileName = file.filename;
+            const imagePath = `${basePath}${fileName}`;
+            imagePaths.push(imagePath);
+        });
+    } else {
+        // If no files are uploaded, use the existing image paths
+        imagePaths = photo.image;
+    }
 
+    const updatedPhoto = await Photo.findByIdAndUpdate(
+        req.params.id,
+        {
+            name: req.body.name,
+            description: req.body.description,
+            image: imagePaths,
+        },
+        { new: true }
+    );
 
-// router.put('/:id', uploadOptions.single('image'), async (req, res) => {
+    if (!updatedPhoto) return res.status(500).send('THE PHOTO CANNOT BE UPDATED!');
 
-//     console.log(req.body);
-//     if (!mongoose.isValidObjectId(req.params.id)) {
-//         return res.status(400).send('INVALID PHOTO ID');
-//     }
-   
-//     const photo = await Photo.findById(req.params.id);
-//     if (!photo) return res.status(400).send('INVALID PHOTO!');
-
-//     const file = req.file;
-//     let imagepath;
-
-//     if (file) {
-//         const fileName = file.filename;
-//         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-//         imagepath = `${basePath}${fileName}`;
-//     } else {
-//         imagepath = photo.image;
-//     }
-
-//     const updatedPhoto = await Photo.findByIdAndUpdate(
-//         req.params.id,
-//         {
-//             name: req.body.name,
-//             description: req.body.description,
-//             image: imagepath,
-//         },
-//         { new: true }
-//     );
-
-//     if (!updatedPhoto) return res.status(500).send('THE PHOTO CANNOT BE UPDATED!');
-
-//     res.send(updatedPhoto);
-// });
+    res.send(updatedPhoto);
+});
 
 router.delete('/:id', (req, res)=>{
     Photo.findByIdAndRemove(req.params.id).then(photo =>{

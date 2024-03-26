@@ -18,7 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import Toast from "react-native-toast-message";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute  } from "@react-navigation/native";
 import mime from "mime";
 
 const PhotoForm = (props) => {
@@ -29,15 +29,18 @@ const PhotoForm = (props) => {
     const [photo, setPhoto] = useState(null);
     const [token, setToken] = useState();
 
-    let navigation = useNavigation()
+    let navigation = useNavigation();
+    let route = useRoute(); // Use useRoute hook to access route params
 
     useEffect(() => {
-        if (!props.route.params) {
-            setPhoto(null);
+        if (route.params && route.params.item) { // Check if there's a selected photo in the route params
+            const { item } = route.params;
+            setName(item.name);
+            setDescription(item.description);
+            setImages(item.image);
+            setPhoto(item); // Set the selected photo
         } else {
-            setName(props.route.params.photo.name);
-            setDescription(props.route.params.photo.description);
-            setImages(props.route.params.photo.image);
+            setPhoto(null);
         }
         (async () => {
             if (Platform.OS !== "web") {
@@ -47,7 +50,7 @@ const PhotoForm = (props) => {
                 }
             }
         })();
-    }, []);
+    }, [route.params]);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,6 +64,7 @@ const PhotoForm = (props) => {
             const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
             setImages([...images, ...selectedImages]);
         }
+        
     };
 
     const removeImage = (id) => {
