@@ -19,32 +19,32 @@ import Icon from "react-native-vector-icons/FontAwesome"
 import Toast from "react-native-toast-message"
 import axios from "axios"
 import * as ImagePicker from "expo-image-picker"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import mime from "mime";
 
 const MaterialForm = (props) => {
 
     const [name, setName] = useState('');
     const [price, setPrice] = useState(0);
-    const [image, setImage] = useState('');
-    const [mainImage, setMainImage] = useState();
+    const [images, setImages] = useState([]);
     const [countInStock, setCountInStock] = useState();
     const [token, setToken] = useState();
     const [error, setError] = useState();
-    const [items, setItems] = useState(null);
+    const [material, setMaterial] = useState(null);
 
     let navigation = useNavigation()
+    let route = useRoute(); 
 
     useEffect(() => {
-        if (!props.route.params) {
-            setItems(null);
+        if (route.params && route.params.item) {
+            const { item } = route.params;
+            setName(item.name);
+            setPrice(item.price.toString());
+            setImages(item.image);
+            setMaterial(item); // Set the selected material
+;
         } else {
-            setItems(props.route.params.items);
-            setName(props.route.params.items.name);
-            setPrice(props.route.params.items.price.toString());
-            setMainImage(props.route.params.items.image);
-            setImage(props.route.params.items.image);
-            setCountInStock(props.route.params.items.countInStock.toString());
+            setMaterial(null);
         }
 
         (async () => {
@@ -57,23 +57,27 @@ const MaterialForm = (props) => {
                 }
             }
         })();
-    }, [])
+    }, [route.params])
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1
         });
 
         if (!result.canceled) {
-            console.log(result)
-            setMainImage(result.assets[0].uri);
-            setImage(result.assets[0].uri);
-        }
+            const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
+            const filteredImages = images.filter(image => image.uri !== undefined); // Filter out images with undefined uri
+            setImages([...filteredImages, ...selectedImages]); // Concatenate existing images (excluding images with undefined uri) with new images
+        } 
     }
     
+    const removeImage = (id) => {
+        setImages(images.filter((image) => image.id !== id));
+    };
+
     const addMaterial = () => {
         if (
             name === "" ||
@@ -81,31 +85,33 @@ const MaterialForm = (props) => {
             countInStock === ""
         ) {
             setError("KINDLY COMPLETE THE FORM ACCURATELY.")
+            return;
         }
 
         let formData = new FormData();
-        const newImageUri = "file:///" + image.split("file:/").join("");
 
         formData.append("name", name);
         formData.append("price", price);
-        formData.append("image", {
-            uri: newImageUri,
-            type: mime.getType(newImageUri),
-            name: newImageUri.split("/").pop()
-        });
         formData.append("countInStock", countInStock);
+        images.forEach((image, index) => {
+            formData.append(`image`, {  
+                uri: image.uri,
+                type: mime.getType(image.uri),
+                name: `image${index}.${mime.getExtension(mime.getType(image.uri))}`,
+            })
+        });
 
-
+        console.log(images.uri)
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${token}`
             }
         }
-        if (items !== null) {
-            console.log(items)
+        if (material !== null) {
+            console.log(material)
             axios
-                .put(`${baseURL}materials/${items.id}`, formData, config)
+                .put(`${baseURL}materials/${material.id}`, formData, config)
                 .then((res) => {
                     if (res.status === 200 || res.status === 201) {
                         Toast.show({
@@ -158,13 +164,21 @@ const MaterialForm = (props) => {
     }
 
     return (
-        <FormContainer title="ADD MATERIALS">
+        <FormContainer title="MATERIALS">
             <View style={styles.imageContainer}>
-                <Image style={styles.image} source={{ uri: mainImage }} />
-                <TouchableOpacity
-                    onPress={pickImage}
-                    style={styles.imagePicker}>
-                    <Icon style={{ color: "white" }} name="camera" />
+                {images.map((imageURL, index) => {
+                    console.log("Image URI:", imageURL);
+                    return(
+
+                    <View key={index}>
+                         <Image style={styles.image} source={{ uri: imageURL.uri || imageURL }} />
+                        <TouchableOpacity onPress={() => removeImage(imageURL.id)} style={styles.removeButton}>
+                            <Text style={styles.removeButtonText}>REMOVE</Text>
+                        </TouchableOpacity>
+                    </View>
+                )})}
+                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    <Icon name="camera" size={24} color="white" />
                 </TouchableOpacity>
             </View>
 
@@ -190,7 +204,7 @@ const MaterialForm = (props) => {
                 onChangeText={(text) => setPrice(text)}
             />
              <View style={styles.label}>
-                <Text style={{ textDecorationLine: "underline" }}>Stock</Text>
+                <Text style={{ textDecorationLine: "underline" }}>STOCK</Text>
             </View>
             <Input
                 placeholder="Stock"
@@ -216,44 +230,50 @@ const MaterialForm = (props) => {
 
 
 const styles = StyleSheet.create({
+    imageContainer: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        marginBottom: 20,
+    },
+    image: {
+        width: 100,
+        height: 100,
+        margin: 5,
+    },
+    imagePicker: {
+        width: 100,
+        height: 100,
+        margin: 5,
+        backgroundColor: "grey",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    removeButton: {
+        position: "absolute",
+        top: 5,
+        right: 5,
+        backgroundColor: "red",
+        padding: 5,
+        borderRadius: 10,
+        zIndex: 1,
+    },
+    removeButtonText: {
+        color: "white",
+    },
     label: {
         width: "80%",
-        marginTop: 10
+        marginTop: 10,
     },
     buttonContainer: {
         width: "80%",
         marginBottom: 80,
         marginTop: 20,
-        alignItems: "center"
+        alignItems: "center",
     },
     buttonText: {
-        color: "white"
+        color: "white",
     },
-    imageContainer: {
-        width: 200,
-        height: 200,
-        borderStyle: "solid",
-        borderWidth: 8,
-        padding: 0,
-        justifyContent: "center",
-        borderRadius: 100,
-        borderColor: "#E0E0E0",
-        elevation: 10
-    },
-    image: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 100
-    },
-    imagePicker: {
-        position: "absolute",
-        right: 5,
-        bottom: 5,
-        backgroundColor: "grey",
-        padding: 8,
-        borderRadius: 100,
-        elevation: 20
-    }
 })
 
 

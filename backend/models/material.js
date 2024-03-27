@@ -9,11 +9,7 @@ const materialSchema = mongoose.Schema({
         type: Number,
         default:0
     },
-    image: {
-        type: String,
-        default: ''
-    },
-    images: [{
+    image: [{
         type: String
     }],
     countInStock: {

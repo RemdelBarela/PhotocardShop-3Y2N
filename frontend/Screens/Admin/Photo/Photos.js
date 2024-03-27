@@ -2,11 +2,9 @@ import React, { useState, useCallback } from "react";
 import {
     View,
     Text,
-    FlatList,
     ActivityIndicator,
     StyleSheet,
     Dimensions,
-    RefreshControl,
     Image,
     Modal,
     TouchableOpacity
@@ -54,6 +52,8 @@ const Photos = (props) => {
             .then((res) => {
                 const photos = photoFilter.filter((item) => item.id !== id)
                 setPhotoFilter(photos)
+
+                onRefresh()
             })
             .catch((error) => console.log(error));
     }
@@ -160,7 +160,7 @@ const Photos = (props) => {
                                     }}
                                     title="Edit"
                                 >
-                                    <Text style={styles.textStyle}>Edit</Text>
+                                    <Text style={styles.textStyle}>EDIT</Text>
                                 </EasyButton>
                                 <EasyButton
                                     medium
@@ -171,7 +171,7 @@ const Photos = (props) => {
                                     }}
                                     title="Delete"
                                 >
-                                    <Text style={styles.textStyle}>Delete</Text>
+                                    <Text style={styles.textStyle}>DELETE</Text>
                                 </EasyButton>
                             </>
                         )}
@@ -224,15 +224,6 @@ const Photos = (props) => {
     }
     
     const styles = StyleSheet.create({
-        listHeader: {
-            flexDirection: 'row',
-            padding: 5,
-            backgroundColor: 'gainsboro'
-        },
-        headerItem: {
-            margin: 3,
-            width: width / 6
-        },
         spinner: {
             height: height / 2,
             alignItems: 'center',

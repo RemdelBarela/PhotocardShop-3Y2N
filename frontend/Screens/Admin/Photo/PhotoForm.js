@@ -39,6 +39,7 @@ const PhotoForm = (props) => {
             setDescription(item.description);
             setImages(item.image);
             setPhoto(item); // Set the selected photo
+
         } else {
             setPhoto(null);
         }
@@ -60,16 +61,24 @@ const PhotoForm = (props) => {
             quality: 1,
         });
 
+        // if (!result.canceled) {
+        //     const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
+        //     setImages([...images, ...selectedImages]);
+        // }
+
         if (!result.canceled) {
             const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
-            setImages([...images, ...selectedImages]);
-        }
+            const filteredImages = images.filter(image => image.uri !== undefined); // Filter out images with undefined uri
+            setImages([...filteredImages, ...selectedImages]); // Concatenate existing images (excluding images with undefined uri) with new images
+        }  
         
     };
 
     const removeImage = (id) => {
         setImages(images.filter((image) => image.id !== id));
     };
+
+  
 
     const addPhoto = () => {
         if (name === '' || description === '') {
@@ -153,16 +162,19 @@ const PhotoForm = (props) => {
     };
 
     return (
-        <FormContainer title="ADD PHOTO">
+        <FormContainer title="PHOTO">
             <View style={styles.imageContainer}>
-                {images.map((image) => (
-                    <View key={image.id}>
-                        <Image style={styles.image} source={{ uri: image.uri }} />
-                        <TouchableOpacity onPress={() => removeImage(image.id)} style={styles.removeButton}>
-                            <Text style={styles.removeButtonText}>Remove</Text>
+                {images.map((imageURL, index) => {
+                    console.log("Image URI:", imageURL);
+                    return(
+
+                    <View key={index}>
+                         <Image style={styles.image} source={{ uri: imageURL.uri || imageURL }} />
+                        <TouchableOpacity onPress={() => removeImage(imageURL.id)} style={styles.removeButton}>
+                            <Text style={styles.removeButtonText}>REMOVE</Text>
                         </TouchableOpacity>
                     </View>
-                ))}
+                )})}
                 <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
                     <Icon name="camera" size={24} color="white" />
                 </TouchableOpacity>

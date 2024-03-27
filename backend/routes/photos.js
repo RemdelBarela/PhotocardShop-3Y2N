@@ -55,7 +55,7 @@ router.post(`/new`, (req, res) => {
 
     uploadOptions(req, res, async (err) => {
         if (err) {
-            // Handle upload error
+            return res.status(500).json({success: false, error: err})
         } else {
             const files = req.files;
             if (!files || files.length === 0) {
@@ -79,14 +79,11 @@ router.post(`/new`, (req, res) => {
                 const savedPhoto = await newPhoto.save();
                 res.status(201).send(savedPhoto);
             } catch (error) {
-                // Handle error
+                return res.status(500).json({success: false, error: err})
             }
         }
     });
 });
-
-
-
 
 router.put('/:id', uploadOptions, async (req, res) => {
     console.log(req.body);

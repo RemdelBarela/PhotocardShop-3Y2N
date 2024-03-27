@@ -28,12 +28,12 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadOptions = multer({ storage: storage });
+const uploadOptions = multer({ storage: storage }).array('image', 10); // Update to handle multiple files
 
 router.get(`/`, async (req, res) =>{
     console.log(req.query)
-    let filter = {};
-    const materialList = await Material.find(filter);
+
+    const materialList = await Material.find();
 
     if(!materialList) {
         res.status(500).json({success: false})
@@ -51,49 +51,62 @@ router.get(`/:id`, async (req, res) =>{
     res.send(material);
 })
 
-router.post(`/new`, uploadOptions.single('image'), async (req, res) => {
+router.post(`/new`, (req, res) => {
 
-    const file = req.file;
-    if (!file) return res.status(400).send('No image in the request');
+    uploadOptions(req, res, async (err) => {
+        if (err) {
+            return res.status(500).json({success: false, error: err})
+        } else {
+            const files = req.files;
+            if (!files || files.length === 0) {
+                return res.status(400).send('NO IMAGES IN THE REQUEST');
+            }
 
-    const fileName = file.filename;
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-    let material = new Material({
-        name: req.body.name,
-         price: req.body.price,
-        image: `${basePath}${fileName}`, 
-        countInStock: req.body.countInStock,
-        
-    });
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        let materialPaths = [];
+        files.forEach(file => {
+            const fileName = file.filename;
+            materialPaths.push(`${basePath}${fileName}`);
+        });
 
-    material = await material.save();
+        const material = new Material({
+            name: req.body.name,
+            price: req.body.price,
+            countInStock: req.body.countInStock,
+            image: materialPaths
+        });
 
-    if (!material) return res.status(500).send('The material cannot be created');
-
-    res.send(material);
+        try {
+            const savedMaterial = await material.save();
+            res.status(201).send(savedMaterial);
+        } catch (error) {
+            return res.status(500).json({success: false, error: err})
+        }
+    }
+});
 });
 
 
-router.put('/:id', uploadOptions.single('image'), async (req, res) => {
+router.put('/:id', uploadOptions, async (req, res) => {
     console.log(req.body);
     if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send('Invalid Material Id');
+        return res.status(400).send('INVALID PHOTO ID');
     }
-    // const category = await Category.findById(req.body.category);
-    // if (!category) return res.status(400).send('Invalid Category');
 
     const material = await Material.findById(req.params.id);
     if (!material) return res.status(400).send('Invalid Material!');
+    let imagePaths = [];
 
-    const file = req.file;
-    let imagepath;
-
-    if (file) {
-        const fileName = file.filename;
+    if (req.files && req.files.length > 0) {
         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-        imagepath = `${basePath}${fileName}`;
+        req.files.forEach(file => {
+            const fileName = file.filename;
+            const imagePath = `${basePath}${fileName}`;
+            imagePaths.push(imagePath);
+        });
     } else {
-        imagepath = material.image;
+        // If no files are uploaded, use the existing image paths
+        imagePaths = material.image;
     }
 
     const updatedMaterial = await Material.findByIdAndUpdate(
@@ -101,8 +114,8 @@ router.put('/:id', uploadOptions.single('image'), async (req, res) => {
         {
             name: req.body.name,
             price: req.body.price,
-            image: imagepath,
-           countInStock: req.body.countInStock,
+            countInStock: req.body.countInStock,
+            image: imagePaths
         },
         { new: true }
     );
