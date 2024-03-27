@@ -41,7 +41,7 @@ router.get(`/`, async (req, res) =>{
     res.send(photoList);
 })
 
-router.get(`/:id`, async (req, res) =>{
+router.get(`/select/:id`, async (req, res) =>{
     const photo = await Photo.findById(req.params.id);
 
     if(!photo) {

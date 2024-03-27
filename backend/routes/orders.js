@@ -1,3 +1,6 @@
+const { Photocard } = require('../models/photocard');
+const { Photo } = require('../models/photo');
+const { Material } = require('../models/material');
 const { Order } = require('../models/order');
 const express = require('express');
 const { OrderItem } = require('../models/order-item');
@@ -12,6 +15,23 @@ router.get(`/`, async (req, res) => {
    
     res.status(201).json(orderList)
 })
+
+// router.get(`/:id`, async (req, res) => {
+//     const order = await Order.findById(req.params.id)
+//         .populate('user', 'name')
+//         .populate({
+//             path: 'orderItems', 
+//             populate: {
+//                 path: 'product', 
+//                 populate: 'category'
+//             }
+//         });
+
+//     if (!order) {
+//         res.status(500).json({ success: false })
+//     }
+//     res.send(order);
+// })
 
 router.get(`/:id`, async (req, res) => {
     const order = await Order.findById(req.params.id)
@@ -28,6 +48,48 @@ router.get(`/:id`, async (req, res) => {
         res.status(500).json({ success: false })
     }
     res.send(order);
+})
+
+router.post('/:photo_id/:material_id', async (req, res) => {
+    try {
+        const photo = await Photo.findById(req.params.photo_id);
+        const material = await Material.findById(req.params.material_id);
+
+        // Check if photo and material exist
+        if (!photo) {
+            return res.status(404).json({ success: false, error: 'PHOTO NOT FOUND' });
+        }
+
+        if (!material) {
+            return res.status(404).json({ success: false, error: 'MATERIAL NOT FOUND' });
+        }
+
+       const photocard = await Photocard.create({
+                photo: req.params.photo_id,
+                material: req.params.material_id,
+            });
+
+            return res.status(201).json({
+                success: true,
+                photocard
+            });
+   
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: 'FAILED TO CREATE PHOTOCARD',
+            error: error.message // You might want to provide more details about the error
+        });
+    }
+})
+
+router.get(`/photocard/:id`, async (req, res) => {
+    const photocard = await Photocard.findById(req.params.id)
+
+    if (!photocard) {
+        res.status(500).json({ success: false })
+    }
+    res.send(photocard);
 })
 
 router.post('/', async (req, res) => {

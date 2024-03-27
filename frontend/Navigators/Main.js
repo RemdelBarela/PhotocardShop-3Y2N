@@ -5,6 +5,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import HomeNavigator from "./HomeNavigator";
 import CartNavigator from "./CartNavigator";
 import UserNavigator from "./UserNavigator";
+import Home from "../Screens/Home"
+
 import { StyleSheet } from "react-native";
 
 const Tab = createBottomTabNavigator();
@@ -33,9 +35,18 @@ const Main = () => {
                     )
                 }}
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name="Home"
                 component={HomeNavigator}
+                options={{
+                    tabBarIcon: ({ color, focused }) => (
+                        <CustomTabBarIcon focused={focused} />
+                    ),
+                }}
+            /> */}
+             <Tab.Screen
+                name="Home"
+                component={Home}
                 options={{
                     tabBarIcon: ({ color, focused }) => (
                         <CustomTabBarIcon focused={focused} />

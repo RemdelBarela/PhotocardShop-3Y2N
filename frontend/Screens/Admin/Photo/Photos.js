@@ -72,6 +72,7 @@ const Photos = (props) => {
             setRefreshing(false);
         }, 2000);
     }, []);
+    
     useFocusEffect(
         useCallback(
             () => {

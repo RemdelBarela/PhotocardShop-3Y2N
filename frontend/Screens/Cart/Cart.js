@@ -81,7 +81,7 @@ const Cart = () => {
                         rightOpenValue={-150}
                         previewOpenValue={-100}
                         previewOpenDelay={3000}
-                        keyExtractor={item => item._id.$oid}
+                        keyExtractor={item => item._id}
                     />
                 </Box>
             ) : (
