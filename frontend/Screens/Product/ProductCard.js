@@ -13,7 +13,6 @@ const { width } = Dimensions.get('window');
 const ProductCard = ({ name, description, images }) => {
     return (
         <View style={styles.card}>
-            {/* FlatList for rendering multiple images */}
             <FlatList
                 horizontal
                 data={images}
