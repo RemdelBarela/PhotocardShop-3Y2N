@@ -24,7 +24,6 @@ const ProductContainer = () => {
     const [products, setProducts] = useState([])
     const [productsFiltered, setProductsFiltered] = useState([]);
     const [focus, setFocus] = useState();
-    const [categories, setCategories] = useState([]);
     const [active, setActive] = useState([]);
     const [initialState, setInitialState] = useState([])
     const [productsCtg, setProductsCtg] = useState([])
@@ -47,16 +46,6 @@ const ProductContainer = () => {
                     .catch((error) => {
                         console.log('Api call error')
                     })
-
-                // Categories
-                // axios
-                //     .get(`${baseURL}categories`)
-                //     .then((res) => {
-                //         setCategories(res.data)
-                //     })
-                //     .catch((error) => {
-                //         console.log('Api categories call error', error)
-                //     })
 
                 return () => {
                     setProducts([]);
