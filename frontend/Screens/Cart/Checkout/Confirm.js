@@ -82,18 +82,23 @@ const Confirm = (props) => {
                             <Text style={styles.title}>items</Text>
 
                             {finalOrder.order.order.orderItems.map((item) => {
+                                console.log(item)
+                                const photoImage = item.newData.photo.image[0];
+                                const photoName = item.newData.photo.name;
+                                const materialName = item.newData.material.name;
+                                const materialPrice = item.newData.material.price;
                                 return (
                                     <HStack space={[2, 3]} justifyContent="space-between" key={item.id}>
                                         <Avatar size="48px" source={{
-                                            uri: item.image ?
-                                                item.image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
+                                            uri: photoImage ?
+                                                photoImage : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
                                         }}
                                         />
                                         <VStack>
                                             <Text _dark={{
                                                 color: "warmGray.50"
                                             }} color="coolGray.800" bold>
-                                                {item.name}
+                                                {photoName}
                                             </Text>
 
                                         </VStack>
@@ -101,7 +106,7 @@ const Confirm = (props) => {
                                         <Text fontSize="xs" _dark={{
                                             color: "warmGray.50"
                                         }} color="coolGray.800" alignSelf="flex-start">
-                                            {item.price}
+                                            {materialPrice}
                                         </Text>
                                     </HStack>
                                 )

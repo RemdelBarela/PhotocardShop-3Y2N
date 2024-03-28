@@ -16,43 +16,56 @@ const Cart = () => {
     const dispatch = useDispatch()
     const cartItems = useSelector(state => state.cartItems)
     const context = useContext(AuthGlobal)
-    var total = 0;
-    console.log("cart", cartItems)
-    cartItems.forEach(cart => {
-        return (total += cart.price)
-    });
-    const renderItem = ({ item, index }) =>
-        <TouchableHighlight
-            _dark={{
-                bg: 'coolGray.800'
-            }}
-            _light={{
-                bg: 'white'
-            }}
+    const total = cartItems.reduce((acc, cart) => {
+        const materialPrice = cart?.newData?.material?.price || 0; // Ensure material exists and price is available
+        return acc + materialPrice * cart.quantity;
+    }, 0);
+    
+    const renderItem = ({ item, index }) => {
+        console.log("Item:", item);
+        
+        const photoImage = item.newData.photo.image[0];
+        const photoName = item.newData.photo.name;
+        const materialName = item.newData.material.name;
+        const materialPrice = item.newData.material.price;
 
-        >
-            <Box pl="4" pr="5" py="2" bg="white" keyExtractor={item => item.id}>
-                <HStack alignItems="center" space={3}>
-                    <Avatar size="48px" source={{
-                        uri: item.image ?
-                            item.image : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
-                    }} />
-                    <VStack>
-                        <Text color="coolGray.800" _dark={{
+        // Accessing nested data using array notation for image array
+        const materialImage = item.newData.material.image[0];
+        return (
+            <TouchableHighlight
+                _dark={{
+                    bg: 'coolGray.800'
+                }}
+                _light={{
+                    bg: 'white'
+                }}
+    
+            >
+                <Box pl="4" pr="5" py="2" bg="white" keyExtractor={item => item.id}>
+                    <HStack alignItems="center" space={3}>
+                        <Avatar size="48px" source={{
+                            uri: photoImage ?
+                                photoImage : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
+                        }} />
+                        <VStack>
+                            <Text color="coolGray.800" _dark={{
+                                color: 'warmGray.50'
+                            }} bold>
+                                {photoName}
+                            </Text>
+                        </VStack>
+                        <Spacer />
+                        <Text fontSize="xs" color="coolGray.800" _dark={{
                             color: 'warmGray.50'
-                        }} bold>
-                            {item.name}
+                        }} alignSelf="flex-start">
+                            $ {materialPrice}
                         </Text>
-                    </VStack>
-                    <Spacer />
-                    <Text fontSize="xs" color="coolGray.800" _dark={{
-                        color: 'warmGray.50'
-                    }} alignSelf="flex-start">
-                        $ {item.price}
-                    </Text>
-                </HStack>
-            </Box>
-        </TouchableHighlight>;
+                    </HStack>
+                </Box>
+            </TouchableHighlight>
+        );
+    };
+    
 
     const renderHiddenItem = (cartItems) =>
         <TouchableOpacity
@@ -81,7 +94,7 @@ const Cart = () => {
                         rightOpenValue={-150}
                         previewOpenValue={-100}
                         previewOpenDelay={3000}
-                        keyExtractor={item => item._id}
+                        keyExtractor={item => item.newData._id}
                     />
                 </Box>
             ) : (

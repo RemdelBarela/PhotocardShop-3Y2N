@@ -85,7 +85,9 @@ router.post('/:photo_id/:material_id', async (req, res) => {
 
 router.get(`/photocard/:id`, async (req, res) => {
     const photocard = await Photocard.findById(req.params.id)
-
+    .populate('photo')
+    .populate( 'material')
+    
     if (!photocard) {
         res.status(500).json({ success: false })
     }
@@ -93,49 +95,148 @@ router.get(`/photocard/:id`, async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const orderItemsIds = Promise.all(req.body.orderItems.map(async (orderItem) => {
-        console.log(req.body)
-        // const orderItemsIds = req.body.orderItems.map(async (orderItem) => {
+    try {
+        const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
             let newOrderItem = new OrderItem({
                 quantity: orderItem.quantity,
-                product: orderItem.product
-            })
+                photocard: orderItem.newData._id
+            });
 
             newOrderItem = await newOrderItem.save();
 
-            return newOrderItem._id;
-        })
-    )
-        console.log(orderItemsIds)
-        const orderItemsIdsResolved =  await orderItemsIds;
-        console.log(orderItemsIds)
-        // const totalPrices = await Promise.all(orderItemsIdsResolved.map(async (orderItemId)=>{
-        //     const orderItem = await OrderItem.findById(orderItemId).populate('product', 'price');
-        //     const totalPrice = orderItem.product.price * orderItem.quantity;
-        //     return totalPrice
-        // }))
+            console.log(newOrderItem);
+            return newOrderItem._id; // Return the ID of the newly created OrderItem
+        });
 
-        // const totalPrice = totalPrices.reduce((a,b) => a +b , 0);
+        const orderItemsIds = await Promise.all(orderItemsPromises); // Wait for all promises to resolve
+
+        console.log(orderItemsIds);
+
+        const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
+            path: 'photocard',
+            populate: {
+                path: 'material',
+                model: 'Material'
+            }
+        });
+
+        let totalPrice = 0;
+
+        for (const orderItem of orderItems) {
+            const photocard = orderItem.photocard;
+            const material = photocard.material;
+            const itemPrice = material.price * orderItem.quantity;
+
+            // Update total price
+            totalPrice += itemPrice;
+
+            // Update material countInStock
+            const updatedCountInStock = material.countInStock - orderItem.quantity;
+            material.countInStock = updatedCountInStock;
+            await material.save();
+
+            console.log(`Material ${material.name}: Count in stock updated to ${updatedCountInStock}`);
+        }
 
         let order = new Order({
-            orderItems: orderItemsIdsResolved,
+            orderItems: orderItemsIds,
             shippingAddress1: req.body.shippingAddress1,
             shippingAddress2: req.body.shippingAddress2,
             city: req.body.city,
             zip: req.body.zip,
             country: req.body.country,
             phone: req.body.phone,
-            status: req.body.status,
-            // totalPrice: totalPrice,
-            user: req.body.user,
-        })
+            status: 'Pending',
+            totalPrice: totalPrice,
+            user: req.body.user
+        });
+
         order = await order.save();
 
         if (!order)
-            return res.status(400).send('the order cannot be created!')
+            return res.status(400).send('The order cannot be created!');
 
         res.send(order);
-    })
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }    
+});
+
+
+// router.post('/', async (req, res) => {
+//     try {
+//         const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
+//             let newOrderItem = new OrderItem({
+//                 quantity: orderItem.quantity,
+//                 photocard: orderItem.newData._id
+//             });
+
+//             newOrderItem = await newOrderItem.save();
+
+//             console.log(newOrderItem);
+//             return newOrderItem._id; // Return the ID of the newly created OrderItem
+//         });
+
+//         const orderItemsIds = await Promise.all(orderItemsPromises); // Wait for all promises to resolve
+
+//         console.log(orderItemsIds);
+
+//         const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
+//             path: 'photocard',
+//             populate: {
+//                 path: 'material',
+//                 model: 'Material'
+//             }
+//         });
+
+//         let totalPrice = 0;
+//         let totalQuantity = 0;
+
+//         orderItems.forEach(orderItem => {
+//             const photocard = orderItem.photocard;
+//             const material = photocard.material;
+//             const itemPrice = material.price * orderItem.quantity;
+//             const itemQuantity = orderItem.quantity;
+
+//             console.log(photocard);
+//             console.log(material);
+//             console.log(itemPrice);
+//             console.log(itemQuantity);
+
+//             // Update total price and quantity
+//             totalPrice += itemPrice;
+//             totalQuantity += itemQuantity;
+
+//             // Output or further processing based on photocard and material details
+//             console.log(`Photocard Material: ${material.name}, Price: ${itemPrice}, Quantity: ${itemQuantity}`);
+//         });
+
+//         let order = new Order({
+//             orderItems: orderItemsIds,
+//             shippingAddress1: req.body.shippingAddress1,
+//             shippingAddress2: req.body.shippingAddress2,
+//             city: req.body.city,
+//             zip: req.body.zip,
+//             country: req.body.country,
+//             phone: req.body.phone,
+//             status: 'Pending',
+//             totalPrice: totalPrice,
+//             user: req.body.user
+//         });
+
+//         order = await order.save();
+
+//         if (!order)
+//             return res.status(400).send('The order cannot be created!');
+
+//         res.send(order);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Internal server error');
+//     }    
+// });
+
 
 
 
