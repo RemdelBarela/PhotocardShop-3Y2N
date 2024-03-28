@@ -59,12 +59,14 @@ router.post('/', async (req, res) => {
         email: req.body.email,
         passwordHash: password,
         phone: req.body.phone,
+        address: req.body.address,
         isAdmin: req.body.isAdmin,
-        street: req.body.street,
-        apartment: req.body.apartment,
-        zip: req.body.zip,
-        city: req.body.city,
-        country: req.body.country,
+        
+        // street: req.body.street,
+        // apartment: req.body.apartment,
+        // zip: req.body.zip,
+        // city: req.body.city,
+        // country: req.body.country,
     })
     user = await user.save();
 
@@ -84,27 +86,29 @@ router.put('/:id', async (req, res) => {
         newPassword = userExist.passwordHash;
     }
 
-    const user = await User.findByIdAndUpdate(
+    const updateProfile = await User.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             email: req.body.email,
             passwordHash: newPassword,
             phone: req.body.phone,
+            address: req.body.address,
             isAdmin: req.body.isAdmin,
-            street: req.body.street,
-            apartment: req.body.apartment,
-            zip: req.body.zip,
-            city: req.body.city,
-            country: req.body.country,
+
+            // street: req.body.street,
+            // apartment: req.body.apartment,
+            // zip: req.body.zip,
+            // city: req.body.city,
+            // country: req.body.country,
         },
         { new: true }
     )
 
-    if (!user)
-        return res.status(400).send('the user cannot be created!')
+    if (!updateProfile)
+        return res.status(400).send('THE USER CANNOT BE UPDATED!')
 
-    res.send(user);
+    res.send(updateProfile);
 })
 
 router.post('/login', async (req, res) => {
@@ -125,15 +129,11 @@ router.post('/login', async (req, res) => {
             secret,
             { expiresIn: '1d' }
         )
-
         res.status(200).send({ user: user.email, token: token })
     } else {
         res.status(400).send('password is wrong!');
     }
-
-
 })
-
 
 router.post('/register', uploadOptions.single('image'), async (req, res) => {
     const file = req.file;
@@ -146,12 +146,14 @@ router.post('/register', uploadOptions.single('image'), async (req, res) => {
         image: `${basePath}${fileName}`,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
+        address: req.body.address,
         isAdmin: req.body.isAdmin,
-        street: req.body.street,
-        apartment: req.body.apartment,
-        zip: req.body.zip,
-        city: req.body.city,
-        country: req.body.country,
+
+        // street: req.body.street,
+        // apartment: req.body.apartment,
+        // zip: req.body.zip,
+        // city: req.body.city,
+        // country: req.body.country,
     })
     user = await user.save();
 

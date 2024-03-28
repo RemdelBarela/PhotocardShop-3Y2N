@@ -21,30 +21,34 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    address: {
+        type: String,
+        required: true,
+    },
     isAdmin: {
         type: Boolean,
         default: false,
     },
-    street: {
-        type: String,
-        default: ''
-    },
-    apartment: {
-        type: String,
-        default: ''
-    },
-    zip :{
-        type: String,
-        default: ''
-    },
-    city: {
-        type: String,
-        default: ''
-    },
-    country: {
-        type: String,
-        default: ''
-    }
+    // street: {
+    //     type: String,
+    //     default: ''
+    // },
+    // apartment: {
+    //     type: String,
+    //     default: ''
+    // },
+    // zip :{
+    //     type: String,
+    //     default: ''
+    // },
+    // city: {
+    //     type: String,
+    //     default: ''
+    // },
+    // country: {
+    //     type: String,
+    //     default: ''
+    // }
 
 });
 
@@ -57,16 +61,3 @@ userSchema.set('toJSON', {
 });
 
 exports.User = mongoose.model('User', userSchema);
-
-
-// {   "name": "",
-//     "email": "",
-//     "passwordHash": "password",
-//     "phone": "0999992123",
-//     "isAdmin": true,
-//     "street": "champaca st",
-//     "apartment": "champaca apartment",
-//     "zip": "1630",
-//     "city": "Taguig city",
-//     "country": "Philippines",
-// }

@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import Login from "../Screens/User/Login";
 import Register from "../Screens/User/Register";
 import UserProfile from "../Screens/User/UserProfile";
+import UpdateProfile from "../Screens/User/UpdateProfile";
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,6 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
-
             <Stack.Screen
                 name="Register"
                 component={Register}
@@ -25,7 +25,6 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
-
             <Stack.Screen
                 name="User Profile"
                 component={UserProfile}
@@ -33,9 +32,14 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
+             <Stack.Screen
+                name="Update Profile"
+                component={UpdateProfile}
+                options={{
+                    headerShown: false
+                }}
+            />
         </Stack.Navigator>
     )
-
 }
-
 export default UserNavigator;

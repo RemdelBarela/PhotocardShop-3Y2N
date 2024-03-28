@@ -23,6 +23,10 @@ function authJwt() {
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },
                 {
+                    url: /\/api\/v1\/users(.*)/,
+                    methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
+                },
+                {
                     url: /\/api\/v1\/categories(.*)/,
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },
@@ -37,6 +41,7 @@ function authJwt() {
                 `${api}/users`,
                 `${api}/users/login`,
                 `${api}/users/register`,
+                `${api}/users/updateProfile`,
             ]
         })
 }
