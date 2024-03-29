@@ -27,6 +27,10 @@ function authJwt() {
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },
                 {
+                    url: /\/api\/v1\/reviews(.*)/,
+                    methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
+                },
+                {
                     url: /\/api\/v1\/categories(.*)/,
                     methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
                 },

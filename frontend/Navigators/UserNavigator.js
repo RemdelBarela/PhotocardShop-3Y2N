@@ -5,6 +5,7 @@ import Login from "../Screens/User/Login";
 import Register from "../Screens/User/Register";
 import UserProfile from "../Screens/User/UserProfile";
 import UpdateProfile from "../Screens/User/UpdateProfile";
+import ReviewForm from "../Screens/Review/ReviewForm";
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,13 @@ const UserNavigator = (props) => {
              <Stack.Screen
                 name="Update Profile"
                 component={UpdateProfile}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name="Review Form"
+                component={ReviewForm}
                 options={{
                     headerShown: false
                 }}

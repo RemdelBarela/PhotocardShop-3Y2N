@@ -121,7 +121,7 @@ const OrderCard = ({ item, select }) => {
         </View>
         {/* {item.editMode ? ( */}
         <View>
-{select ? null : <><Select
+        {select ? null : <><Select
             width="80%"
             iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
             style={{ width: undefined }}
@@ -150,12 +150,20 @@ const OrderCard = ({ item, select }) => {
             <Text style={{ color: "white" }}>Update</Text>
           </EasyButton></> }
           
+          <View style={styles.buttonContainer}>
+          <EasyButton
+              secondary
+              large
+              onPress={() => navigation.navigate('Review Form', { orderId: item.id })}
+            >
+              <Text style={{ color: 'white' }}>Review Order</Text>
+            </EasyButton>
+          </View>
+
         </View>
         {/* //   ) : null} */}
       </View>
     </View>
-
-
   );
 }
 
