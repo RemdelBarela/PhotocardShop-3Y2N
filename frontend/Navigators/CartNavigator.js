@@ -13,14 +13,14 @@ function MyStack() {
                 name="Cart"
                 component={Cart}
                 options={{
-                    headerShown: false
+                    headerShown: false // Hide header for the Cart screen
                 }}
             />
             <Stack.Screen 
                 name="Checkout"
                 component={CheckoutNavigator}
                 options={{
-                    title: 'Checkout'
+                    headerShown: false // Hide header for the Checkout screen
                 }}
             />
         </Stack.Navigator>
