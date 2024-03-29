@@ -25,7 +25,7 @@ import Login from "../Screens/User/Login";
 import Main from "./Main";
 import Materials from "./MaterialNavigator"
 import Photos from "./PhotoNavigator"
-
+import Users from "./UsersNavigator"
 
 import Cart from "../Screens/Cart/Cart";
 import Products from "../Screens/Admin/Products";
@@ -166,6 +166,7 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/>
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
+        <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
 
       </Drawer.Navigator>
     </Box>

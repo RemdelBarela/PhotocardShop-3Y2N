@@ -71,7 +71,6 @@ const Register = () => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-
             }
         }
         axios
@@ -181,28 +180,8 @@ const Register = () => {
                             {error ? <Error message={error} /> : null}
                         </View>
                         <EasyButton x-l primary onPress={() =>  register()}>
-                            <Text style={{ color: 'white' }}>REGISTER</Text>
+                            <Text style={{ color: 'white' }}>CONFIRM</Text>
                         </EasyButton>
-                       
-                        <View style={styles.socialButtonContainer}>
-                            <TouchableOpacity onPress={() => { }}>
-                                <FontAwesomeIcon name="facebook" size={30} color="#4267B2" />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { }}>
-                        <Icon name="google" size={30} color="#4285F4" />
-                    </TouchableOpacity>
-                        </View>
-                    </View>
-                    <Text>Sign up</Text>
-                    <View style={styles.formBlockToggleBlock}>
-                        <Text>Already have an account? Click here</Text>
-                        <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={mode === 'login' ? "#f5dd4b" : "#f4f3f4"}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleMode}
-                            value={mode === 'login'}
-                        />
                     </View>
                 </View>
             </View>

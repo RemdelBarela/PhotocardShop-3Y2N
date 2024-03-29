@@ -1,17 +1,13 @@
 import React, { useContext, useState, useCallback } from 'react';
-import { View, Text, ScrollView, Button, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Button, StyleSheet, Image } from 'react-native';
 import { Container } from "native-base"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import axios from "axios"
 import baseURL from "../../assets/common/baseurl"
-
 import AuthGlobal from "../../Context/Store/AuthGlobal"
 import { logoutUser } from "../../Context/Actions/Auth.actions"
 import OrderCard from '../../Shared/OrderCard';
-
 
 const UserProfile = (props) => {
     const context = useContext(AuthGlobal)
@@ -27,7 +23,6 @@ const UserProfile = (props) => {
             ) {
                 navigation.navigate("Login")
             }
-            console.log("context", context.stateUser.user)
             AsyncStorage.getItem("jwt")
                 .then((res) => {
                     axios
@@ -41,12 +36,9 @@ const UserProfile = (props) => {
                 .get(`${baseURL}orders`)
                 .then((x) => {
                     const data = x.data;
-                    console.log(data)
                     const userOrders = data.filter(
                         (order) =>
-                            // console.log(order)
                             order.user ? (order.user._id === context.stateUser.user.userId) : false
-
                     );
                     setOrders(userOrders);
                 })
@@ -58,41 +50,54 @@ const UserProfile = (props) => {
 
         }, [context.stateUser.isAuthenticated]))
 
+    const handleUpdateProfile = () => {
+        console.log("UserProfile:", userProfile);
+        navigation.navigate("Update Profile", { user: userProfile });
+    };
+
+    const handleSignOut = () => {
+        AsyncStorage.removeItem("jwt");
+        logoutUser(context.dispatch);
+    };
+
     return (
         <Container style={styles.container}>
             <ScrollView contentContainerStyle={styles.subContainer}>
-                <Text style={{ fontSize: 30 }}>
-                    {userProfile ? userProfile.name : ""}
-                </Text>
-                <View style={{ marginTop: 20 }}>
-                    <Text style={{ margin: 10 }}>
+                <View style={styles.userInfoContainer}>
+                    {userProfile && userProfile.image &&
+                        <Image style={styles.profileImage} source={{ uri: userProfile.image }} />
+                    }
+                    <Text style={styles.header}>
+                        {userProfile ? userProfile.name : ""}
+                    </Text>
+                    <Text style={styles.userInfoText}>
                         Email: {userProfile ? userProfile.email : ""}
                     </Text>
-                    <Text style={{ margin: 10 }}>
+                    <Text style={styles.userInfoText}>
                         Phone: {userProfile ? userProfile.phone : ""}
                     </Text>
+                    <Text style={styles.userInfoText}>
+                        Address: {userProfile ? userProfile.address : ""}
+                    </Text>
                 </View>
-                <View style={{ marginTop: 80 }}>
-                    <Button title={"Sign Out"} onPress={() => [
-                        AsyncStorage.removeItem("jwt"),
-                        logoutUser(context.dispatch)
-                    ]} />
-                    <View style={styles.order}>
-                        <Text style={{ fontSize: 20 }}>My Orders</Text>
-                        <View>
-                            {orders ? (
-                                orders.map((order) => {
-                                    return <OrderCard key={order.id} item={order} select="false" />;
-                                })
-                            ) : (
-                                <View style={styles.order}>
-                                    <Text>You have no orders</Text>
-                                </View>
-                            )}
-                        </View>
+                <View style={styles.buttonContainer}>
+                    <Button title={"Update Profile"} onPress={handleUpdateProfile} color="#888" />
+                    <Button title={"Sign Out"} onPress={handleSignOut} color="#888" />
+                </View>
+                <View style={styles.orderContainer}>
+                    <Text style={styles.orderHeader}>MY ORDERS</Text>
+                    <View>
+                        {orders ? (
+                            orders.map((order) => {
+                                return <OrderCard key={order.id} item={order} select="false" />;
+                            })
+                        ) : (
+                            <View style={styles.noOrderContainer}>
+                                <Text style={styles.noOrderText}>YOU HAVE NO ORDERS</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
-
             </ScrollView>
         </Container>
     )
@@ -101,17 +106,66 @@ const UserProfile = (props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: "center"
+        backgroundColor: "#fff",
+        paddingHorizontal: 20,
+        paddingTop: 40,
+        width: "100%"
     },
     subContainer: {
-        alignItems: "center",
-        marginTop: 60
+        alignItems: "center"
     },
-    order: {
-        marginTop: 20,
+    profileImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginBottom: 10,
+    },
+    header: {
+        fontSize: 30,
+        marginBottom: 20,
+        fontWeight: "bold",
+        color: "#333",
+        textAlign: "center",
+    },
+    userInfoContainer: {
+        marginBottom: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: "#ccc",
+        paddingBottom: 20,
         alignItems: "center",
-        marginBottom: 60
+    },
+    userInfoText: {
+        marginVertical: 10,
+        fontSize: 16,
+        color: "#555",
+        textAlign: "center",
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 30, 
+        marginHorizontal: "5%",
+        width: "80%"
+    },
+    orderContainer: {
+        alignItems: "center",
+        marginBottom: 20,
+    },
+    orderHeader: {
+        fontSize: 20,
+        marginBottom: 20,
+        fontWeight: "bold",
+        color: "#333",
+        textAlign: "center",
+    },
+    noOrderContainer: {
+        alignItems: "center",
+    },
+    noOrderText: {
+        fontSize: 16,
+        color: "#555",
+        textAlign: "center",
     }
 })
 
-export default UserProfile
+export default UserProfile;
