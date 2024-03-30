@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { Text, View, Button, SafeAreaView } from 'react-native'
+import { Text, View, Button,KeyboardAvoidingView,StyleSheet, Dimensions, SafeAreaView } from 'react-native'
 import { Select, Item, Picker, Toast } from 'native-base'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import FormContainer from '../../../Shared/Form/FormContainer'
@@ -65,13 +65,17 @@ const Checkout = (props) => {
     console.log(orderItems)
     return (
 
-        <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            extraHeight={200}
-            enableOnAndroid={true}
-        >
-            <FormContainer title={"Shipping Address"}>
-                <Input
+        <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -500}
+    >
+              <FormContainer bg="lightgray" title={"Shipping Address"}>
+           <View style={styles.app}>
+                <View style={styles.formBlockWrapper} />
+                <View style={[styles.formBlock,   styles.isLogin]}>
+                <View style={styles.formBlockHeader}>
+                    <Input
                     placeholder={"Phone"}
                     name={"phone"}
                     value={phone}
@@ -125,10 +129,86 @@ const Checkout = (props) => {
                
                 <View style={{ width: '80%', alignItems: "center" }}>
                     <Button title="Confirm" onPress={() => checkOut()} />
-                </View>
+                    </View></View></View></View>
             </FormContainer>
-        </KeyboardAwareScrollView>
+        
+            </KeyboardAvoidingView>
 
     )
 }
+
+
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    buttonGroup: {
+        width: "80%",
+        alignItems: "center",
+       
+    },
+    app: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center', 
+    },
+    formBlockWrapper: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    isLogin: {
+        opacity: 0.92,
+        backgroundColor: '#B6B6B4',
+    },
+    isSignup: {
+        opacity: 0.94,
+        backgroundColor: '#B6B6B4',
+    },
+    formBlock: {
+        position: 'relative',
+        margin: 100,
+        width: Dimensions.get('window').width - 100, // Adjust width according to your design
+        padding: 25,
+        height: 500, // Adjust height according to your design
+        backgroundColor: 'rgba(255, 255, 255, .13)',
+        borderRadius: 8,
+        color: '#fff',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 16,
+        },
+        shadowOpacity: 0.07,
+        shadowRadius: 9,
+        elevation: 10,
+    },
+    formBlockHeader: {
+        marginBottom: 20,
+    },
+    formBlockToggleBlock: {
+        position: 'relative',
+    },
+    formGroupLogin: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+    },
+    formGroupSignup: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+    },
+    socialButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
+    },
+});
 export default Checkout;

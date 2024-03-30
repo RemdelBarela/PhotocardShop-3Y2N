@@ -7,7 +7,8 @@ import {
     Dimensions,
     Image,
     Modal,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView,
 } from "react-native";
 import { Box } from "native-base";
 import { DataTable, Searchbar } from "react-native-paper";
@@ -30,6 +31,8 @@ const Photos = (props) => {
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
+    const [imageModalVisible, setImageModalVisible] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
     const navigation = useNavigation()
 
 
@@ -72,7 +75,7 @@ const Photos = (props) => {
             setRefreshing(false);
         }, 2000);
     }, []);
-    
+
     useFocusEffect(
         useCallback(
             () => {
@@ -106,10 +109,37 @@ const Photos = (props) => {
         setModalVisible(true);
     };
 
+    const handleImagePress = (imageUrl) => {
+        setSelectedImage(imageUrl);
+        setImageModalVisible(true);
+    };
+
+    const renderGallery = () => {
+        if (selectedPhoto && selectedPhoto.image.length > 0) {
+            return (
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    {selectedPhoto.image.map((imageUrl, idx) => (
+                        <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
+                            <Image
+                                source={{
+                                    uri: imageUrl ? imageUrl : null,
+                                }}
+                                resizeMode="cover"
+                                style={{ width: width, height: width / 2, marginVertical: 5 }}
+                                onError={() => console.log('Error loading image')}
+                            />
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            );
+        } else {
+            return <Text>No images available for this photo.</Text>;
+        }
+    };
+
     return (
         <Box flex={1}>
             <View style={styles.buttonContainer}>
-                
                 <EasyButton
                     secondary
                     medium
@@ -152,6 +182,7 @@ const Photos = (props) => {
                         {selectedPhoto && (
                             <>
                                 <Text>{selectedPhoto.name}</Text>
+                                {renderGallery()}
                                 <EasyButton
                                     medium
                                     secondary
@@ -180,96 +211,115 @@ const Photos = (props) => {
                 </View>
             </Modal>
 
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={imageModalVisible}
+                onRequestClose={() => {
+                    setImageModalVisible(false)
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <TouchableOpacity
+                            underlayColor="#E8E8E8"
+                            onPress={() => {
+                                setImageModalVisible(false)
+                            }}
+                            style={{
+                                alignSelf: "flex-end",
+                                position: "absolute",
+                                top: 5,
+                                right: 10
+                            }}
+                        >
+                            <Icon name="close" size={20} />
+                        </TouchableOpacity>
+                        <Image
+                            source={{
+                                uri: selectedImage ? selectedImage : null,
+                            }}
+                            resizeMode="contain"
+                            style={{ width: width - 40, height: height / 2 }}
+                            onError={() => console.log('Error loading image')}
+                        />
+                    </View>
+                </View>
+            </Modal>
+
             {loading ? (
                 <View style={styles.spinner}>
                     <ActivityIndicator size="x-large" color="black" />
                 </View>
             ) : (
                 <DataTable>
-                    <DataTable.Header>
-                        <DataTable.Title>NAME</DataTable.Title>
-                        <DataTable.Title>DESCRIPTION</DataTable.Title>
-                        <DataTable.Title>IMAGES</DataTable.Title>
+                    <DataTable.Header style={{ backgroundColor: 'black' }}>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>DESCRIPTION</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
                     </DataTable.Header>
                     {photoFilter.map((item, index) => (
                         <TouchableOpacity
                             key={index}
                             onPress={() => handleRowPress(item)}
-                            style={[styles.container, {
-                                backgroundColor: index % 2 == 0 ? "white" : "gainsboro"
-                            }]}
-                            >
-                                <DataTable.Row>
-                                    <DataTable.Cell>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell>{item.description}</DataTable.Cell>
-                                    <DataTable.Cell>
-                                        {item.image.map((imageUrl, idx) => (
-                                            <Image
-                                                key={idx}
-                                                source={{
-                                                    uri: imageUrl ? imageUrl : null
-                                                }}
-                                                resizeMode="contain"
-                                                style={styles.image}
-                                                onError={() => console.log("Error loading image")}
-                                            />
-                                        ))}
-                                    </DataTable.Cell>
-                                </DataTable.Row>
-                            </TouchableOpacity>
-                        ))}
-                    </DataTable>
-                )}
-            </Box>
-        );
-    }
-    
-    const styles = StyleSheet.create({
-        spinner: {
-            height: height / 2,
-            alignItems: 'center',
-            justifyContent: 'center'
+                            style={{
+                                backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
+                            }}>
+                            <DataTable.Row>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.description}</DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ textDecorationLine: 'underline' }}>View</Text>
+                                </DataTable.Cell>
+                            </DataTable.Row>
+                        </TouchableOpacity>
+                    ))}
+                </DataTable>
+            )}
+        </Box>
+    );
+}
+
+const styles = StyleSheet.create({
+    spinner: {
+        height: height / 2,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    container: {
+        marginBottom: 160,
+        backgroundColor: 'white'
+    },
+    buttonContainer: {
+        margin: 20,
+        alignSelf: 'center',
+        flexDirection: 'row'
+    },
+    buttonText: {
+        marginLeft: 4,
+        color: 'white'
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
         },
-        container: {
-            marginBottom: 160,
-            backgroundColor: 'white'
-        },
-        buttonContainer: {
-            margin: 20,
-            alignSelf: 'center',
-            flexDirection: 'row'
-        },
-        buttonText: {
-            marginLeft: 4,
-            color: 'white'
-        },
-        image: {
-            width: 50, // Adjust image width as needed
-            height: 50, // Adjust image height as needed
-            marginRight: 5, // Add margin between images
-        },
-        modalView: {
-            margin: 20,
-            backgroundColor: "white",
-            borderRadius: 20,
-            padding: 35,
-            alignItems: "center",
-            shadowColor: "#000",
-            shadowOffset: {
-                width: 0,
-                height: 2
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5
-        },
-        centeredView: {
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 22
-        },
-    });
-    
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+});
+
 export default Photos;
-    

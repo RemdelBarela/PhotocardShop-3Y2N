@@ -8,8 +8,9 @@ import {
     Image,
     Modal,
     TouchableOpacity,
+    ScrollView,
 } from "react-native";
-import { Box } from "native-base"
+import { Box } from "native-base";
 import { DataTable, Searchbar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useFocusEffect } from "@react-navigation/native"
@@ -23,34 +24,37 @@ import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
 const Materials = (props) => {
 
-    const [materialList, setMaterialList] = useState([]);
-    const [materialFilter, setMaterialFilter] = useState([]);
+    const [photoList, setPhotoList] = useState([]);
+    const [photoFilter, setPhotoFilter] = useState([]);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedMaterial, setSelectedMaterial] = useState(null);
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
+    const [imageModalVisible, setImageModalVisible] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
     const navigation = useNavigation()
 
-    const searchMaterial = (text) => {
+
+    const searchPhoto = (text) => {
         if (text === "") {
-            setMaterialFilter(materialList)
+            setPhotoFilter(photoList)
         }
-        setMaterialFilter(
-            materialList.filter((i) =>
+        setPhotoFilter(
+            photoList.filter((i) =>
                 i.name.toLowerCase().includes(text.toLowerCase())
             )
         )
     }
 
-    const deleteMaterial = (id) => {
+    const deletePhoto = (id) => {
         axios
             .delete(`${baseURL}materials/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                const materials = materialFilter.filter((item) => item.id !== id)
-                setMaterialFilter(materials)
+                const materials = photoFilter.filter((item) => item.id !== id)
+                setPhotoFilter(materials)
 
                 onRefresh()
             })
@@ -64,13 +68,14 @@ const Materials = (props) => {
                 .get(`${baseURL}materials`)
                 .then((res) => {
                     // console.log(res.data)
-                    setMaterialList(res.data);
-                    setMaterialFilter(res.data);
+                    setPhotoList(res.data);
+                    setPhotoFilter(res.data);
                     setLoading(false);
                 })
             setRefreshing(false);
         }, 2000);
     }, []);
+
     useFocusEffect(
         useCallback(
             () => {
@@ -84,14 +89,14 @@ const Materials = (props) => {
                     .get(`${baseURL}materials`)
                     .then((res) => {
                         console.log(res.data)
-                        setMaterialList(res.data);
-                        setMaterialFilter(res.data);
+                        setPhotoList(res.data);
+                        setPhotoFilter(res.data);
                         setLoading(false);
                     })
 
                 return () => {
-                    setMaterialList();
-                    setMaterialFilter();
+                    setPhotoList();
+                    setPhotoFilter();
                     setLoading(true);
                 }
             },
@@ -99,27 +104,55 @@ const Materials = (props) => {
         )
     )
 
-    const handleRowPress = (material) => {
-        setSelectedMaterial(material);
+    const handleRowPress = (photo) => {
+        setSelectedPhoto(photo);
         setModalVisible(true);
     };
+
+    const handleImagePress = (imageUrl) => {
+        setSelectedImage(imageUrl);
+        setImageModalVisible(true);
+    };
+
+    const renderGallery = () => {
+        if (selectedPhoto && selectedPhoto.image.length > 0) {
+            return (
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    {selectedPhoto.image.map((imageUrl, idx) => (
+                        <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
+                            <Image
+                                source={{
+                                    uri: imageUrl ? imageUrl : null,
+                                }}
+                                resizeMode="cover"
+                                style={{ width: width, height: width / 2, marginVertical: 5 }}
+                                onError={() => console.log('Error loading image')}
+                            />
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            );
+        } else {
+            return <Text>No images available for this photo.</Text>;
+        }
+    };
+
     return (
         <Box flex={1}>
             <View style={styles.buttonContainer}>
                 <EasyButton
                     secondary
                     medium
-                    onPress={() => navigation.navigate("MaterialForm")}
+                    onPress={() => navigation.navigate("PhotoForm")}
                 >
                     <Icon name="plus" size={18} color="white" />
                     <Text style={styles.buttonText}> ADD</Text>
                 </EasyButton>
             </View>
 
-            <Searchbar
-                width="80%"
-                placeholder="Search Material Name"
-                onChangeText={(text) => searchMaterial(text)}
+            <Searchbar width="80%"
+                placeholder="Search Photo Name"
+                onChangeText={(text) => searchPhoto(text)}
             />
 
             <Modal
@@ -146,14 +179,15 @@ const Materials = (props) => {
                         >
                             <Icon name="close" size={20} />
                         </TouchableOpacity>
-                        {selectedMaterial && (
+                        {selectedPhoto && (
                             <>
-                                <Text>{selectedMaterial.name}</Text>
+                                <Text>{selectedPhoto.name}</Text>
+                                {renderGallery()}
                                 <EasyButton
                                     medium
                                     secondary
                                     onPress={() => {
-                                        navigation.navigate("MaterialForm", { item: selectedMaterial });
+                                        navigation.navigate("PhotoForm", { item: selectedPhoto });
                                         setModalVisible(false);
                                     }}
                                     title="Edit"
@@ -164,7 +198,7 @@ const Materials = (props) => {
                                     medium
                                     danger
                                     onPress={() => {
-                                        deleteMaterial(selectedMaterial.id);
+                                        deletePhoto(selectedPhoto.id);
                                         setModalVisible(false);
                                     }}
                                     title="Delete"
@@ -177,47 +211,79 @@ const Materials = (props) => {
                 </View>
             </Modal>
 
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={imageModalVisible}
+                onRequestClose={() => {
+                    setImageModalVisible(false)
+                }}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <TouchableOpacity
+                            underlayColor="#E8E8E8"
+                            onPress={() => {
+                                setImageModalVisible(false)
+                            }}
+                            style={{
+                                alignSelf: "flex-end",
+                                position: "absolute",
+                                top: 5,
+                                right: 10
+                            }}
+                        >
+                            <Icon name="close" size={20} />
+                        </TouchableOpacity>
+                        <Image
+                            source={{
+                                uri: selectedImage ? selectedImage : null,
+                            }}
+                            resizeMode="contain"
+                            style={{ width: width - 40, height: height / 2 }}
+                            onError={() => console.log('Error loading image')}
+                        />
+                    </View>
+                </View>
+            </Modal>
+
             {loading ? (
                 <View style={styles.spinner}>
                     <ActivityIndicator size="x-large" color="black" />
                 </View>
             ) : (
-                    <DataTable>
-                        <DataTable.Header>
-                            <DataTable.Title>Name</DataTable.Title>
-                            <DataTable.Title>Price</DataTable.Title>
-                            <DataTable.Title>Stock</DataTable.Title>
-                            <DataTable.Title>Images</DataTable.Title>
-                        </DataTable.Header>
-                        {materialFilter.map((item, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                onPress={() => handleRowPress(item)}
-                                style={[styles.container, {
-                                    backgroundColor: index % 2 == 0 ? "white" : "gainsboro"
-                                }]}
-                            >
-                                <DataTable.Row>
-                                    <DataTable.Cell>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell>{item.price}</DataTable.Cell>
-                                    <DataTable.Cell>{item.countInStock}</DataTable.Cell>
-                                    <DataTable.Cell>
-                                        {item.image.map((imageUrl, idx) => (
-                                            <Image
-                                                key={idx}
-                                                source={{
-                                                    uri: imageUrl ? imageUrl : null
-                                                }}
-                                                resizeMode="contain"
-                                                style={styles.image}
-                                                onError={() => console.log("Error loading image")}
-                                            />
-                                        ))}
-                                    </DataTable.Cell>
-                                </DataTable.Row>
-                            </TouchableOpacity>
-                        ))}
-                    </DataTable>
+                <DataTable>
+                    <DataTable.Header style={{ backgroundColor: 'black' }}>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
+                      
+                 
+                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
+                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>STOCK</Text></DataTable.Title>
+                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
+                 
+                      
+                         </DataTable.Header>
+                    {photoFilter.map((item, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => handleRowPress(item)}
+                            style={{
+                                backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
+                            }}>
+                            <DataTable.Row>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.price}</DataTable.Cell>
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.countInStock}</DataTable.Cell>
+                                  
+                               
+                               
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ textDecorationLine: 'underline' }}>View</Text>
+                                </DataTable.Cell>
+                            </DataTable.Row>
+                        </TouchableOpacity>
+                    ))}
+                </DataTable>
             )}
         </Box>
     );
@@ -241,11 +307,6 @@ const styles = StyleSheet.create({
     buttonText: {
         marginLeft: 4,
         color: 'white'
-    },
-    image: {
-        width: 10, // Adjust image width as needed
-        height: 10, // Adjust image height as needed
-        marginRight: 5, // Add margin between images
     },
     modalView: {
         margin: 20,
@@ -271,4 +332,3 @@ const styles = StyleSheet.create({
 });
 
 export default Materials;
-

@@ -1,6 +1,6 @@
 import Input from "../../Shared/Form/Input";
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, StyleSheet, Switch } from 'react-native'
+import { View, Text, StyleSheet, KeyboardAvoidingView ,Switch, Dimensions } from 'react-native'
 import FormContainer from "../../Shared/Form/FormContainer";
 import Error from '../../Shared/Error'
 import { Button } from "native-base";
@@ -54,17 +54,17 @@ const Login = (props) => {
     };
 
     return (
-        <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            extraHeight={50}
-            enableOnAndroid={true}
-        >
+        <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={styles.container}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -500}
+    >
             <View style={styles.app}>
                 <View style={styles.formBlockWrapper} />
                 <View style={[styles.formBlock, mode === 'register' ? styles.isSignup : styles.isLogin]}>
                     <View style={styles.formBlockHeader}>
                              <Input
-                                placeholder={"Enter email"}
+                                placeholder={"Enter Email"}
                                 name={"email"}
                                 id={"email"}
                                 value={email}
@@ -78,27 +78,34 @@ const Login = (props) => {
                                 value={password}
                                 onChangeText={(text) => setPassword(text)}
                             /> 
-                             <EasyButton x-l primary onPress={() =>  handleSubmit()}>
-                            <Text style={{ color: 'white' }}>Login</Text>
+                        
+                             <EasyButton x-l primary onPress={() =>  handleSubmit()}  style={{ backgroundColor: '#3E424B' }}>
+                            <Text style={{ color: 'white' }}>LOGIN</Text>
                         </EasyButton>
-                            <View style={styles.formBlockToggleBlock}>
-                                <Text>Already have an account? Click here</Text>
-                                <Switch
-                                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                                    thumbColor={mode === 'register' ? "#f5dd4b" : "#f4f3f4"}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={toggleMode}
-                                    value={mode === 'register'}
-                                />
-                            </View> 
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10,marginLeft : -10 }}>
+    <Text>Do not have an account? Register here</Text>
+    <Switch
+        trackColor={{ false: "#767577", true: "#81b0ff" }}
+        thumbColor={mode === 'register' ? "#f5dd4b" : "#f4f3f4"}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={toggleMode}
+        value={mode === 'register'}
+    />
+</View>
+
+
                     </View>
                 </View>
             </View>
-        </KeyboardAwareScrollView>
+        
+            </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
     buttonGroup: {
         width: "80%",
         alignItems: "center",
@@ -107,6 +114,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#1F2022',
     },
     formBlockWrapper: {
         position: 'absolute',
@@ -117,18 +125,32 @@ const styles = StyleSheet.create({
     },
     isLogin: {
         opacity: 0.92,
-        backgroundColor: '#2C497F',
+        backgroundColor: '#B6B6B4',
     },
     isSignup: {
         opacity: 0.94,
-        backgroundColor: '#433B7C',
+        backgroundColor: '#B6B6B4',
     },
+
+    formBlockToggleBlock: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    toggleText: {
+        marginRight: 10,
+    },
+    switchContainer: {
+        marginLeft: 'auto', // Pushes the switch to the right
+    },
+
+
     formBlock: {
         position: 'relative',
         margin: 100,
-        width: 285,
+        width: Dimensions.get('window').width - 55, // Adjust width according to your design
         padding: 25,
-        height: 300,
+        height: 300, // Adjust height according to your design
         backgroundColor: 'rgba(255, 255, 255, .13)',
         borderRadius: 8,
         color: '#fff',

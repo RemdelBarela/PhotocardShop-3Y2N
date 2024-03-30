@@ -61,8 +61,7 @@ const Register = () => {
         formData.append("email", email);
         formData.append("password", password);
         formData.append("phone", phone);
-        formData.append("address", address);
-        formData.append("isAdmin", false);
+          formData.append("isAdmin", false);
         formData.append("image", {
             uri: newImageUri,
             type: mime.getType(newImageUri),
@@ -129,8 +128,8 @@ const Register = () => {
 
     return (
         <KeyboardAwareScrollView
-            viewIsInsideTabBar={true}
-            extraHeight={200}
+            viewIsInsideTabBar={false}
+            extraHeight={0}
             enableOnAndroid={true}
         >
             <View style={styles.app}>
@@ -171,18 +170,14 @@ const Register = () => {
                             keyboardType={"numeric"}
                             onChangeText={(text) => setPhone(text)}
                         />
-                         <Input
-                            placeholder={"Address"}
-                            name={"address"}
-                            id={"address"}
-                            onChangeText={(text) => setAddress(text)}
-                        />
+                        
                         <View style={styles.buttonGroup}>
                             {error ? <Error message={error} /> : null}
                         </View>
-                        <EasyButton x-l primary onPress={() =>  register()}>
-                            <Text style={{ color: 'white' }}>REGISTER</Text>
-                        </EasyButton>
+                        <EasyButton x-l primary onPress={() => register()} style={{ backgroundColor: '#3E424B' }}>
+    <Text style={{ color: 'white' }}>REGISTER</Text>
+</EasyButton>
+
                        
                         <View style={styles.socialButtonContainer}>
                             <TouchableOpacity onPress={() => { }}>
@@ -193,12 +188,11 @@ const Register = () => {
                     </TouchableOpacity>
                         </View>
                     </View>
-                    <Text>Sign up</Text>
-                    <View style={styles.formBlockToggleBlock}>
-                        <Text>Already have an account? Click here</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10,marginLeft : -17 }}>
+      <Text>Already have an account? Click here</Text>
                         <Switch
-                            trackColor={{ false: "#767577", true: "#81b0ff" }}
-                            thumbColor={mode === 'login' ? "#f5dd4b" : "#f4f3f4"}
+                            trackColor={{ false: "#5E5E5E", true: "#5E5E5E" }}
+                            thumbColor={mode === 'login' ? "#353839" : "#353839"}
                             ios_backgroundColor="#3e3e3e"
                             onValueChange={toggleMode}
                             value={mode === 'login'}
@@ -213,10 +207,11 @@ const Register = () => {
 
 const styles = StyleSheet.create({
     app: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#1F2022',
     },
+    
     formBlockWrapper: {
         position: 'absolute',
         top: 0,
@@ -230,7 +225,7 @@ const styles = StyleSheet.create({
     },
     isSignup: {
         opacity: 0.94,
-        backgroundColor: '#433B7C',
+        backgroundColor: '#848482',
     },
     formBlock: {
         position: 'relative',
@@ -292,9 +287,7 @@ const styles = StyleSheet.create({
         margin: 20,
         justifyContent: "center",
         borderRadius: 100,
-        borderColor: "#E0E0E0",
-        elevation: 10
-    },
+        },
     image: {
         width: "100%",
         height: "100%",
