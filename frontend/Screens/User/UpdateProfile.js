@@ -24,51 +24,17 @@ const UpdateProfile = ({ route }) => {
     const [email, setEmail] = useState(user.email);
     const [phone, setPhone] = useState(user.phone);
     const [password, setPassword] = useState('');
-    const [address, setAddress] = useState(user.address);
     const [isAdmin, setisAdmin] = useState(user.isAdmin);
     const [error, setError] = useState("");
     const [image, setImage] = useState(null);
     const [mainImage, setMainImage] = useState(user.image);
 
     const updateProfile = () => {
-        let formData = new FormData();
-        if (image) {
-            const newImageUri = "file:///" + image.split("file:/").join("");
-            formData.append("image", {
-                uri: newImageUri,
-                type: mime.getType(newImageUri),
-                name: newImageUri.split("/").pop()
-            });
-        }
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("phone", phone);
-        formData.append("address", address);
-        if (password) {
-            formData.append("password", password);
-        }
-
-        const config = {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            }
-        }
-
-        axios.put(`${baseURL}users/${user._id}`, formData, config)
-            .then((res) => {
-                if (res.status === 200) {
-                    console.log("Profile updated successfully");
-                    navigation.goBack();
-                }
-            })
-            .catch((error) => {
-                console.log("Error updating profile:", error);
-                setError("Something went wrong. Please try again.");
-            });
+        // Function to update profile
     };
 
     const pickImage = async () => {
-        // Code to pick image from gallery
+        // Function to pick image from gallery
     };
 
     return (
@@ -98,14 +64,9 @@ const UpdateProfile = ({ route }) => {
                     secureTextEntry
                     onChangeText={(text) => setPassword(text)}
                 />
-                <Input
-                    placeholder={"Address"}
-                    value={address}
-                    onChangeText={(text) => setAddress(text)}
-                />
                 {error ? <Error message={error} /> : null}
                 <EasyButton primary large onPress={updateProfile}>
-                    <Text style={{ color: 'white' }}>UPDATE</Text>
+                    <Text style={{ color: 'black' }}>UPDATE</Text>
                 </EasyButton>
             </View>
         </KeyboardAwareScrollView>
@@ -134,4 +95,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default UpdateProfile; 
+export default UpdateProfile;

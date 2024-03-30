@@ -188,7 +188,7 @@ const Users = (props) => {
                         <DataTable.Title>EMAIL</DataTable.Title>
                         <DataTable.Title>PASSWORD</DataTable.Title>
                         <DataTable.Title>PHONE</DataTable.Title>
-                        <DataTable.Title>ADDRESS</DataTable.Title>
+                        {/* <DataTable.Title>ADDRESS</DataTable.Title> */}
                         <DataTable.Title>ROLE</DataTable.Title>
                         <DataTable.Title>IMAGES</DataTable.Title>
                     </DataTable.Header>
@@ -205,7 +205,7 @@ const Users = (props) => {
                                     <DataTable.Cell>{item.email}</DataTable.Cell>
                                     <DataTable.Cell>{item.password}</DataTable.Cell>
                                     <DataTable.Cell>{item.phone}</DataTable.Cell>
-                                    <DataTable.Cell>{item.address}</DataTable.Cell>
+                                    {/* <DataTable.Cell>{item.address}</DataTable.Cell> */}
                                     <DataTable.Cell>{item.isAdmin}</DataTable.Cell>
                                     <DataTable.Cell>
     {Array.isArray(item.image) ? (

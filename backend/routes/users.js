@@ -60,9 +60,9 @@ router.post('/', async (req, res) => {
         email: req.body.email,
         passwordHash: password,
         phone: req.body.phone,
-        address: req.body.address,
         isAdmin: req.body.isAdmin,
-        
+
+        // address: req.body.address,
         // street: req.body.street,
         // apartment: req.body.apartment,
         // zip: req.body.zip,
@@ -94,9 +94,9 @@ router.put('/:id', async (req, res) => {
             email: req.body.email,
             passwordHash: newPassword,
             phone: req.body.phone,
-            address: req.body.address,
             isAdmin: req.body.isAdmin,
 
+            // address: req.body.address,
             // street: req.body.street,
             // apartment: req.body.apartment,
             // zip: req.body.zip,
@@ -108,7 +108,6 @@ router.put('/:id', async (req, res) => {
 
     if (!updateProfile)
         return res.status(400).send('THE USER CANNOT BE UPDATED!')
-
     res.send(updateProfile);
 })
 
@@ -147,9 +146,9 @@ router.post('/register', uploadOptions.single('image'), async (req, res) => {
         image: `${basePath}${fileName}`,
         passwordHash: bcrypt.hashSync(req.body.password, 10),
         phone: req.body.phone,
-        address: req.body.address,
         isAdmin: req.body.isAdmin,
 
+        // address: req.body.address,
         // street: req.body.street,
         // apartment: req.body.apartment,
         // zip: req.body.zip,
@@ -160,7 +159,6 @@ router.post('/register', uploadOptions.single('image'), async (req, res) => {
 
     if (!user)
         return res.status(400).send('the user cannot be created!')
-
     res.send(user);
 })
 

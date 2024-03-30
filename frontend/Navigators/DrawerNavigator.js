@@ -4,6 +4,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
+import { Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   NativeBaseProvider,
@@ -37,18 +38,20 @@ const Drawer = createDrawerNavigator();
 
 const getIcon = (screenName) => {
   switch (screenName) {
-    case "Inbox":
-      return "email";
-    case "Outbox":
-      return "send";
-    case "Cart":
-      return "cart";
-    case "Product List":
-      return "archive";
-    case "Trash":
-      return "trash-can";
-    case "Spam":
-      return "alert-circle";
+    case "HOME":
+      return "home-outline";
+    case "PROFILE":
+      return "account-outline";
+    case "CART":
+      return "cart-outline";
+    case "PHOTOS":
+      return "image-outline";
+    case "MATERIALS":
+      return "file-document-outline";
+    case "USERS":
+      return "account-group-outline";
+    case "CHARTS":
+      return "chart-line"; 
     default:
       return undefined;
   }
@@ -58,14 +61,20 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props} safeArea>
       <VStack space="6" my="2" mx="1">
-        <Box px="4">
+      <Box width={12} height={12} borderRadius="full" overflow="hidden" justifyContent="center" alignItems="center" marginLeft="110">
+        <Image
+          source={require("../assets/Logo.png")}
+          style={{ width: "100%", height: "100%" }}
+        />
+      </Box>
+        {/* <Box px="4">
           <Text bold color="gray.700">
             Mail
           </Text>
           <Text fontSize="14" mt="1" color="gray.500" fontWeight="500">
             john_doe@gmail.com
           </Text>
-        </Box>
+        </Box> */}
         <VStack divider={<Divider />} space="4">
           <VStack space="3">
             {props.state.routeNames.map((name, index) => (
@@ -75,7 +84,7 @@ function CustomDrawerContent(props) {
                 rounded="md"
                 bg={
                   index === props.state.index
-                    ? "rgba(6, 182, 212, 0.1)"
+                    ? "rgba(0, 0, 0, 0.2)"
                     : "transparent"
                 }
                 onPress={(event) => {
@@ -85,7 +94,7 @@ function CustomDrawerContent(props) {
                 <HStack space="7" alignItems="center">
                   <Icon
                     color={
-                      index === props.state.index ? "primary.500" : "gray.500"
+                      index === props.state.index ? "" : "gray.700"
                     }
                     size="5"
                     as={<MaterialCommunityIcons name={getIcon(name)} />}
@@ -93,7 +102,7 @@ function CustomDrawerContent(props) {
                   <Text
                     fontWeight="500"
                     color={
-                      index === props.state.index ? "primary.500" : "gray.700"
+                      index === props.state.index ? "" : "white.700"
                     }
                   >
                     {name}
@@ -101,49 +110,6 @@ function CustomDrawerContent(props) {
                 </HStack>
               </Pressable>
             ))}
-          </VStack>
-          <VStack space="5">
-            <Text fontWeight="500" fontSize="14" px="5" color="gray.500">
-              Labels
-            </Text>
-            <VStack space="3">
-              <Pressable px="5" py="3">
-                <HStack space="7" alignItems="center">
-                  <Icon
-                    color="gray.500"
-                    size="5"
-                    as={<MaterialCommunityIcons name="bookmark" />}
-                  />
-                  <Text color="gray.700" fontWeight="500">
-                    Family
-                  </Text>
-                </HStack>
-              </Pressable>
-              <Pressable px="5" py="2">
-                <HStack space="7" alignItems="center">
-                  <Icon
-                    color="gray.500"
-                    size="5"
-                    as={<MaterialCommunityIcons name="bookmark" />}
-                  />
-                  <Text color="gray.700" fontWeight="500">
-                    Friends
-                  </Text>
-                </HStack>
-              </Pressable>
-              <Pressable px="5" py="3">
-                <HStack space="7" alignItems="center">
-                  <Icon
-                    color="gray.500"
-                    size="5"
-                    as={<MaterialCommunityIcons name="bookmark" />}
-                  />
-                  <Text fontWeight="500" color="gray.700">
-                    Work
-                  </Text>
-                </HStack>
-              </Pressable>
-            </VStack>
           </VStack>
         </VStack>
       </VStack>
@@ -157,17 +123,17 @@ const DrawerNavigator = () => {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
         <Drawer.Screen
-          name="Home"
+          name="HOME"
           component={Main}
         />
-        <Drawer.Screen name="Products" component={Main} initialParams={{ screen: 'Products' }} />
-        <Drawer.Screen name="Login" component={Main} initialParams={{ screen: 'User' }} />
-        <Drawer.Screen name="Cart" component={Main} initialParams={{ screen: 'Cart' }} />
-        <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/>
+        {/* <Drawer.Screen name="Products" component={Main} initialParams={{ screen: 'Products' }} /> */}
+        {/* <Drawer.Screen name="PROFILE" component={Main} initialParams={{ screen: 'User' }} /> */}
+        <Drawer.Screen name="CART" component={Main} initialParams={{ screen: 'Cart' }} />
+        {/* <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/> */}
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
         <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
-
+        <Drawer.Screen name="CHARTS" component={''}  initialParams={{ screen: '' }}/>
       </Drawer.Navigator>
     </Box>
   );
