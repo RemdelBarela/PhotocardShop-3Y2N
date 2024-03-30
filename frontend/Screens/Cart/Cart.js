@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/FontAwesome";
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { removeFromCart, clearCart } from '../../Redux/Actions/cartActions'
+import { updateCart, removeFromCart, clearCart } from '../../Redux/Actions/cartActions'
 var { height, width } = Dimensions.get("window");
 import EasyButton from "../../Shared/StyledComponents/EasyButton"
 import AuthGlobal from "../../Context/Store/AuthGlobal"
@@ -19,35 +19,34 @@ const Cart = () => {
     const dispatch = useDispatch()
     const cartItems = useSelector(state => state.cartItems)
     const context = useContext(AuthGlobal)
+
+    const handleCountChange = (item, change) => {
+        const updatedCartItems = cartItems.map(cartItem => {
+            if (cartItem.newData._id === item.newData._id) {
+                const newQuantity = Math.max(cartItem.quantity + change, 1);
+                return { ...cartItem, quantity: newQuantity };
+            }
+            return cartItem;
+        });
+        dispatch(updateCart(updatedCartItems));
+    };
+
     const total = cartItems.reduce((acc, cart) => {
         const materialPrice = cart?.newData?.material?.price || 0; // Ensure material exists and price is available
         return acc + materialPrice * cart.quantity;
     }, 0);
-      // State to manage item count
-      const [count, setCount] = useState(1); // Default count is 1
-    
-      // Function to handle increment
-      const incrementCount = () => {
-          setCount(count + 1);
-      };
-      
-      // Function to handle decrement
-      const decrementCount = () => {
-          if (count > 1) { // Ensure count doesn't go below 1
-              setCount(count - 1);
-          }
-      };
-  
+
     const renderItem = ({ item, index }) => {
         console.log("Item:", item);
         
-        const photoImage = item.newData.photo.image[0];
-        const photoName = item.newData.photo.name;
-        const materialName = item.newData.material.name;
-        const materialPrice = item.newData.material.price;
+        const photoImage = item.newData && item.newData.photo.image[0];
+        const photoName = item.newData && item.newData.photo.name;
+        const materialName = item.newData && item.newData.material.name;
+        const materialPrice = item.newData && item.newData.material.price;
     
+        console.log("photoImage: ", photoImage)
         // Accessing nested data using array notation for image array
-        const materialImage = item.newData.material.image[0];
+        const materialImage = item.newData && item.newData.material.image[0];
         return (
             <TouchableHighlight
                 _dark={{
@@ -77,18 +76,19 @@ const Cart = () => {
                             </Text>
                         </VStack>
                         <HStack alignItems="center">
-
- 
-                            <TouchableOpacity onPress={decrementCount}>
+    
+    
+                            <TouchableOpacity onPress={() => handleCountChange(item, -1)}>
                                 <Icon name="minus" size={20} color="white" style={{backgroundColor: 'black', padding: 5, borderRadius: 5}} />
                             </TouchableOpacity>
                             <Text fontSize="sm" color="coolGray.800" _dark={{
                                 color: 'warmGray.50'
                             }} alignSelf="center" style={{marginHorizontal: 5}}>
                                 {/* Display item count */}
-                                {count}
+                                {/* {count} */}
+                                {item.quantity}
                             </Text>
-                            <TouchableOpacity onPress={incrementCount}>
+                            <TouchableOpacity onPress={() => handleCountChange(item, 1)}>
                                 <Icon name="plus" size={20} color="white" style={{backgroundColor: 'black', padding: 5, borderRadius: 5}} />
                             </TouchableOpacity>
                         </HStack>
@@ -97,6 +97,7 @@ const Cart = () => {
             </TouchableHighlight>
         );
     };
+    
     
     
     const renderHiddenItem = (cartItems) =>
@@ -127,8 +128,8 @@ const Cart = () => {
                         rightOpenValue={-150}
                         previewOpenValue={-100}
                         previewOpenDelay={3000}
-                        keyExtractor={item => item.newData._id}
-                    />
+                        keyExtractor={item => item.newData ? item.newData._id : item.id}
+                        />
                 </Box>
             ) : (
                 <Box style={styles.emptyContainer}>
@@ -144,19 +145,19 @@ const Cart = () => {
                 <HStack justifyContent="space-between">
                     {/* <Button alignItems="center" onPress={() => dispatch(clearCart())} >Clear</Button> */}
                     <EasyButton
-    danger
-    medium
-    alignItems="center"
-    onPress={() => dispatch(clearCart())}
-    style={{
-        height: 50,
-        borderRadius: 10,
-        borderColor: 'white',
-        borderWidth: 1,
-        justifyContent: 'center', // To center the text vertically
-        alignItems: 'center',     // To center the text horizontally
-    }}
->
+                        danger
+                        medium
+                        alignItems="center"
+                        onPress={() => dispatch(clearCart())}
+                        style={{
+                            height: 50,
+                            borderRadius: 10,
+                            borderColor: 'white',
+                            borderWidth: 1,
+                            justifyContent: 'center', // To center the text vertically
+                            alignItems: 'center',     // To center the text horizontally
+                        }}
+                    >
     <Text style={{ color: 'white', textAlign: 'center' }}>Clear</Text>
 </EasyButton>
 
@@ -167,18 +168,18 @@ const Cart = () => {
                 </HStack> */}
                 {context.stateUser.isAuthenticated ? (
                     <EasyButton
-    primary
-    medium
-    onPress={() => navigation.navigate('Checkout')}
-    style={{
-        height: 50,
-        borderRadius: 10,
-        borderColor: 'white',
-        borderWidth: 1,
-        justifyContent: 'center', // To center the text vertically
-        alignItems: 'center',     // To center the text horizontally
-    }}
->
+                        primary
+                        medium
+                        onPress={() => navigation.navigate('Checkout')}
+                        style={{
+                            height: 50,
+                            borderRadius: 10,
+                            borderColor: 'white',
+                            borderWidth: 1,
+                            justifyContent: 'center', // To center the text vertically
+                            alignItems: 'center',     // To center the text horizontally
+                        }}
+                    >
     <Text style={{ color: 'white', textAlign: 'center' }}>Checkout</Text>
 </EasyButton>
 

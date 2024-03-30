@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Dimensions, View, Text, TouchableOpacity, TextInput, Switch, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import { Camera } from 'expo-camera';
 import * as ImagePicker from "expo-image-picker";
 import { PermissionsAndroid } from "react-native";
