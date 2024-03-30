@@ -32,23 +32,43 @@ router.get(`/`, async (req, res) => {
 //     }
 //     res.send(order);
 // })
+router.get('/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id)
+            .populate('user')
+            .populate({
+                path: 'orderItems', 
+                populate: {
+                    path: 'photocard',
+                    populate: {
+                        path: 'photo',
+                        model: 'Photo'
+                    }
+                }
+            })
+            .populate({
+                path: 'orderItems',
+                populate: {
+                    path: 'photocard',
+                    populate: {
+                        path: 'material',
+                        model: 'Material'
+                    }
+                }
+            });
 
-router.get(`/:id`, async (req, res) => {
-    const order = await Order.findById(req.params.id)
-        .populate('user', 'name')
-        .populate({
-            path: 'orderItems', 
-            populate: {
-                path: 'product', 
-                populate: 'category'
-            }
-        });
+        console.log(order)
 
-    if (!order) {
-        res.status(500).json({ success: false })
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({ success: true, order });
+    } catch (error) {
+        console.error('Error fetching order:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
-    res.send(order);
-})
+});
 
 router.post('/:photo_id/:material_id', async (req, res) => {
     try {

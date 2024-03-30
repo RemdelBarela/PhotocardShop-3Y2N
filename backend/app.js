@@ -28,6 +28,8 @@ const photosRoutes = require("./routes/photos");
 const materialsRoutes = require("./routes/materials");
 
 const ordersRoutes = require("./routes/orders");
+const reviewsRoutes = require("./routes/reviews");
+
 
 const api = process.env.API_URL;
 
@@ -39,6 +41,8 @@ app.use(`${api}/photos`, photosRoutes);
 app.use(`${api}/materials`, materialsRoutes);
 
 app.use(`${api}/orders`, ordersRoutes);
+app.use(`${api}/reviews`, reviewsRoutes);
+
 
 //Database
 mongoose

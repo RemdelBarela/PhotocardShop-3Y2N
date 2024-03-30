@@ -23,8 +23,9 @@ import mime from "mime";
 import StarRating from "../../Shared/StarRating";
 
 const ReviewForm = (props) => {
-    const [comment, setComment] = useState('');
+    const [review, setReview] = useState('');
     const [rating, setRating] = useState('');
+    // const [images, setImages] = useState([]);
     const [error, setError] = useState('');
     const [reviews, setReviews] = useState(null);
     const [token, setToken] = useState();
@@ -35,24 +36,61 @@ const ReviewForm = (props) => {
     useEffect(() => {
         if (route.params && route.params.item) {
             const { item } = route.params;
-            setComment(item.comment);
+            setReview(item.review);
             setRating(item.rating);
+            // setImages(item.image);
             setReviews(item); 
+
         } else {
             setReviews(null);
         }
-
+        // (async () => {
+        //     if (Platform.OS !== "web") {
+        //         const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        //         if (status !== "granted") {
+        //             alert("Apologies, but in order to proceed, we require permission to access your camera roll!");
+        //         }
+        //     }
+        // })();
     }, [route.params]);
 
+    // const pickImage = async () => {
+    //     let result = await ImagePicker.launchImageLibraryAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //         allowsEditing: true,
+    //         aspect: [1,1],
+    //         quality: 1,
+    //     });
+
+    //     if (!result.canceled) {
+    //         const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
+    //         const filteredImages = images.filter(image => image.uri !== undefined);
+    //         setImages([...filteredImages, ...selectedImages]); 
+    //     }  
+        
+    // };
+
+    // const removeImage = (id) => {
+    //     setImages(images.filter((image) => image.id !== id));
+    // };
+
     const addReview = () => {
-        if ( comment === '' || rating === '') {
+        if ( rating === '' || review === '') {
             setError('Please complete the form accurately.');
             return;
         }
 
         let formData = new FormData();
-        formData.append("comment", comment);
+        formData.append("review", review);
         formData.append("rating", rating);
+        // images.forEach((image, index) => {
+        //     formData.append(`image`, {  // Update 'image' here
+        //         uri: image.uri,
+        //         type: mime.getType(image.uri),
+        //         reviews: `image${index}.${mime.getExtension(mime.getType(image.uri))}`,
+        //     });
+        // });
+
         
         const config = {
             headers: {
@@ -132,15 +170,30 @@ const ReviewForm = (props) => {
 
     return (
         <FormContainer title="REVIEW">
+            {/* <View style={styles.imageContainer}>
+                {images.map((imageURL, index) => {
+                    return(
+
+                    <View key={index}>
+                         <Image style={styles.image} source={{ uri: imageURL.uri || imageURL }} />
+                        <TouchableOpacity onPress={() => removeImage(imageURL.id)} style={styles.removeButton}>
+                            <Text style={styles.removeButtonText}>REMOVE</Text>
+                        </TouchableOpacity>
+                    </View>
+                )})}
+                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    <Icon name="camera" size={24} color="white" />
+                </TouchableOpacity>
+            </View> */}
             <View style={styles.label}>
                 <Text style={{ textDecorationLine: "underline" }}>COMMENT</Text>
             </View>
             <Input
-                placeholder="Comment"
-                name="comment"
-                id="comment"
-                value={comment}
-                onChangeText={(text) => setComment(text)}
+                placeholder="Review"
+                name="review"
+                id="review"
+                value={review}
+                onChangeText={(text) => setReview(text)}
             />
             <View style={styles.label}>
                     <Text style={{ textDecorationLine: "underline" }}>RATING</Text>

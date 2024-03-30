@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = mongoose.Schema({
-    review: {
+    // photo: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Photo',
+    //     required:true
+    // }],
+    comment: {
         type: String,
         required: true,
     },
@@ -9,9 +14,9 @@ const reviewSchema = mongoose.Schema({
         type: Number,
         default:0
     },
-    image: [{
-        type: String
-    }],
+    // image: [{
+    //     type: String
+    // }],
     dateCreated: {
         type: Date,
         default: Date.now,

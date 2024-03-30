@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null;
         }
-        cb(uploadError, 'public/uploads');
+        cb(uploadError, 'public/uploads/reviews');
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const uploadOptions = multer({ storage: storage }).array('image', 10);
+const uploadOptions = multer({ storage: storage }).array('image', 10); // Update to handle multiple files
 
 router.get(`/`, async (req, res) =>{
     
@@ -50,40 +50,42 @@ router.get(`/select/:id`, async (req, res) =>{
     res.send(review);
 })
 
-router.post(`/new`, (req, res) => {
-    console.log(req.files)
+router.post(`/new`, async (req, res) => {
+    console.log(req.body)
 
-    uploadOptions(req, res, async (err) => {
-        if (err) {
-            return res.status(500).json({success: false, error: err})
-        } else {
-            const files = req.files;
-            if (!files || files.length === 0) {
-                return res.status(400).send('NO IMAGES IN THE REQUEST');
-            }
+    // uploadOptions(req, res, async (err) => {
+    //     if (err) {
+    //         return res.status(500).json({success: false, error: err})
+    //     } else {
+    //         const files = req.files;
+    //         if (!files || files.length === 0) {
+    //             return res.status(400).send('NO IMAGES IN THE REQUEST');
+    //         }
 
-            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
-            let reviewPaths = [];
-            files.forEach(file => {
-                const fileName = file.filename;
-                reviewPaths.push(`${basePath}${fileName}`);
-            });
+    //         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/reviews/`;
+    //         let reviewPaths = [];
+    //         files.forEach(file => {
+    //             const fileName = file.filename;
+    //             reviewPaths.push(`${basePath}${fileName}`);
+    //         });
 
             const newReview = new Review({
-                review: req.body.review,
+                comment: req.body.comment,
                 rating: req.body.rating,
-                image: reviewPaths
+                // image: reviewPaths
             });
 
+            console.log(newReview)
             try {
                 const savedReview = await newReview.save();
                 res.status(201).send(savedReview);
             } catch (error) {
-                return res.status(500).json({success: false, error: err})
+                return res.status(500).json({success: false})
             }
         }
-    });
-});
+    // }
+    // );
+);
 
 router.put('/:id', uploadOptions, async (req, res) => {
     console.log(req.body);
@@ -96,7 +98,7 @@ router.put('/:id', uploadOptions, async (req, res) => {
 
     let imagePaths = [];
     if (req.files && req.files.length > 0) {
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/reviews/`;
         req.files.forEach(file => {
             const fileName = file.filename;
             const imagePath = `${basePath}${fileName}`;

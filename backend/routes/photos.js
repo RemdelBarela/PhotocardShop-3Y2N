@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null;
         }
-        cb(uploadError, 'public/uploads');
+        cb(uploadError, 'public/uploads/photos/');
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -62,7 +62,7 @@ router.post(`/new`, (req, res) => {
                 return res.status(400).send('NO IMAGES IN THE REQUEST');
             }
 
-            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+            const basePath = `${req.protocol}://${req.get('host')}/public/uploads/photos/`;
             let photoPaths = [];
             files.forEach(file => {
                 const fileName = file.filename;
@@ -96,7 +96,7 @@ router.put('/:id', uploadOptions, async (req, res) => {
 
     let imagePaths = [];
     if (req.files && req.files.length > 0) {
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/photos/`;
         req.files.forEach(file => {
             const fileName = file.filename;
             const imagePath = `${basePath}${fileName}`;

@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null;
         }
-        cb(uploadError, 'public/uploads');
+        cb(uploadError, 'public/uploads/users');
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -29,6 +29,7 @@ const storage = multer.diskStorage({
 });
 
 const uploadOptions = multer({ storage: storage });
+
 router.get(`/`, async (req, res) => {
     // const userList = await User.find();
     const userList = await User.find().select('-passwordHash');
