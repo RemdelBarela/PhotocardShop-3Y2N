@@ -20,33 +20,47 @@ const Cart = () => {
     const cartItems = useSelector(state => state.cartItems)
     const context = useContext(AuthGlobal)
 
+    // const handleCountChange = (item, change) => {
+    //     const updatedCartItems = cartItems.map(cartItem => {
+    //         if (cartItem.newData._id === item.newData._id) {
+    //             const newQuantity = Math.max(cartItem.quantity + change, 1);
+    //             return { ...cartItem, quantity: newQuantity };
+    //         }
+    //         return cartItem;
+    //     });
+    //     dispatch(updateCart(updatedCartItems));
+    // };
+
     const handleCountChange = (item, change) => {
         const updatedCartItems = cartItems.map(cartItem => {
             if (cartItem.newData._id === item.newData._id) {
-                const newQuantity = Math.max(cartItem.quantity + change, 1);
-                return { ...cartItem, quantity: newQuantity };
+                const newQuantity = Math.max(cartItem.quantity + change, 0); // Ensure new quantity is at least 0
+                if (newQuantity === 0) {
+                    return null; // Remove the item by returning null
+                } else {
+                    return { ...cartItem, quantity: newQuantity };
+                }
             }
             return cartItem;
-        });
+        }).filter(Boolean); // Remove null values from the updated array
         dispatch(updateCart(updatedCartItems));
     };
-
+    
     const total = cartItems.reduce((acc, cart) => {
         const materialPrice = cart?.newData?.material?.price || 0; // Ensure material exists and price is available
         return acc + materialPrice * cart.quantity;
     }, 0);
 
     const renderItem = ({ item, index }) => {
-        console.log("Item:", item);
         
-        const photoImage = item.newData && item.newData.photo.image[0];
-        const photoName = item.newData && item.newData.photo.name;
-        const materialName = item.newData && item.newData.material.name;
-        const materialPrice = item.newData && item.newData.material.price;
-    
+        const photoImage = item.newData.photo.image[0];
+        const photoName = item.newData.photo.name;
+        const materialName = item.newData.material.name;
+        const materialPrice = item.newData.material.price;
+        const materialImage = item.newData.material.image[0];
+
         console.log("photoImage: ", photoImage)
         // Accessing nested data using array notation for image array
-        const materialImage = item.newData && item.newData.material.image[0];
         return (
             <TouchableHighlight
                 _dark={{
