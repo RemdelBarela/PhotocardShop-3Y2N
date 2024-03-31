@@ -76,9 +76,6 @@ const UserProfile = (props) => {
                     <Text style={styles.userInfoText}>
                         Phone: {userProfile ? userProfile.phone : ""}
                     </Text>
-                    {/* <Text style={styles.userInfoText}>
-                        Address: {userProfile ? userProfile.address : ""}
-                    </Text> */}
                 </View>
                 <View style={styles.buttonContainer}>
                     <Button title={"Update Profile"} onPress={handleUpdateProfile} color="#888" />

@@ -148,7 +148,7 @@ const Users = (props) => {
                         </TouchableOpacity>
                         {selectedUser && (
                             <>
-                                <Text>{selectedUser.name}</Text>
+                                {/* <Text>{selectedUser.name}</Text> */}
                                 <EasyButton
                                     medium
                                     secondary
@@ -158,7 +158,7 @@ const Users = (props) => {
                                     }}
                                     title="Edit"
                                 >
-                                    <Text style={styles.textStyle}>Edit</Text>
+                                    <Text style={styles.textStyle}>EDIT</Text>
                                 </EasyButton>
                                 <EasyButton
                                     medium
@@ -169,7 +169,7 @@ const Users = (props) => {
                                     }}
                                     title="Delete"
                                 >
-                                    <Text style={styles.textStyle}>Delete</Text>
+                                    <Text style={styles.textStyle}>DELETE</Text>
                                 </EasyButton>
                             </>
                         )}
@@ -188,7 +188,6 @@ const Users = (props) => {
                         <DataTable.Title>EMAIL</DataTable.Title>
                         <DataTable.Title>PASSWORD</DataTable.Title>
                         <DataTable.Title>PHONE</DataTable.Title>
-                        {/* <DataTable.Title>ADDRESS</DataTable.Title> */}
                         <DataTable.Title>ROLE</DataTable.Title>
                         <DataTable.Title>IMAGES</DataTable.Title>
                     </DataTable.Header>
@@ -203,9 +202,8 @@ const Users = (props) => {
                                 <DataTable.Row>
                                     <DataTable.Cell>{item.name}</DataTable.Cell>
                                     <DataTable.Cell>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell>{item.password}</DataTable.Cell>
+                                    <DataTable.Cell>{item.passwordHash}</DataTable.Cell>
                                     <DataTable.Cell>{item.phone}</DataTable.Cell>
-                                    {/* <DataTable.Cell>{item.address}</DataTable.Cell> */}
                                     <DataTable.Cell>{item.isAdmin}</DataTable.Cell>
                                     <DataTable.Cell>
     {Array.isArray(item.image) ? (
