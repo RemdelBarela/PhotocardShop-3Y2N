@@ -68,83 +68,50 @@ const UpdateProfile = ({ route }) => {
     return (
         <KeyboardAwareScrollView>
             <View style={styles.container}>
-                {/* <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
+                <TouchableOpacity onPress={handleSignOut} style={styles.signOutButton}>
                     <Text style={styles.signOutButtonText}>Sign Out</Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
                 <View style={styles.userInfoContainer}>
                     <Image style={styles.profileImage} source={{ uri: mainImage }} />
-                    {/* <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                    <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
                         <Text style={styles.imagePickerText}>Change Picture</Text>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                     <Input
                         placeholder={"Name"}
-                        value={name}style={styles.userInfoText}
+                        value={name}
                         onChangeText={(text) => setName(text)}
                     />
                     <Input
                         placeholder={"Email"}
-                        value={email}style={styles.userInfoText}
+                        value={email}
                         onChangeText={(text) => setEmail(text.toLowerCase())}
                     />
                     <Input
                         placeholder={"Phone Number"}
-                        value={phone}style={styles.userInfoText}
+                        value={phone}
                         onChangeText={(text) => setPhone(text)}
                     />
                     <Input
                         placeholder={"Password"}
-                        value={password}style={styles.userInfoText}
+                        value={password}
                         onChangeText={(text) => setPassword(text)}
                     />
                     {error ? <Error message={error} /> : null}
                 </View>
-                <EasyButton
-    primary
-    large
-    onPress={updateProfile}
-    style={styles.updateButton}>
-    <Text style={styles.updateButtonText}>UPDATE</Text>
-</EasyButton>
-
-
-
-                
+                <EasyButton primary large onPress={updateProfile}>
+                    <Text style={{ color: 'white' }}>UPDATE</Text>
+                </EasyButton>
             </View>
         </KeyboardAwareScrollView>
     );
 };
 
 const styles = StyleSheet.create({
-    updateButton: {
-        backgroundColor: 'gray', // Light gray background color
-        width: '100%', // Full width
-        borderRadius: 10, // Border radius
-        alignItems: 'center', // Center the content horizontally
-        justifyContent: 'center', // Center the content vertically
-    marginLeft:0 },
-    updateButtonText: {
-        color: 'white', // Text color
-        fontWeight: 'bold', // Bold font weight
-        fontSize: 18, // Font size
-       
-      },
     container: {
-        margin: 35,
-        backgroundColor: '#666', // Lighter black background color
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
         paddingHorizontal: 20,
-        paddingTop: 40,
-        paddingBottom: 20,
-        width: '80%', // Adjusted width to make it centered
-        maxWidth: 400, // Max width for better centering on larger screens
-        borderRadius: 10, // Added border radius
-        borderColor: 'black', // Added border color
-        borderWidth: 1, // Added border width
-   
-    },  userInfoText: {
-        marginVertical: 10,
-        fontSize: 16,
-          color: "#333",
-        textAlign: "center",
     },
     signOutButton: {
         alignSelf: 'flex-end',
@@ -163,10 +130,7 @@ const styles = StyleSheet.create({
         height: 100,
         borderRadius: 50,
         marginBottom: 20,
-        borderColor: 'black', // Border color
-        borderWidth: 1, // Border width
     },
-    
     imagePicker: {
         marginBottom: 20,
     },

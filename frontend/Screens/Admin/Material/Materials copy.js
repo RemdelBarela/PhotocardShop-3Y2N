@@ -19,10 +19,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
 import { useNavigation } from "@react-navigation/native"
 
-import baseURL from "../../assets/common/baseurl"
-import EasyButton from "../../Shared/StyledComponents/EasyButton";
+import baseURL from "../../../assets/common/baseurl"
+import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
-const Users = (props) => {
+const Materials = (props) => {
 
     const [photoList, setPhotoList] = useState([]);
     const [photoFilter, setPhotoFilter] = useState([]);
@@ -49,12 +49,12 @@ const Users = (props) => {
 
     const deletePhoto = (id) => {
         axios
-            .delete(`${baseURL}users/${id}`, {
+            .delete(`${baseURL}materials/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                const users = photoFilter.filter((item) => item.id !== id)
-                setPhotoFilter(users)
+                const materials = photoFilter.filter((item) => item.id !== id)
+                setPhotoFilter(materials)
 
                 onRefresh()
             })
@@ -65,7 +65,7 @@ const Users = (props) => {
         setRefreshing(true);
         setTimeout(() => {
             axios
-                .get(`${baseURL}users`)
+                .get(`${baseURL}materials`)
                 .then((res) => {
                     // console.log(res.data)
                     setPhotoList(res.data);
@@ -86,7 +86,7 @@ const Users = (props) => {
                     })
                     .catch((error) => console.log(error))
                 axios
-                    .get(`${baseURL}users`)
+                    .get(`${baseURL}materials`)
                     .then((res) => {
                         console.log(res.data)
                         setPhotoList(res.data);
@@ -113,51 +113,33 @@ const Users = (props) => {
         setSelectedImage(imageUrl);
         setImageModalVisible(true);
     };
+
     const renderGallery = () => {
-        // Check if selectedPhoto is defined and has image property
-        if (selectedPhoto && selectedPhoto.image) {
+        if (selectedPhoto && selectedPhoto.image.length > 0) {
             return (
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {/* Check if image is an array */}
-                    {Array.isArray(selectedPhoto.image) ? (
-                        // Map over the image array
-                        selectedPhoto.image.map((imageUrl, idx) => (
-                            <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
-                                <Image
-                                    source={{
-                                        uri: imageUrl || null, // Ensure imageUrl is not undefined
-                                    }}
-                                    resizeMode="cover"
-                                    style={{ width: width, height: width / 2, marginVertical: 5 }}
-                                    onError={() => console.log('Error loading image')}
-                                />
-                            </TouchableOpacity>
-                        ))
-                    ) : (
-                        // Render a single image if not an array
-                        <TouchableOpacity onPress={() => handleImagePress(selectedPhoto.image)}>
+                    {selectedPhoto.image.map((imageUrl, idx) => (
+                        <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
                             <Image
                                 source={{
-                                    uri: selectedPhoto.image || null, // Ensure imageUrl is not undefined
+                                    uri: imageUrl ? imageUrl : null,
                                 }}
                                 resizeMode="cover"
                                 style={{ width: width, height: width / 2, marginVertical: 5 }}
                                 onError={() => console.log('Error loading image')}
                             />
                         </TouchableOpacity>
-                    )}
+                    ))}
                 </ScrollView>
             );
         } else {
             return <Text>No images available for this photo.</Text>;
         }
     };
-    
-    
 
     return (
         <Box flex={1}>
-                 <View style={styles.buttonContainer}>
+          <View style={styles.buttonContainer}>
      <Searchbar
         placeholder="Search Photo Name"
         onChangeText={(text) => searchPhoto(text)}
@@ -174,6 +156,7 @@ const Users = (props) => {
     </EasyButton>
   
 </View>
+
 
             <Modal
                 animationType="fade"
@@ -277,11 +260,8 @@ const Users = (props) => {
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
                       
                  
-                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>EMAIL</Text></DataTable.Title>
-                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PASSWORD</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHONE</Text></DataTable.Title>
-                 
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>ROLE</Text></DataTable.Title>
+                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
+                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>STOCK</Text></DataTable.Title>
                           <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
                  
                       
@@ -295,14 +275,9 @@ const Users = (props) => {
                             }}>
                             <DataTable.Row>
                                 <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.password}</DataTable.Cell>
-                                  
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.phone}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.isAdmin}</DataTable.Cell>
-                                  
-                           
-                                                
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.price}</DataTable.Cell>
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.countInStock}</DataTable.Cell>
+                     
     <DataTable.Cell 
     style={{
         width: 40,
@@ -316,6 +291,7 @@ const Users = (props) => {
 >     
     <Icon name="eye" size={18} color="white" />
 </DataTable.Cell>
+
                             </DataTable.Row>
                         </TouchableOpacity>
                     ))}
@@ -336,9 +312,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white'
     },
     buttonContainer: {
-        margin: 20,
-        alignSelf: 'center',
-        flexDirection: 'row'
+        flexDirection: 'row', // Arrange items horizontally
+        alignItems: 'center', // Align items vertically
+        margin: 10, // Add some bottom margin for spacing
     },
     buttonText: {
         marginLeft: 4,
@@ -367,4 +343,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Users;
+export default Materials;

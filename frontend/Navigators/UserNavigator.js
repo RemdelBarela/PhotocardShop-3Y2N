@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 const UserNavigator = (props) => {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator >
             <Stack.Screen
                 name="Login"
                 component={Login}
@@ -26,18 +26,22 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
-            <Stack.Screen
-                name="User Profile"
-                component={UserProfile}
-                options={{
-                    headerShown: false
-                }}
-            />
+           <Stack.Screen
+    name="User Profile"
+    component={UserProfile}
+    options={{
+        headerShown: false,
+        cardStyle: { backgroundColor: '#CCCCCC' }  
+    }}
+/>
+
              <Stack.Screen
                 name="Update Profile"
                 component={UpdateProfile}
                 options={{
-                    headerShown: false
+                    headerShown: false,
+                    cardStyle: { backgroundColor: '#CCCCCC' } // Set background color here
+   
                 }}
             />
             <Stack.Screen

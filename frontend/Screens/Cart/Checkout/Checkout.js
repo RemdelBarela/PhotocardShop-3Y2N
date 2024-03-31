@@ -67,7 +67,7 @@ const Checkout = (props) => {
 
         <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
-        style={styles.container}
+        style={styles.background}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -500}
     >
               <FormContainer bg="lightgray" title={"Shipping Address"}>
@@ -108,7 +108,7 @@ const Checkout = (props) => {
                     onChangeText={(text) => setZip(text)}
                 />
                 <Select
-                    width="80%"
+                    width="100%"
                     iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
                     style={{ width: undefined }}
                     selectedValue={country}
@@ -127,8 +127,8 @@ const Checkout = (props) => {
                     })}
                 </Select>
                
-                <View style={{ width: '80%', alignItems: "center" }}>
-                    <Button title="Confirm" onPress={() => checkOut()} />
+                <View style={{ margin:10}}>
+                    <Button  color="black"  style={{ width: '100%', alignItems: "center" }} title="Confirm" onPress={() => checkOut()} />
                     </View></View></View></View>
             </FormContainer>
         
@@ -141,7 +141,10 @@ const Checkout = (props) => {
 
 
 const styles = StyleSheet.create({
-    container: {
+    background: {
+        flex: 1,
+        backgroundColor: 'lightgray',
+      }, container: {
         flex: 1,
     },
     buttonGroup: {
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center', 
+        
     },
     formBlockWrapper: {
         position: 'absolute',
@@ -165,13 +169,11 @@ const styles = StyleSheet.create({
         opacity: 0.92,
         backgroundColor: '#B6B6B4',
     },
-    isSignup: {
-        opacity: 0.94,
-        backgroundColor: '#B6B6B4',
-    },
+   
     formBlock: {
         position: 'relative',
-        margin: 100,
+        margin: 10,
+        marginBottom: 100,
         width: Dimensions.get('window').width - 100, // Adjust width according to your design
         padding: 25,
         height: 500, // Adjust height according to your design
