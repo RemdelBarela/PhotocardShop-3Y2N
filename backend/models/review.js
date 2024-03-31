@@ -1,22 +1,19 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = mongoose.Schema({
-    // photo: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Photo',
-    //     required:true
-    // }],
+    orderItem: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'orderItem',
+        required:true
+    },
     comment: {
         type: String,
         required: true,
     },
     rating: {
         type: Number,
-        default:0
+        required: true,
     },
-    // image: [{
-    //     type: String
-    // }],
     dateCreated: {
         type: Date,
         default: Date.now,

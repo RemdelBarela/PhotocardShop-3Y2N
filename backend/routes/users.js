@@ -95,13 +95,6 @@ router.put('/:id', async (req, res) => {
             passwordHash: newPassword,
             phone: req.body.phone,
             isAdmin: req.body.isAdmin,
-
-            // address: req.body.address,
-            // street: req.body.street,
-            // apartment: req.body.apartment,
-            // zip: req.body.zip,
-            // city: req.body.city,
-            // country: req.body.country,
         },
         { new: true }
     )
@@ -139,7 +132,7 @@ router.post('/register', uploadOptions.single('image'), async (req, res) => {
     const file = req.file;
     const fileName = file.filename;
     if (!file) return res.status(400).send('No image in the request');
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/users`;
     let user = new User({
         name: req.body.name,
         email: req.body.email,

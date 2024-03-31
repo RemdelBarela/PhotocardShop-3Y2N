@@ -1,33 +1,9 @@
 const express = require('express');
 const { Review } = require('../models/review');
+const { OrderItem } = require('../models/order-item');
+
 const router = express.Router();
 const mongoose = require('mongoose');
-const multer = require('multer');
-
-const FILE_TYPE_MAP = {
-    'image/png': 'png',
-    'image/jpeg': 'jpeg',
-    'image/jpg': 'jpg'
-};
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const isValid = FILE_TYPE_MAP[file.mimetype];
-        let uploadError = new Error('invalid image type');
-
-        if (isValid) {
-            uploadError = null;
-        }
-        cb(uploadError, 'public/uploads/reviews');
-    },
-    filename: function (req, file, cb) {
-        const fileName = file.originalname.split(' ').join('-');
-        const extension = FILE_TYPE_MAP[file.mimetype];
-        cb(null, `${fileName}-${Date.now()}.${extension}`);
-    }
-});
-
-const uploadOptions = multer({ storage: storage }).array('image', 10); // Update to handle multiple files
 
 router.get(`/`, async (req, res) =>{
     
@@ -50,71 +26,41 @@ router.get(`/select/:id`, async (req, res) =>{
     res.send(review);
 })
 
-router.post(`/new`, async (req, res) => {
-    console.log(req.body)
+router.post(`/new/:id`, async (req, res) => {
+    const orderId = req.params.id;
 
-    // uploadOptions(req, res, async (err) => {
-    //     if (err) {
-    //         return res.status(500).json({success: false, error: err})
-    //     } else {
-    //         const files = req.files;
-    //         if (!files || files.length === 0) {
-    //             return res.status(400).send('NO IMAGES IN THE REQUEST');
-    //         }
-
-    //         const basePath = `${req.protocol}://${req.get('host')}/public/uploads/reviews/`;
-    //         let reviewPaths = [];
-    //         files.forEach(file => {
-    //             const fileName = file.filename;
-    //             reviewPaths.push(`${basePath}${fileName}`);
-    //         });
-
-            const newReview = new Review({
-                comment: req.body.comment,
-                rating: req.body.rating,
-                // image: reviewPaths
-            });
-
-            console.log(newReview)
-            try {
-                const savedReview = await newReview.save();
-                res.status(201).send(savedReview);
-            } catch (error) {
-                return res.status(500).json({success: false})
-            }
+    console.log('req: ', req.body)
+    try {
+        const orderItem = await OrderItem.findById(orderId);
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: "Order item not found" });
         }
-    // }
-    // );
-);
 
-router.put('/:id', uploadOptions, async (req, res) => {
-    console.log(req.body);
-    if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).send('INVALID REVIEW ID');
-    }
-
-    const review = await Review.findById(req.params.id);
-    if (!review) return res.status(400).send('INVALID REVIEW!');
-
-    let imagePaths = [];
-    if (req.files && req.files.length > 0) {
-        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/reviews/`;
-        req.files.forEach(file => {
-            const fileName = file.filename;
-            const imagePath = `${basePath}${fileName}`;
-            imagePaths.push(imagePath);
+        const newReview = new Review({
+            orderItem: orderId,
+            comment: req.body.comment,
+            rating: req.body.rating
         });
-    } else {
-        // If no files are uploaded, use the existing image paths
-        imagePaths = review.image;
-    }
 
+        console.log('newReview: ', newReview)
+
+        const savedReview = await newReview.save();
+        res.status(201).send(savedReview);
+    } catch (error) {
+        console.error("Error saving review:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+
+router.put('/:id', async (req, res) => {
+    console.log(req.body);
+    
     const updatedReview = await Review.findByIdAndUpdate(
         req.params.id,
         {
             review: req.body.review,
             rating: req.body.rating,
-            image: imagePaths,
         },
         { new: true }
     );
@@ -136,15 +82,60 @@ router.delete('/:id', (req, res)=>{
     })
 })
 
-router.get(`/get/count`, async (req, res) =>{
-    const reviewCount = await Review.countDocuments((count) => count)
+router.get(`/order-item/:id`, async (req, res) => {
+    const orderItem = await OrderItem.findById(req.params.id)
+        .populate({
+            path: 'photocard', 
+            populate: {
+                    path: 'photo',
+                    model: 'Photo'
+                }
+        })
+        .populate({
+            path: 'photocard', 
+            populate: {
+                    path: 'material',
+                    model: 'Material'
+                }
+        })
 
-    if(!reviewCount) {
-        res.status(500).json({success: false})
-    } 
-    res.send({
-        reviewCount: reviewCount
-    });
+    if (!orderItem) {
+        res.status(500).json({ success: false })
+    }
+    res.send(orderItem);
 })
+
+// router.get(`/order-item/:id`, async (req, res) => {
+//     try {
+//         const orderItem = await OrderItem.findById(req.params.id)
+//             .populate({
+//                 path: 'photocard', 
+//                 populate: {
+//                     path: 'photo',
+//                     model: 'Photo'
+//                 }
+//             })
+//             .populate({
+//                 path: 'photocard', 
+//                 populate: {
+//                     path: 'material',
+//                     model: 'Material'
+//                 }
+//             });
+
+//         if (!orderItem) {
+//             return res.status(404).json({ success: false, message: 'Order Item not found' });
+//         }
+
+//         // Check if the orderItem_id exists in the Review model
+//         const existingReview = await Review.findOne({ orderItem: orderItem._id });
+
+//         res.status(200).json({ success: true, orderItem, hasReview: !!existingReview });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, message: 'Internal Server Error' });
+//     }
+// });
+
 
 module.exports=router;

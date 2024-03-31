@@ -3,6 +3,8 @@ const { Photo } = require('../models/photo');
 const { Material } = require('../models/material');
 const { Order } = require('../models/order');
 const { User } = require('../models/user');
+const { Review } = require('../models/review');
+
 const nodemailer = require('nodemailer');
 
 const sendTransactionEmail = require('../utils/sendTransactionEmail');
@@ -69,7 +71,15 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        res.status(200).json({ success: true, order });
+        const orderItems = order.orderItems;
+
+        // Check if a review exists for any of the order items
+        const hasReviews = await Promise.all(orderItems.map(async (orderItem) => {
+            const existingReview = await Review.findOne({ orderItem: orderItem._id });
+            return !!existingReview;
+        }));
+
+        res.status(200).json({ success: true, order, hasReviews });
     } catch (error) {
         console.error('Error fetching order:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });

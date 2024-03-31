@@ -5,93 +5,107 @@ import {
     Image,
     StyleSheet,
     TouchableOpacity,
-    Platform
+    Modal,
+    ScrollView,
+    Dimensions,
 } from "react-native";
+import Carousel from 'react-native-snap-carousel';
+import { DataTable } from "react-native-paper";
 import FormContainer from "../../Shared/Form/FormContainer";
 import Input from "../../Shared/Form/Input";
 import EasyButton from "../../Shared/StyledComponents/EasyButton";
+import StarRating from "../../Shared/StarRating";
 
 import baseURL from "../../assets/common/baseurl";
 import Error from "../../Shared/Error";
 
-import Icon from "react-native-vector-icons/FontAwesome";
-import Toast from "react-native-toast-message";
 import axios from "axios";
-import * as ImagePicker from "expo-image-picker";
-import { useNavigation, useRoute  } from "@react-navigation/native";
-import mime from "mime";
-import StarRating from "../../Shared/StarRating";
+import Toast from "react-native-toast-message";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { BlurView } from "expo-blur";
 
-const ReviewForm = (props) => {
-    const [review, setReview] = useState('');
+const { width, height } = Dimensions.get("window");
+
+
+const ReviewForm = () => {
+    const [comment, setComment] = useState('');
     const [rating, setRating] = useState('');
-    // const [images, setImages] = useState([]);
     const [error, setError] = useState('');
-    const [reviews, setReviews] = useState(null);
+    const [order, setOrder] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     let navigation = useNavigation();
     let route = useRoute();
 
     useEffect(() => {
-        if (route.params && route.params.item) {
-            const { item } = route.params;
-            setReview(item.review);
-            setRating(item.rating);
-            // setImages(item.image);
-            setReviews(item); 
+        fetchOrderDetails();
+    }, []);
 
-        } else {
-            setReviews(null);
+    const fetchOrderDetails = async () => {
+        try {
+            const response = await axios.get(`${baseURL}orders/${route.params.orderId}`);
+            setOrder(response.data.order);
+            // Initialize comments and ratings for each product
+            // const initialComments = {};
+            // const initialRatings = {};
+            // response.data.order.orderItems.forEach(item => {
+            //     initialComments[item.photocard.photo._id] = '';
+            //     initialRatings[item.photocard.photo._id] = '';
+            // });
+            // setComments(initialComments);
+            // setRatings(initialRatings);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching order details:", error);
+            setError('Error fetching order details');
+            setLoading(false);
         }
-        // (async () => {
-        //     if (Platform.OS !== "web") {
-        //         const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        //         if (status !== "granted") {
-        //             alert("Apologies, but in order to proceed, we require permission to access your camera roll!");
-        //         }
-        //     }
-        // })();
-    }, [route.params]);
+    };
 
-    // const pickImage = async () => {
-    //     let result = await ImagePicker.launchImageLibraryAsync({
-    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //         allowsEditing: true,
-    //         aspect: [1,1],
-    //         quality: 1,
-    //     });
+    const toggleModal = (orderItem) => {
+        console.log('orderItem: ', orderItem)
+        setIsModalVisible(!isModalVisible);
+        axios.get(`${baseURL}reviews/order-item/${orderItem}`)
+            .then((res) => {
+                setSelectedItem(res.data)
+                console.log('Additional details for selected orderItem:', res.data);
+            })
+            .catch((error) => {
+                console.log('Error fetching additional details for selected orderItem:', error);
+            });
+    };
 
-    //     if (!result.canceled) {
-    //         const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
-    //         const filteredImages = images.filter(image => image.uri !== undefined);
-    //         setImages([...filteredImages, ...selectedImages]); 
-    //     }  
-        
-    // };
 
-    // const removeImage = (id) => {
-    //     setImages(images.filter((image) => image.id !== id));
-    // };
 
-    const addReview = () => {
-        if ( rating === '' || review === '') {
-            setError('Please complete the form accurately.');
+    const addReview = (orderItemID) => {
+
+        if (!comment) {
+            setError('YOUR COMMENT IS MISSING');
             return;
         }
 
         let formData = new FormData();
-        formData.append("review", review);
+        formData.append("comment", comment);
         formData.append("rating", rating);
-        // images.forEach((image, index) => {
-        //     formData.append(`image`, {  // Update 'image' here
-        //         uri: image.uri,
-        //         type: mime.getType(image.uri),
-        //         reviews: `image${index}.${mime.getExtension(mime.getType(image.uri))}`,
-        //     });
-        // });
 
+        const getToken = async () => {
+            try {
+                const token = await AsyncStorage.getItem("jwt");
+                setToken(token);
+            } catch (error) {
+                console.log(error);
+            }
+        };
         
+        getToken();
+        
+        console.log('form: ', formData)
+        console.log('tokenss: ', token)
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -99,169 +113,217 @@ const ReviewForm = (props) => {
             }
         };
 
-        if (reviews !== null) {
-            axios
-                .put(`${baseURL}reviews/${reviews.id}`, formData, config)
-
-                .then((res) => {
-                    if (res.status === 200 || res.status === 201) {
-
-                        Toast.show({
-                            topOffset: 60,
-                            type: "success",
-                            text1: "REVIEW SUCCESSFULLY UPDATED",
-                            text2: ""
-                        });
-                        setTimeout(() => {
-                            navigation.navigate("User Profile");
-                        }, 500)
-                    }
-                })
-                .catch((error) => {
-                    Toast.show({
-                        topOffset: 60,
-                        type: "error",
-                        text1: "SOMETHING WENT WRONG",
-                        text2: "PLEASE TRY AGAIN"
-                    })
-                })
-        } else {
-            console.log('form: ', formData)
-
-            axios.post(`${baseURL}reviews/new`, formData, config)
-                .then((res) => {
-                    if (res.status === 200 || res.status === 201) {
-                        console.log(res)
-                        Toast.show({
-                            topOffset: 60,
-                            type: "success",
-                            text1: "New review added",
-                            text2: ""
-                        });
-                        setTimeout(() => {
-                            navigation.navigate("User Profile");
-                        }, 500);
-                    } else {
-                        console.log('Unexpected response status:', res.status);
-                    }
-                })
-                .catch((error) => {
-                    if (error.response) {
-                        // The request was made and the server responded with a status code
-                        // that falls out of the range of 2xx
-                        console.log('Error status:', error.response.status);
-                        console.log('Error data:', error.response.data);
-                    } else if (error.request) {
-                        // The request was made but no response was received
-                        console.log('Error request:', error.request);
-                    } else {
-                        // Something happened in setting up the request that triggered an Error
-                        console.log('Error message:', error.message);
-                    }
-                    console.log('Error config:', error.config);
-                    Toast.show({
-                        topOffset: 60,
-                        type: "error",
-                        text1: "Something went wrong",
-                        text2: "Please try again"
-                    });
-                })};
+        axios.post(`${baseURL}reviews/new/${orderItemID}`, formData, config)
+        .then((res) => {
+            console.log('Response:', res);
+            if (res.status === 200 || res.status === 201) {
+                Toast.show({
+                    topOffset: 60,
+                    type: "success",
+                    text1: "REVIEW ADDED",
+                    text2: ""
+                });
+                setTimeout(() => {
+                    navigation.navigate("ReviewForm");
+                    console.log('Navigation complete');
+                }, 500);
+            } else {
+                console.log('Unexpected response status:', res.status);
+            }
+        })
+        .catch((error) => {
+            console.log('Error config:', error.config);
+            Toast.show({
+                topOffset: 60,
+                type: "error",
+                text1: "ERROR!",
+                text2: "PLEASE TRY AGAIN"
+            });
+        });
     };
+
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.container}>
+                <Text>Error: {error}</Text>
+            </View>
+        );
+    }
 
     return (
         <FormContainer title="REVIEW">
-            {/* <View style={styles.imageContainer}>
-                {images.map((imageURL, index) => {
-                    return(
-
-                    <View key={index}>
-                         <Image style={styles.image} source={{ uri: imageURL.uri || imageURL }} />
-                        <TouchableOpacity onPress={() => removeImage(imageURL.id)} style={styles.removeButton}>
-                            <Text style={styles.removeButtonText}>REMOVE</Text>
-                        </TouchableOpacity>
-                    </View>
-                )})}
-                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-                    <Icon name="camera" size={24} color="white" />
-                </TouchableOpacity>
-            </View> */}
-            <View style={styles.label}>
-                <Text style={{ textDecorationLine: "underline" }}>COMMENT</Text>
-            </View>
-            <Input
-                placeholder="Review"
-                name="review"
-                id="review"
-                value={review}
-                onChangeText={(text) => setReview(text)}
-            />
-            <View style={styles.label}>
-                    <Text style={{ textDecorationLine: "underline" }}>RATING</Text>
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <View style={styles.orderSummary}>
+                    <Text style={styles.heading}>ORDER SUMMARY</Text>
+                    <Text style={styles.summaryText}>Order ID: {order._id}</Text>
+                    <Text style={styles.summaryText}>Total Price: ₱{order.totalPrice.toFixed(2)}</Text>
                 </View>
-                <StarRating
-                    maxStars={5} // Set the maximum number of stars
-                    rating={parseInt(rating)} // Parse the rating to integer and pass it as props
-                    onChangeRating={(newRating) => setRating(newRating.toString())} // Convert the rating back to string
-            />
-            {error ? <Error message={error} /> : null}
-            <View style={styles.buttonContainer}>
-                <EasyButton
-                    large
-                    primary
-                    onPress={() => addReview()}
+                {order.orderItems.map((item, index) => (
+                    <View key={index} style={styles.itemContainer}>
+                        <View style={styles.itemBox}>
+                            <View style={styles.productInfo}>
+                                <Text style={styles.heading}>{item.photocard.photo.name}</Text>
+                                <DataTable>
+                                    <DataTable.Header>
+                                        <DataTable.Title>Material</DataTable.Title>
+                                        <DataTable.Title>Quantity</DataTable.Title>
+                                    </DataTable.Header>
+                                    <DataTable.Row>
+                                        <DataTable.Cell>{item.photocard.material.name}</DataTable.Cell>
+                                        <DataTable.Cell>{item.quantity}</DataTable.Cell>
+                                    </DataTable.Row>
+                                </DataTable>
+                            </View>
+                            <TouchableOpacity onPress={() => toggleModal(item._id)}>
+                                <Text style={styles.heading}>MAKE REVIEW</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                ))}
+                {selectedItem && (
+                <Modal
+                    visible={isModalVisible}
+                    animationType="slide"
+                    onRequestClose={() => setIsModalVisible(false)}
                 >
-                    <Text style={styles.buttonText}>CONFIRM</Text>
-                </EasyButton>
-            </View>
+                <BlurView
+                    style={styles.blur}
+                    tint="dark"
+                    intensity={50}
+                >
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.heading}>MAKE REVIEW</Text>
+                        <Carousel
+                            data={selectedItem.photocard.photo.image}
+                            renderItem={({ item }) => (
+                                <Image
+                                    source={{ uri: item }}
+                                    resizeMode="contain"
+                                    style={styles.image}
+                                />
+                            )}
+                            sliderWidth={width}
+                            itemWidth={width * 0.8}
+                            loop={true}
+                            autoplay={true}
+                            autoplayInterval={5000}
+                        />
+                        <View style={styles.orderSummary}>
+                            <Text style={styles.heading}>{selectedItem.photocard.photo.name}</Text>
+                            <Text style={styles.summaryText}>MATERIAL: {selectedItem.photocard.material.name}</Text>
+                        </View>
+                        <Input
+                            placeholder="Enter your comment"
+                            value={comment}
+                            onChangeText={text => setComment(text)} // Update the comment state here
+                            style={{ color: 'black' }}
+                        />
+                        
+                        <View style={styles.ratingContainer}>
+                            <Text style={styles.ratingLabel}>Rating:</Text>
+                            <StarRating
+                                maxStars={5}
+                                rating={parseInt(rating) || 0}
+                                onChangeRating={newRating => setRating(newRating.toString())}
+                            />
+                        </View>
+                        <EasyButton
+                            large
+                            secondary
+                            primary={false}
+                            style={styles.blackButton}
+                            onPress={() => addReview(selectedItem?._id)}
+                        >
+                            <Text style={styles.buttonText}>CONFIRM</Text>
+                        </EasyButton>
+                    </View>
+                </BlurView>
+                </Modal>
+                )}
+                {error ? <Error message={error} /> : null}
+            </ScrollView>
         </FormContainer>
     );
 };
 
 const styles = StyleSheet.create({
-    imageContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "center",
+    container: {
+        flex: 1,
+        padding: 20,
+    },
+    scrollViewContent: {
+        flexGrow: 1,
+        paddingBottom: 100,
+    },
+    orderSummary: {
         marginBottom: 20,
+        marginTop: 10,
+    },
+    itemContainer: {
+        marginBottom: 30,
+    },
+    itemBox: {
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 10,
+        padding: 10,
+    },
+    heading: {
+        fontSize: 18,
+        fontWeight: "bold",
+        marginBottom: 10,
+        textTransform: 'uppercase'
+    },
+    summaryText: {
+        fontSize: 16,
+        marginBottom: 5,
+    },
+    productInfo: {
+        marginBottom: 20,
+    },
+    reviewSection: {
+        marginBottom: 20,
+    },
+    ratingContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    ratingLabel: {
+        marginRight: 10,
+        fontSize: 16,
     },
     image: {
         width: 100,
         height: 100,
-        margin: 5,
+        marginRight: 5,
     },
-    imagePicker: {
-        width: 100,
-        height: 100,
-        margin: 5,
-        backgroundColor: "grey",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    removeButton: {
-        position: "absolute",
-        top: 5,
-        right: 5,
-        backgroundColor: "red",
-        padding: 5,
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        padding: 20,
+        width: Dimensions.get('window').width - 40,
+        maxHeight: Dimensions.get('window').height - 100, // Adjust height as needed
         borderRadius: 10,
-        zIndex: 1,
+        alignSelf: 'center',
     },
-    removeButtonText: {
-        color: "white",
-    },
-    label: {
-        width: "80%",
-        marginTop: 10,
-    },
-    buttonContainer: {
-        width: "80%",
-        marginBottom: 80,
-        marginTop: 20,
+    blur: {
+        flex: 1,
         alignItems: "center",
+        justifyContent: "center",
     },
-    buttonText: {
-        color: "white",
+    image: {
+        aspectRatio: 5.5 / 8.5,
     },
-})
+    
+});
 
 export default ReviewForm;
