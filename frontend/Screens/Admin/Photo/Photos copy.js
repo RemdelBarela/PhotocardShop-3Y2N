@@ -19,10 +19,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
 import { useNavigation } from "@react-navigation/native"
 
-import baseURL from "../../assets/common/baseurl"
-import EasyButton from "../../Shared/StyledComponents/EasyButton";
+import baseURL from "../../../assets/common/baseurl"
+import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
-const Users = (props) => {
+const Photos = (props) => {
 
     const [photoList, setPhotoList] = useState([]);
     const [photoFilter, setPhotoFilter] = useState([]);
@@ -49,12 +49,12 @@ const Users = (props) => {
 
     const deletePhoto = (id) => {
         axios
-            .delete(`${baseURL}users/${id}`, {
+            .delete(`${baseURL}photos/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                const users = photoFilter.filter((item) => item.id !== id)
-                setPhotoFilter(users)
+                const photos = photoFilter.filter((item) => item.id !== id)
+                setPhotoFilter(photos)
 
                 onRefresh()
             })
@@ -65,7 +65,7 @@ const Users = (props) => {
         setRefreshing(true);
         setTimeout(() => {
             axios
-                .get(`${baseURL}users`)
+                .get(`${baseURL}photos`)
                 .then((res) => {
                     // console.log(res.data)
                     setPhotoList(res.data);
@@ -86,7 +86,7 @@ const Users = (props) => {
                     })
                     .catch((error) => console.log(error))
                 axios
-                    .get(`${baseURL}users`)
+                    .get(`${baseURL}photos`)
                     .then((res) => {
                         console.log(res.data)
                         setPhotoList(res.data);
@@ -113,17 +113,16 @@ const Users = (props) => {
         setSelectedImage(imageUrl);
         setImageModalVisible(true);
     };
+
     const renderGallery = () => {
-        // Check if selectedPhoto is defined and has image property
-        if (selectedPhoto && selectedPhoto.image && Array.isArray(selectedPhoto.image)) {
+        if (selectedPhoto && selectedPhoto.image.length > 0) {
             return (
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {/* Map over the image array */}
                     {selectedPhoto.image.map((imageUrl, idx) => (
                         <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
                             <Image
                                 source={{
-                                    uri: imageUrl || null, // Ensure imageUrl is not undefined
+                                    uri: imageUrl ? imageUrl : null,
                                 }}
                                 resizeMode="cover"
                                 style={{ width: width, height: width / 2, marginVertical: 5 }}
@@ -137,25 +136,26 @@ const Users = (props) => {
             return <Text>No images available for this photo.</Text>;
         }
     };
-    
 
     return (
         <Box flex={1}>
-            <View style={styles.buttonContainer}>
-                <EasyButton
-                    secondary
-                    medium
-                    onPress={() => navigation.navigate("PhotoForm")}
-                >
-                    <Icon name="plus" size={18} color="white" />
-                    <Text style={styles.buttonText}> ADD</Text>
-                </EasyButton>
-            </View>
-
-            <Searchbar width="80%"
-                placeholder="Search Photo Name"
-                onChangeText={(text) => searchPhoto(text)}
-            />
+               <View style={styles.buttonContainer}>
+     <Searchbar
+        placeholder="Search Photo Name"
+        onChangeText={(text) => searchPhoto(text)}
+        style={{ flex: 1 }} // Allow the search bar to take remaining space
+    /> 
+      <EasyButton
+        secondary
+        medium
+        onPress={() => navigation.navigate("PhotoForm")}
+        style={{ marginRight: 10 ,backgroundColor: 'black'}} // Add some right margin for spacing
+    >
+        <Icon name="plus" size={18} color="white" />
+        <Text style={[styles.buttonText, { color: 'white'   }]}> ADD</Text>
+    </EasyButton>
+  
+</View>
 
             <Modal
                 animationType="fade"
@@ -257,17 +257,9 @@ const Users = (props) => {
                 <DataTable>
                     <DataTable.Header style={{ backgroundColor: 'black' }}>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
-                      
-                 
-                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>EMAIL</Text></DataTable.Title>
-                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PASSWORD</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHONE</Text></DataTable.Title>
-                 
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>ROLE</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
-                 
-                      
-                         </DataTable.Header>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>DESCRIPTION</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
+                    </DataTable.Header>
                     {photoFilter.map((item, index) => (
                         <TouchableOpacity
                             key={index}
@@ -277,17 +269,21 @@ const Users = (props) => {
                             }}>
                             <DataTable.Row>
                                 <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.password}</DataTable.Cell>
-                                  
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.phone}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.isAdmin}</DataTable.Cell>
-                                  
-                           
-                               
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ textDecorationLine: 'underline' }}>View</Text>
-                                </DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.description}</DataTable.Cell>
+                                                
+    <DataTable.Cell 
+    style={{
+        width: 40,
+        height: 40,
+        marginRight: 10,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20 // Half of width or height to make it circular
+    }}
+>     
+    <Icon name="eye" size={18} color="white" />
+</DataTable.Cell>
                             </DataTable.Row>
                         </TouchableOpacity>
                     ))}
@@ -339,4 +335,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Users;
+export default Photos;

@@ -77,10 +77,17 @@ const Cart = () => {
                             <Text fontSize="sm" color="coolGray.800" _dark={{
                                 color: 'warmGray.50'
                             }} alignSelf="flex-start">
-                                {materialName} - $ {materialPrice}
+                                {materialName} 
                             </Text>
+                          
                         </VStack>
                         <HStack alignItems="center">
+                        <Text fontSize="sm" color="coolGray.800" _dark={{
+                                color: 'warmGray.50'
+                            }} alignSelf="center" style={{ marginHorizontal:10 }}>
+                                 $ {materialPrice}
+                            </Text>
+
                             <TouchableOpacity onPress={() => handleCountChange(item, -1)}>
                                 <Icon name="minus" size={20} color="white" style={{ backgroundColor: 'black', padding: 5, borderRadius: 5 }} />
                             </TouchableOpacity>

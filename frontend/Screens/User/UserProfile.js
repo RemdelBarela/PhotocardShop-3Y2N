@@ -61,7 +61,7 @@ const UserProfile = (props) => {
     };
 
     return (
-        <Container style={styles.container}>
+        <Container  style={styles.container}>
             <ScrollView contentContainerStyle={styles.subContainer}>
                 <View style={styles.userInfoContainer}>
                     {userProfile && userProfile.image &&
@@ -116,8 +116,8 @@ const UserProfile = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
+        margin: 35,
+        backgroundColor: '#fff',
         paddingHorizontal: 20,
         paddingTop: 40,
         paddingBottom: 20,
