@@ -2,13 +2,14 @@ import React, { useState, useCallback } from "react";
 import {
     View,
     Text,
+    FlatList,
     ActivityIndicator,
     StyleSheet,
     Dimensions,
+    RefreshControl,
     Image,
     Modal,
-    TouchableOpacity,
-    ScrollView,
+    TouchableOpacity
 } from "react-native";
 import { Box } from "native-base";
 import { DataTable, Searchbar } from "react-native-paper";
@@ -23,40 +24,34 @@ import baseURL from "../../assets/common/baseurl"
 import EasyButton from "../../Shared/StyledComponents/EasyButton";
 
 const Users = (props) => {
-
-    const [photoList, setPhotoList] = useState([]);
-    const [photoFilter, setPhotoFilter] = useState([]);
+    const [userList, setUserList] = useState([]);
+    const [userFilter, setUserFilter] = useState([]);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedPhoto, setSelectedPhoto] = useState(null);
-    const [imageModalVisible, setImageModalVisible] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const navigation = useNavigation()
 
-
-    const searchPhoto = (text) => {
+    const searchUser = (text) => {
         if (text === "") {
-            setPhotoFilter(photoList)
+            setUserFilter(userList)
         }
-        setPhotoFilter(
-            photoList.filter((i) =>
+        setUserFilter(
+            userList.filter((i) =>
                 i.name.toLowerCase().includes(text.toLowerCase())
             )
         )
     }
 
-    const deletePhoto = (id) => {
+    const deleteUser = (id) => {
         axios
             .delete(`${baseURL}users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                const users = photoFilter.filter((item) => item.id !== id)
-                setPhotoFilter(users)
-
-                onRefresh()
+                const users = userFilter.filter((item) => item.id !== id)
+                setUserFilter(users)
             })
             .catch((error) => console.log(error));
     }
@@ -68,14 +63,13 @@ const Users = (props) => {
                 .get(`${baseURL}users`)
                 .then((res) => {
                     // console.log(res.data)
-                    setPhotoList(res.data);
-                    setPhotoFilter(res.data);
+                    setUserList(res.data);
+                    setUserFilter(res.data);
                     setLoading(false);
                 })
             setRefreshing(false);
         }, 2000);
     }, []);
-
     useFocusEffect(
         useCallback(
             () => {
@@ -89,14 +83,14 @@ const Users = (props) => {
                     .get(`${baseURL}users`)
                     .then((res) => {
                         console.log(res.data)
-                        setPhotoList(res.data);
-                        setPhotoFilter(res.data);
+                        setUserList(res.data);
+                        setUserFilter(res.data);
                         setLoading(false);
                     })
 
                 return () => {
-                    setPhotoList();
-                    setPhotoFilter();
+                    setUserList();
+                    setUserFilter();
                     setLoading(true);
                 }
             },
@@ -104,69 +98,28 @@ const Users = (props) => {
         )
     )
 
-    const handleRowPress = (photo) => {
-        setSelectedPhoto(photo);
+    const handleRowPress = (user) => {
+        setSelectedUser(user);
         setModalVisible(true);
     };
-
-    const handleImagePress = (imageUrl) => {
-        setSelectedImage(imageUrl);
-        setImageModalVisible(true);
-    };
-    const renderGallery = () => {
-        if (selectedPhoto) {
-            return (
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {Array.isArray(selectedPhoto.image) ? (
-                        selectedPhoto.image.map((imageUrl, idx) => (
-                            <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
-                                <Image
-                                    key={idx}
-                                    source={{
-                                        uri: imageUrl ? imageUrl : null
-                                    }}
-                                    resizeMode="cover"
-                                    style={{ width: width, height: width / 2, marginVertical: 5 }}
-                                    onError={() => console.log("Error loading image")}
-                                />
-                            </TouchableOpacity>
-                        ))
-                    ) : (
-                        <TouchableOpacity onPress={() => handleImagePress(selectedPhoto.image)}>
-                            <Image
-                                source={{
-                                    uri: selectedPhoto.image ? selectedPhoto.image : null
-                                }}
-                                resizeMode="cover"
-                                style={{ width: width, height: width / 2, marginVertical: 5 }}
-                                onError={() => console.log("Error loading image")}
-                            />
-                        </TouchableOpacity>
-                    )}
-                </ScrollView>
-            );
-        } else {
-            return <Text>No images available for this photo.</Text>;
-        }
-    };
-    
 
     return (
         <Box flex={1}>
             <View style={styles.buttonContainer}>
+                
                 <EasyButton
                     secondary
                     medium
-                    onPress={() => navigation.navigate("PhotoForm")}
+                    onPress={() => navigation.navigate("Register")}
                 >
                     <Icon name="plus" size={18} color="white" />
-                    <Text style={styles.buttonText}> ADD</Text>
+                    <Text style={styles.buttonText}>ADD USER</Text>
                 </EasyButton>
             </View>
 
             <Searchbar width="80%"
-                placeholder="Search Photo Name"
-                onChangeText={(text) => searchPhoto(text)}
+                placeholder="Search User"
+                onChangeText={(text) => searchUser(text)}
             />
 
             <Modal
@@ -193,74 +146,33 @@ const Users = (props) => {
                         >
                             <Icon name="close" size={20} />
                         </TouchableOpacity>
-                        {selectedPhoto && (
+                        {selectedUser && (
                             <>
-<<<<<<< HEAD
-                                <Text>{selectedPhoto.name}</Text>
-                                {renderGallery()}
-=======
-                                {/* <Text>{selectedUser.name}</Text> */}
->>>>>>> b07932cd117b865bf0128968d37ab96e19903b71
+                                <Text>{selectedUser.name}</Text>
                                 <EasyButton
                                     medium
                                     secondary
                                     onPress={() => {
-                                        navigation.navigate("PhotoForm", { item: selectedPhoto });
+                                        navigation.navigate("Register", { user: selectedUser });
                                         setModalVisible(false);
                                     }}
                                     title="Edit"
                                 >
-                                    <Text style={styles.textStyle}>EDIT</Text>
+                                    <Text style={styles.textStyle}>Edit</Text>
                                 </EasyButton>
                                 <EasyButton
                                     medium
                                     danger
                                     onPress={() => {
-                                        deletePhoto(selectedPhoto.id);
+                                        deleteUser(selectedUser.id);
                                         setModalVisible(false);
                                     }}
                                     title="Delete"
                                 >
-                                    <Text style={styles.textStyle}>DELETE</Text>
+                                    <Text style={styles.textStyle}>Delete</Text>
                                 </EasyButton>
                             </>
                         )}
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={imageModalVisible}
-                onRequestClose={() => {
-                    setImageModalVisible(false)
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <TouchableOpacity
-                            underlayColor="#E8E8E8"
-                            onPress={() => {
-                                setImageModalVisible(false)
-                            }}
-                            style={{
-                                alignSelf: "flex-end",
-                                position: "absolute",
-                                top: 5,
-                                right: 10
-                            }}
-                        >
-                            <Icon name="close" size={20} />
-                        </TouchableOpacity>
-                        <Image
-                            source={{
-                                uri: selectedImage ? selectedImage : null,
-                            }}
-                            resizeMode="contain"
-                            style={{ width: width - 40, height: height / 2 }}
-                            onError={() => console.log('Error loading image')}
-                        />
                     </View>
                 </View>
             </Modal>
@@ -271,84 +183,12 @@ const Users = (props) => {
                 </View>
             ) : (
                 <DataTable>
-<<<<<<< HEAD
-                    <DataTable.Header style={{ backgroundColor: 'black' }}>
-                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
-                      
-                 
-                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>EMAIL</Text></DataTable.Title>
-                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PASSWORD</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHONE</Text></DataTable.Title>
-                 
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>ROLE</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
-                 
-                      
-                         </DataTable.Header>
-                    {photoFilter.map((item, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => handleRowPress(item)}
-                            style={{
-                                backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
-                            }}>
-                            <DataTable.Row>
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.password}</DataTable.Cell>
-                                  
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.phone}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.isAdmin}</DataTable.Cell>
-                                  
-                           
-                               
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ textDecorationLine: 'underline' }}>View</Text>
-                                </DataTable.Cell>
-                            </DataTable.Row>
-                        </TouchableOpacity>
-                    ))}
-                </DataTable>
-            )}
-        </Box>
-    );
-}
-
-const styles = StyleSheet.create({
-    spinner: {
-        height: height / 2,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    container: {
-        marginBottom: 160,
-        backgroundColor: 'white'
-    },
-    buttonContainer: {
-        margin: 20,
-        alignSelf: 'center',
-        flexDirection: 'row'
-    },
-    buttonText: {
-        marginLeft: 4,
-        color: 'white'
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-=======
                     <DataTable.Header>
                         <DataTable.Title>NAME</DataTable.Title>
                         <DataTable.Title>EMAIL</DataTable.Title>
                         <DataTable.Title>PASSWORD</DataTable.Title>
                         <DataTable.Title>PHONE</DataTable.Title>
+                        {/* <DataTable.Title>ADDRESS</DataTable.Title> */}
                         <DataTable.Title>ROLE</DataTable.Title>
                         <DataTable.Title>IMAGES</DataTable.Title>
                     </DataTable.Header>
@@ -363,8 +203,9 @@ const styles = StyleSheet.create({
                                 <DataTable.Row>
                                     <DataTable.Cell>{item.name}</DataTable.Cell>
                                     <DataTable.Cell>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell>{item.passwordHash}</DataTable.Cell>
+                                    <DataTable.Cell>{item.password}</DataTable.Cell>
                                     <DataTable.Cell>{item.phone}</DataTable.Cell>
+                                    {/* <DataTable.Cell>{item.address}</DataTable.Cell> */}
                                     <DataTable.Cell>{item.isAdmin}</DataTable.Cell>
                                     <DataTable.Cell>
     {Array.isArray(item.image) ? (
@@ -404,18 +245,55 @@ const styles = StyleSheet.create({
             flexDirection: 'row',
             padding: 5,
             backgroundColor: 'gainsboro'
->>>>>>> b07932cd117b865bf0128968d37ab96e19903b71
         },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22
-    },
-});
-
+        headerItem: {
+            margin: 3,
+            width: width / 6
+        },
+        spinner: {
+            height: height / 2,
+            alignItems: 'center',
+            justifyContent: 'center'
+        },
+        container: {
+            marginBottom: 160,
+            backgroundColor: 'white'
+        },
+        buttonContainer: {
+            margin: 20,
+            alignSelf: 'center',
+            flexDirection: 'row'
+        },
+        buttonText: {
+            marginLeft: 4,
+            color: 'white'
+        },
+        image: {
+            width: 50,
+            height: 50,
+            marginRight: 5,
+        },
+        modalView: {
+            margin: 20,
+            backgroundColor: "white",
+            borderRadius: 20,
+            padding: 35,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 2
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5
+        },
+        centeredView: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 22
+        },
+    });
+    
 export default Users;
