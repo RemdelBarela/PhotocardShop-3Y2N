@@ -10,12 +10,12 @@ const sendTransactionEmail = async (options) => {
         }
     });
 
-    const { email, name, subject, orderDetails } = options;
+    const { email, name, orderID, subject, orderDetails } = options;
 
     const htmlContent = `
         <p>Dear ${name},</p>
         <p>Thank you for your pruchase. Below are the details of your order:</p>
-        <h1> Order ID: ${orderDetails.orderID} </h1>
+        <h1> Order ID: ${orderID} </h1>
         <ul>
             ${orderDetails.map(item => 
                 `<li> Photo: ${item.photo} <br>

@@ -440,10 +440,12 @@ router.post('/', async (req, res) => {
                 price: orderItem.photocard.material.price,
             }));
 
+            console.log(order)
             // Send order confirmation email to the user
             await sendTransactionEmail({
                 email: user.email,
                 name: user.name,
+                orderID: order._id,
                 subject: 'ORDER CONFIRMATION',
                 orderDetails: orderDetails
             });
