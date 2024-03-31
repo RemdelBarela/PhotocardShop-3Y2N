@@ -20,8 +20,8 @@ const sendTransactionEmail = async (options) => {
             ${orderDetails.map(item => 
                 `<li> Photo: ${item.photo} <br>
                         Material: ${item.material} <br>
-                        Price: ${item.quantity} <br>
-                        Quantity: ${item.price}
+                        Price: ${item.price} <br>
+                        Quantity: ${item.quantity}
                 </li>`).join('')}
         </ul>
         <p>Total Price: ${orderDetails.reduce((total, item) => total + item.price * item.quantity, 0)}</p>
