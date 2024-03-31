@@ -48,7 +48,10 @@ const Cart = () => {
         const materialImage = item.newData.material.image[0];
         
         // Determine if the plus button should be disabled
-        const isDisabled = item.quantity >= item.newData.material.stock;
+        const isDisabled = item.quantity === item.newData.material.countInStock;
+        console.log('quantiI: ', item.quantity)
+        console.log('quantiM: ', item.newData.material.countInStock)
+
         
         return (
             <TouchableHighlight

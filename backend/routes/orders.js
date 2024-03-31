@@ -172,7 +172,7 @@ router.get(`/photocard/:id`, async (req, res) => {
 //             zip: req.body.zip,
 //             country: req.body.country,
 //             phone: req.body.phone,
-//             status: 'Pending',
+//             : 'Pending',
 //             totalPrice: totalPrice,
 //             user: req.body.user
 //         });
@@ -390,8 +390,8 @@ router.post('/', async (req, res) => {
 
         let order = new Order({
             orderItems: orderItemsIds,
-            shippingAddress1: req.body.shippingAddress1,
-            shippingAddress2: req.body.shippingAddress2,
+            street: req.body.street,
+            barangay: req.body.barangay,
             city: req.body.city,
             zip: req.body.zip,
             country: req.body.country,

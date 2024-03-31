@@ -121,7 +121,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 40,
         paddingBottom: 20,
-        width: "100%"
+        width: "100%",
+        margin: 'auto'
     },
     subContainer: {
         alignItems: "center"

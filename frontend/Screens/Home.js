@@ -506,59 +506,56 @@ const Home = () => {
                                                                 </View>
 
                                                                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                                                    {materials.map((item, index) => (
-                                                                        <TouchableOpacity
-                                                                            key={item._id}
-                                                                            onPress={() => handleMaterialPress(item, index)}
-                                                                            style={[
-                                                                                styles.materialContainer,
-                                                                                index === selectedMaterialIndex && styles.selectedMaterialIndicator // Apply indicator style for selected material
-                                                                            ]}
-                                                                        >
-                                                                            <Text style={styles.materialName}>{item.name}</Text>
-                                                                        </TouchableOpacity>
-                                                                    ))}
+                                                                {materials.map((item, index) => (
+                                                                    <TouchableOpacity
+                                                                        key={item._id}
+                                                                        onPress={() => handleMaterialPress(item, index)}
+                                                                        style={[
+                                                                            styles.materialContainer,
+                                                                            index === selectedMaterialIndex && styles.selectedMaterialIndicator,
+                                                                            item.countInStock === 0 && { opacity: 0.5 } // Add opacity style when stock is 0
+                                                                        ]}
+                                                                        // Add disabled prop to disable the TouchableOpacity when stock is 0
+                                                                        disabled={item.countInStock === 0}
+                                                                    >
+                                                                        <Text style={styles.materialName}>{item.name}</Text>
+                                                                    </TouchableOpacity>
+                                                                ))}
                                                                 </ScrollView>
 
                                                                 <EasyButton
-    primary
-    medium
-    onPress={() => handleAddToCart(selectedPhoto?._id, selectedMaterial?._id)}
-    style={[
-        styles.cartButton,
-        selectedMaterial && selectedMaterial.countInStock === 0 && {
-            backgroundColor: 'lightgray',
-            borderColor: 'black',
-        },
-    ]}
-    disabled={!selectedMaterial || selectedMaterial.countInStock === 0}
->
-    <Text style={[
-        styles.cartButtonText,
-        selectedMaterial && selectedMaterial.countInStock === 0 && { color: 'red' }
-    ]}>
-        ADD TO CART
-    </Text>
-</EasyButton>
+                                                                    primary
+                                                                    medium
+                                                                    onPress={() => handleAddToCart(selectedPhoto?._id, selectedMaterial?._id)}
+                                                                    style={[
+                                                                        styles.cartButton,
+                                                                    ]}
+                                                                >
+                                                                    <Text style={[
+                                                                        styles.cartButtonText,
+                                                                    ]}>
+                                                                        ADD TO CART
+                                                                    </Text>
+                                                                </EasyButton>
 
                                                                 <View>
-                                                                <View>
-    {/* Display first two reviews */}
-    {reviews.slice(0, 2).map(review => (
-        <View key={review.id} style={styles.reviewItem}>
-            <Text>User: {review.user}</Text>
-            <Text>Rating: {review.rating}/5</Text>
-            <Text>Comment: {review.comment}</Text>
-        </View>
-    ))}
+                                                                    <View>
+                                                                        {/* Display first two reviews */}
+                                                                        {reviews.slice(0, 2).map(review => (
+                                                                            <View key={review.id} style={styles.reviewItem}>
+                                                                                <Text>User: {review.user}</Text>
+                                                                                <Text>Rating: {review.rating}/5</Text>
+                                                                                <Text>Comment: {review.comment}</Text>
+                                                                            </View>
+                                                                        ))}
 
-    {/* Button to see more reviews */}
-    <TouchableOpacity onPress={navigateToAllReviews} style={styles.seeMoreButton}>
-        <Text style={styles.seeMoreButtonText}>See More Reviews</Text>
-    </TouchableOpacity>
-</View>
+                                                                        {/* Button to see more reviews */}
+                                                                        <TouchableOpacity onPress={navigateToAllReviews} style={styles.seeMoreButton}>
+                                                                            <Text style={styles.seeMoreButtonText}>See More Reviews</Text>
+                                                                        </TouchableOpacity>
+                                                                    </View>
 
-        </View>
+                                                                </View>
  
                                                             </View>
 

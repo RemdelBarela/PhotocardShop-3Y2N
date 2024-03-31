@@ -73,8 +73,8 @@ const Confirm = (props) => {
                         <View style={{ borderWidth: 1, borderColor: "orange" }}>
                             <Text style={styles.title}>Shipping to:</Text>
                             <View style={{ padding: 8 }}>
-                                <Text>Address: {finalOrder.order.order.shippingAddress1}</Text>
-                                <Text>Address2: {finalOrder.order.order.shippingAddress2}</Text>
+                                <Text>Street: {finalOrder.order.order.street}</Text>
+                                <Text>Barangay: {finalOrder.order.order.barangay}</Text>
                                 <Text>City: {finalOrder.order.order.city}</Text>
                                 <Text>Zip Code: {finalOrder.order.order.zip}</Text>
                                 <Text>Country: {finalOrder.order.order.country}</Text>
