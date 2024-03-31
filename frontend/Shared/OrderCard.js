@@ -126,9 +126,9 @@ const OrderCard = ({ item, select }) => {
             iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
             style={{ width: undefined }}
             selectedValue={statusChange}
-            color="white"
+            color="black"
             placeholder="Change Status"
-            placeholderTextColor="white"
+            placeholderTextColor="black"
             placeholderStyle={{ color: '#FFFFFF' }}
             placeholderIconColor="#007aff"
             onValueChange={(e) => setStatusChange(e)}
@@ -144,6 +144,7 @@ const OrderCard = ({ item, select }) => {
           <EasyButton
             secondary
             large
+            style={styles.updateButton} // Changed to gray
             onPress={updateOrder}
           >
             <Text style={styles.buttonText}>Update</Text>
@@ -154,7 +155,7 @@ const OrderCard = ({ item, select }) => {
         <EasyButton
           secondary
           large
-          style={styles.reviewButton} // Added style for Review button
+          style={styles.reviewButton} // Styled as black
           onPress={() => navigation.navigate('Review Form', { orderId: item.id })}
         >
           <Text style={styles.buttonText}>Review Order</Text>
@@ -199,8 +200,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
   },
-  reviewButton: {
+  updateButton: {
+    marginTop: 20,
     backgroundColor: "#888",
+  },
+  reviewButton: {
+    backgroundColor: "black",
   },
 });
 
