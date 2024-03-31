@@ -121,11 +121,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 40,
         paddingBottom: 20,
-        width: '80%', // Adjusted width to make it centered
-        maxWidth: 400, // Max width for better centering on larger screens
-        borderRadius: 10, // Added border radius
-        borderColor: 'black', // Added border color
-        borderWidth: 1, // Added border width
+        width: "100%",
+        margin: 'auto'
     },
     subContainer: {
         alignItems: "center"

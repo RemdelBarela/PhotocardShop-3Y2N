@@ -16,8 +16,8 @@ import SelectDropdown from 'react-native-select-dropdown'
 const Checkout = (props) => {
     const [user, setUser] = useState('')
     const [orderItems, setOrderItems] = useState([])
-    const [address, setAddress] = useState('')
-    const [address2, setAddress2] = useState('')
+    const [street, setStreet] = useState('')
+    const [barangay, setBarangay] = useState('')
     const [city, setCity] = useState('')
     const [zip, setZip] = useState('')
     const [country, setCountry] = useState('Philippines')
@@ -48,14 +48,13 @@ const Checkout = (props) => {
     const checkOut = () => {
         console.log("orders", orderItems)
         let order = {
+            barangay,
             city,
             country,
             dateOrdered: Date.now(),
             orderItems,
             phone,
-            shippingAddress1: address,
-            shippingAddress2: address2,
-            status: "3",
+            street,
             user,
             zip,
         }
@@ -83,16 +82,16 @@ const Checkout = (props) => {
                     onChangeText={(text) => setPhone(text)}
                 />
                 <Input
-                    placeholder={"Shipping Address 1"}
-                    name={"ShippingAddress1"}
-                    value={address}
-                    onChangeText={(text) => setAddress(text)}
+                    placeholder={"Street"}
+                    name={"street"}
+                    value={street}
+                    onChangeText={(text) => setStreet(text)}
                 />
                 <Input
-                    placeholder={"Shipping Address 2"}
-                    name={"ShippingAddress2"}
-                    value={address2}
-                    onChangeText={(text) => setAddress2(text)}
+                    placeholder={"Barangay"}
+                    name={"barangay"}
+                    value={barangay}
+                    onChangeText={(text) => setBarangay(text)}
                 />
                 <Input
                     placeholder={"City"}

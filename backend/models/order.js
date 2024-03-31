@@ -6,12 +6,13 @@ const orderSchema = mongoose.Schema({
         ref: 'OrderItem',
         required:true
     }],
-    shippingAddress1: {
+    street: {
         type: String,
         required: true,
     },
-    shippingAddress2: {
+    barangay: {
         type: String,
+        required: true,
     },
     city: {
         type: String,
@@ -32,7 +33,6 @@ const orderSchema = mongoose.Schema({
     status: {
         type: String,
         required: true,
-        default: 'Pending',
     },
     totalPrice: {
         type: Number,

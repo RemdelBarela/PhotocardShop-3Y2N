@@ -4,6 +4,7 @@ import { Image, View } from "react-native";
 import { Badge } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import HomeNavigator from "./HomeNavigator";
+import CartIcon from "../Shared/CartIcon";
 import CartNavigator from "./CartNavigator";
 import UserNavigator from "./UserNavigator";
 import Home from "../Screens/Home";
@@ -40,7 +41,7 @@ const Main = () => {
               <Icon name="shopping-cart" style={{ position: "relative" }} color={color} size={30} />
               {cartItemsCount > 0 && (
                 <Badge style={styles.badge} size={20}>
-                  {cartItemsCount}
+                  <CartIcon />
                 </Badge>
               )}
             </View>
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     right: -8,
+    bottom: 5
   },
 });
 
