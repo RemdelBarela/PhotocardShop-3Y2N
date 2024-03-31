@@ -30,11 +30,43 @@ const UpdateProfile = ({ route }) => {
     const [mainImage, setMainImage] = useState(user.image);
 
     const updateProfile = () => {
-        // Function to update profile
+        let formData = new FormData();
+        if (image) {
+            const newImageUri = "file:///" + image.split("file:/").join("");
+            formData.append("image", {
+                uri: newImageUri,
+                type: mime.getType(newImageUri),
+                name: newImageUri.split("/").pop()
+            });
+        }
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        if (password) {
+            formData.append("password", password);
+        }
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }
+        }
+
+        axios.put(`${baseURL}users/${user._id}`, formData, config)
+            .then((res) => {
+                if (res.status === 200) {
+                    console.log("Profile updated successfully");
+                    navigation.goBack();
+                }
+            })
+            .catch((error) => {
+                console.log("Error updating profile:", error);
+                setError("Something went wrong. Please try again.");
+            });
     };
 
     const pickImage = async () => {
-        // Function to pick image from gallery
+        // Code to pick image from gallery
     };
 
     return (
@@ -61,12 +93,12 @@ const UpdateProfile = ({ route }) => {
                 />
                 <Input
                     placeholder={"Password"}
-                    secureTextEntry
+                    value={password}
                     onChangeText={(text) => setPassword(text)}
                 />
                 {error ? <Error message={error} /> : null}
                 <EasyButton primary large onPress={updateProfile}>
-                    <Text style={{ color: 'black' }}>UPDATE</Text>
+                    <Text style={{ color: 'white' }}>UPDATE</Text>
                 </EasyButton>
             </View>
         </KeyboardAwareScrollView>
@@ -95,4 +127,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default UpdateProfile;
+export default UpdateProfile; 

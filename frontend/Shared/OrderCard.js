@@ -16,6 +16,7 @@ const codes = [
   { name: "shipped", code: "2" },
   { name: "delivered", code: "1" },
 ];
+
 const OrderCard = ({ item, select }) => {
   const [orderStatus, setOrderStatus] = useState();
   const [statusText, setStatusText] = useState('');
@@ -24,12 +25,15 @@ const OrderCard = ({ item, select }) => {
   const [cardColor, setCardColor] = useState('');
   const navigation = useNavigation()
 
-  const updateOrder = () => {
+  useEffect(() => {
     AsyncStorage.getItem("jwt")
       .then((res) => {
         setToken(res);
       })
       .catch((error) => console.log(error));
+  }, []);
+
+  const updateOrder = () => {
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -73,95 +77,89 @@ const OrderCard = ({ item, select }) => {
         });
       });
   }
+
   useEffect(() => {
     if (item.status === "3") {
-      setOrderStatus(<TrafficLight unavailable></TrafficLight>);
-      setStatusText("pending");
-      setCardColor("#E74C3C");
+      setOrderStatus(<TrafficLight unavailable />);
+      setStatusText("Pending");
+      setCardColor("#f0f0f0"); // Gray background
     } else if (item.status === "2") {
-      setOrderStatus(<TrafficLight limited></TrafficLight>);
-      setStatusText("shipped");
-      setCardColor("#F1C40F");
+      setOrderStatus(<TrafficLight limited />);
+      setStatusText("Shipped");
+      setCardColor("#f0f0f0"); // Gray background
     } else {
-      setOrderStatus(<TrafficLight available></TrafficLight>);
-      setStatusText("delivered");
-      setCardColor("#2ECC71");
+      setOrderStatus(<TrafficLight available />);
+      setStatusText("Delivered");
+      setCardColor("#f0f0f0"); // Gray background
     }
 
     return () => {
-      setOrderStatus();
-      setStatusText();
-      setCardColor();
+      setOrderStatus(null);
+      setStatusText('');
+      setCardColor('');
     };
   }, []);
 
   return (
-    // <View style={[{ backgroundColor: cardColor }, styles.container]}>
-    //   <View style={styles.container}>
-    //     <Text>Order Number: #{item.id}</Text>
-    //   </View>
-    // </View>
-    <View style={[{ backgroundColor: cardColor }, styles.container]}>
-      <View style={styles.container}>
-        <Text>Order Number: #{item.id}</Text>
-      </View>
-      <View style={{ marginTop: 10 }}>
+    <View style={[styles.container, { backgroundColor: cardColor }]}>
+      <View style={styles.orderInfo}>
+        <Text style={styles.orderNumber}>Order Number:</Text>
+        <Text style={styles.orderNumberValue}>#{item.id}</Text>
         <Text>
           Status: {statusText} {orderStatus}
         </Text>
         <Text>
-          Address: {item.shippingAddress1} {item.shippingAddress2}
+          Address: {item.shippingAddress1} or {item.shippingAddress2}
         </Text>
         <Text>City: {item.city}</Text>
         <Text>Country: {item.country}</Text>
         <Text>Date Ordered: {item.dateOrdered.split("T")[0]}</Text>
         <View style={styles.priceContainer}>
           <Text>Price: </Text>
-          <Text style={styles.price}>$ {item.totalPrice}</Text>
+          <Text style={styles.price}>₱<Text style={{ textDecorationLine: 'underline' }}>{item.totalPrice}</Text></Text>
         </View>
-        {/* {item.editMode ? ( */}
-        <View>
-        {select ? null : <><Select
+      </View>
+      {!select &&
+        <View style={styles.buttonContainer}>
+          <Select
             width="80%"
             iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
             style={{ width: undefined }}
             selectedValue={statusChange}
-            color="white"
+            color="black"
             placeholder="Change Status"
-            placeholderTextColor="white"
+            placeholderTextColor="black"
             placeholderStyle={{ color: '#FFFFFF' }}
             placeholderIconColor="#007aff"
             onValueChange={(e) => setStatusChange(e)}
           >
-            {codes.map((c) => {
-              return <Select.Item
+            {codes.map((c) => (
+              <Select.Item
                 key={c.code}
                 label={c.name}
                 value={c.code}
               />
-            })}
+            ))}
           </Select>
-
           <EasyButton
             secondary
             large
-            onPress={() => updateOrder()}
+            style={styles.updateButton} // Changed to gray
+            onPress={updateOrder}
           >
-            <Text style={{ color: "white" }}>Update</Text>
-          </EasyButton></> }
-          
-          <View style={styles.buttonContainer}>
-          <EasyButton
-              secondary
-              large
-              onPress={() => navigation.navigate('Review Form', { orderId: item.id })}
-            >
-              <Text style={{ color: 'white' }}>Review Order</Text>
-            </EasyButton>
-          </View>
-
+            <Text style={styles.buttonText}>Update</Text>
+          </EasyButton>
         </View>
-        {/* //   ) : null} */}
+      }
+      <View style={styles.buttonContainer}>
+        <EasyButton
+          secondary
+          large
+          style={styles.reviewButton} // Styled as black
+          onPress={() => navigation.navigate('Review Form', { orderId: item.id })}
+        >
+          <Text style={styles.buttonText}>Review Order</Text>
+        </EasyButton>
       </View>
     </View>
   );
@@ -173,9 +171,18 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 10,
   },
-  title: {
-    backgroundColor: "#62B1F6",
-    padding: 5,
+  orderInfo: {
+    marginBottom: 10,
+  },
+  orderNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  orderNumberValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 5,
   },
   priceContainer: {
     marginTop: 10,
@@ -183,8 +190,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   price: {
-    color: "white",
+    color: "black",
     fontWeight: "bold",
+  },
+  buttonContainer: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+  },
+  updateButton: {
+    marginTop: 20,
+    backgroundColor: "#888",
+  },
+  reviewButton: {
+    backgroundColor: "black",
   },
 });
 

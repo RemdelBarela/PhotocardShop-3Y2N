@@ -13,6 +13,10 @@ const PhotoNavigator= () => {
              <Stack.Screen 
                 name="Photos"
                 component={Photos}
+                options={{
+                    tabBarLabel: '', // Hide the name from the tab
+                    headerShown: false // Hide header for the Cart screen
+                   }}
             />
             <Stack.Screen name="PhotoForm" component={PhotoForm} />
 

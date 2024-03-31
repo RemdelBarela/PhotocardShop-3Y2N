@@ -3,7 +3,9 @@ import {
     TouchableOpacity, View, Dimensions,
     ScrollView, Text, StyleSheet, FlatList,
     Image, Modal
-} from "react-native";
+} from "react-native";import { Alert } from 'react-native';
+
+ 
 import {
     VStack, Input, Icon, HStack, Container,
     Avatar, Box, Spacer, Center, Heading
@@ -19,11 +21,11 @@ import axios from "axios";
 import baseURL from "../assets/common/baseurl";
 import EasyButton from "../Shared/StyledComponents/EasyButton";
 
-import { images } from "./Product/constants";  
- 
+import { images } from "./Product/constants";
+
 const { width, height } = Dimensions.get("window");
 
-const Home = ( ) => {
+const Home = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState('');
 
@@ -38,8 +40,7 @@ const Home = ( ) => {
     const [token, setToken] = useState();
     const [selectedMaterialIndex, setSelectedMaterialIndex] = useState(0);
 
-    const navigation = useNavigation();
-    const dispatch = useDispatch()
+     const dispatch = useDispatch()
 
     const [backgroundColor, setBackgroundColor] = useState('lightgray');
 
@@ -57,18 +58,19 @@ const Home = ( ) => {
         // Return a hexadecimal color in the range of light gray
         return `#${randomColor}${randomColor}${randomColor}`;
     };
-    
-    
+
+
     const styles2 = StyleSheet.create({
         container: {
             flex: 1,
-            marginTop:20,
-            marginBottom:20,
-            backgroundColor: generateBackgroundColor()        },
+            marginTop: 20,
+            marginBottom: 20,
+            backgroundColor: generateBackgroundColor()
+        },
         contentContainer: {
             padding: 20,
-            
-            borderRadius:20,
+
+            borderRadius: 20,
         },
         contentHeader: {
             fontSize: 24,
@@ -80,8 +82,8 @@ const Home = ( ) => {
             marginTop: 10,
             fontFamily: 'Arial, Helvetica, sans-serif', // Specify multiple font families separated by commas
         },
-        
-        
+
+
         materialContainer: {
             marginVertical: 10,
             padding: 10,
@@ -118,16 +120,17 @@ const Home = ( ) => {
             height: 400,
             margin: 2, // Add margin
             padding: 10, // Add padding
-            backgroundColor: 'lightgray', 
-            borderWidth: 1  ,
-            borderRadius: 22 },
+            backgroundColor: 'lightgray',
+            borderWidth: 1,
+            borderRadius: 22
+        },
         image: {
             width: '100%',
-            height: '100%',  
+            height: '100%',
         },
         modalImage: {
-            width: width +150 , // Adjust as needed
-            height: width + 150  , // Adjust as needed
+            width: width + 150, // Adjust as needed
+            height: width + 150, // Adjust as needed
             resizeMode: 'contain',
         },
     });
@@ -229,11 +232,21 @@ const Home = ( ) => {
             });
     };
 
-
     const handleAddToCart = (photo_id, material_id) => {
-        console.log("pHOTO: ", photo_id)
-        console.log("mAT: ", material_id)
-
+        if (!selectedMaterial) {
+            // If selectedMaterial is not set, show validation message
+            Alert.alert('Please select a material', 'SELECT MATERIAL');
+            return; // Exit the function without proceeding further
+        }
+    
+        // Check if the selected material's stock is greater than zero
+        if (selectedMaterial.countInStock === 0) {
+            // If the stock is zero, display a message
+            Alert.alert('Material out of stock', 'SELECT ANOTHER MATERIAL');
+            return; // Exit the function without proceeding further
+        }
+    
+        // Proceed with adding to cart logic
         axios.post(`${baseURL}orders/${photo_id}/${material_id}`)
             .then((res) => {
                 console.log('Response:', res);
@@ -242,7 +255,7 @@ const Home = ( ) => {
                         .then((response) => {
                             const newData = response.data;
                             console.log('newData:', newData);
-
+    
                             dispatch(addToCart({ newData, quantity: 1 }));
                         })
                         .catch((error) => {
@@ -255,14 +268,46 @@ const Home = ( ) => {
             .catch((error) => {
                 console.log('Error:', error);
             });
-
-        // The rest of your logic goes here
+    
+        // Reset selectedPhoto and selectedMaterial and close modal
         setSelectedPhoto(null);
         setSelectedMaterial(null);
         setShowAddToCartModal(false);
     };
+        const renderStars = (rating, userRating) => {
+        const stars = [];
+        // Push filled stars
+        for (let i = 1; i <= userRating; i++) {
+            stars.push('★');
+        }
+        // Push empty stars
+        for (let i = userRating + 1; i <= 5; i++) {
+            stars.push('☆');
+        }
+        return (
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {stars.map((star, index) => ( 
+                    <Text key={index} style={{ color: 'gray', fontSize: 16 }}>{star}</Text>
+                ))}
+            </View>
+        );
+    };
+    
+    
+    const reviews = [
+        { id: 1, user: 'User1', comment: 'Great product!', rating: 5 },
+        { id: 2, user: 'User2', comment: 'Could be better.', rating: 3 },
+        // Add more reviews as needed
+    ];
 
+    const navigation = useNavigation();
 
+    const navigateToAllReviews = () => {
+        // Navigate to a new page/component where all reviews are displayed
+        navigation.navigate('AllReviewsPage', { reviews });
+    };
+
+    
     return (
         <View style={styles.Outercontainer}>
             <VStack w="100%" space={5} alignSelf="center">
@@ -285,41 +330,37 @@ const Home = ( ) => {
             </VStack>
             {focus === true ? (
                 <Container style={{ width: width }}>
-                    {photoFilter.length > 0 ? (
-                        <Box width={80}>
-                            <FlatList data={photoFilter} renderItem={({ item }) =>
+                {photoFilter.length > 0 ? (
+                    <Box width={80}>
+                        <FlatList
+                            data={photoFilter}
+                            renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={{ margin: 10, marginBottom: -10, flex: 1, flexDirection: "row" }}
                                     onPress={() => {
-                                        handlePhotoSelect(item._id);
-                                        setShowAddToCartModal(true);
+                                        // handle your logic here
                                     }}
                                 >
                                     <View style={styles.card}>
-
-                                        <Image
-                                            source={{ uri: item.image[0] }}
-                                            resizeMode="contain"
-                                            style={styles.image}
-                                        />
-
                                         <View style={{ flex: 1.5, justifyContent: 'center' }}>
                                             <Text style={styles.boldText}>{item.name}</Text>
                                             <Text style={styles.description}>{item.description}</Text>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                {renderStars(item.rating, item.userRating)} {/* Assuming each item has a 'rating' and 'userRating' property */}
+                                            </View>
                                         </View>
                                     </View>
-                                </TouchableOpacity>} keyExtractor={item => item._id}
-                            />
-                        </Box>
-                    ) : (
-                        <View style={styles.Searchcenter}>
-                            <Text style={{ alignSelf: 'center' }}>
-                                NO PHOTOS FOUND
-                            </Text>
-                        </View>
-                    )}
-                </Container>
-            ) : (
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={item => item._id}
+                        />
+                    </Box>
+                ) : (
+                    <View style={styles.Searchcenter}>
+                        <Text style={{ alignSelf: 'center' }}>NO PHOTOS FOUND</Text>
+                    </View>
+                )}
+            </Container>            ) : (
                 <ScrollView>
                     {photoFilter.length > 0 ? (
                         <View style={styles.listContainer}>
@@ -340,28 +381,29 @@ const Home = ( ) => {
                                         flex: 1
                                     }}
                                     >
-                                        <TouchableOpacity
-                                            style={{ margin: 10, marginBottom: -10, flex: 1, flexDirection: "row" }}
-                                            onPress={() => {
-                                                handlePhotoSelect(item._id);
-                                                setShowAddToCartModal(true);
-                                            }}
-                                        >
-                                            <View style={styles.card}>
-
-                                                <Image
-                                                    source={{ uri: item.image[0] }}
-                                                    resizeMode="contain"
-                                                    style={styles.image}
-                                                />
-
-                                                <View style={{ flex: 1.5, justifyContent: 'center' }}>
-                                                    <Text style={styles.boldText}>{item.name}</Text>
-                                                    <Text style={styles.description}>{item.description}</Text>
-                                                </View>
-                                            </View>
-                                        </TouchableOpacity>
-                                        {selectedPhoto && (
+                                 <TouchableOpacity
+                                style={{ margin: 10, marginBottom: -10, flex: 1, flexDirection: "row" }}
+                                onPress={() => {
+                                    handlePhotoSelect(item._id);
+                                    setShowAddToCartModal(true);
+                                }}
+                            >
+                                <View style={styles.card}>
+                                    <Image
+                                        source={{ uri: item.image[0] }}
+                                        resizeMode="contain"
+                                        style={styles.image}
+                                    />
+                                    <View style={{ flex: 1.5, justifyContent: 'center' }}>
+                                        <Text style={styles.boldText}>{item.name}</Text>
+                                        <Text style={styles.description}>{item.description}</Text>
+                                         <Text>   {renderStars(item.rating, item.userRating)} {/* Assuming each item has a 'rating' and 'userRating' property */}
+                                      </Text>   
+                                      
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        {selectedPhoto && (
                                             <Modal
                                                 animationType="slide"
                                                 transparent={true}
@@ -414,81 +456,112 @@ const Home = ( ) => {
 
 
 
-<Carousel
-                data={selectedPhoto.image}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        onPress={() => handleImageClick(item)}
-                        style={styles1.imageContainer}
-                    >
-                        <Image
-                            source={{ uri: item }}
-                            resizeMode="contain"
-                            style={styles1.image}
-                        />
-                    </TouchableOpacity>
-                )}
-                sliderWidth={width}
-                itemWidth={width * 0.8}
-                loop={true}
-                autoplay={true}
-                autoplayInterval={5000}
-            />
-            <Modal
-                visible={modalVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
-                        <Image
-                            source={{ uri: selectedImage }}
-                            style={styles1.modalImage}
-                            />
-                    </TouchableOpacity>
-                </View>
-            </Modal>
-            <View style={[styles2.container, { backgroundColor }]}>
-            <View style={styles2.contentContainer}>
-                <Heading style={styles2.contentHeader}>{selectedPhoto?.name}</Heading>
-                <Text style={styles2.Singledescription}>{selectedPhoto?.description}</Text>
-                {selectedMaterial || materials.length > 0 ? (
-                    <View style={styles.selectedMaterialContainer}>
-                        <View style={styles.selectedMaterialContent}>
-                            <Text style={styles.selectedMaterialText}>PRICE: ${materials[selectedMaterialIndex]?.price}</Text>
-                            <Text style={styles.selectedMaterialText}>STOCK: {materials[selectedMaterialIndex]?.countInStock}</Text>
-                        </View>
-                    </View>
-                ) : null}
-            </View>
+                                                            <Carousel
+                                                                data={selectedPhoto.image}
+                                                                renderItem={({ item }) => (
+                                                                    <TouchableOpacity
+                                                                        onPress={() => handleImageClick(item)}
+                                                                        style={styles1.imageContainer}
+                                                                    >
+                                                                        <Image
+                                                                            source={{ uri: item }}
+                                                                            resizeMode="contain"
+                                                                            style={styles1.image}
+                                                                        />
+                                                                    </TouchableOpacity>
+                                                                )}
+                                                                sliderWidth={width}
+                                                                itemWidth={width * 0.8}
+                                                                loop={true}
+                                                                autoplay={true}
+                                                                autoplayInterval={5000}
+                                                            />
+                                                            <Modal
+                                                                visible={modalVisible}
+                                                                transparent={true}
+                                                                animationType="fade"
+                                                                onRequestClose={() => setModalVisible(false)}
+                                                            >
+                                                                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                                                                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                                                        <Image
+                                                                            source={{ uri: selectedImage }}
+                                                                            style={styles1.modalImage}
+                                                                        />
+                                                                    </TouchableOpacity>
+                                                                </View>
+                                                            </Modal>
+                                                            <View style={[styles2.container, { backgroundColor }]}>
+                                                                <View style={styles2.contentContainer}>
+                                                                    <Heading style={styles2.contentHeader}>{selectedPhoto?.name}</Heading>
+                                                                    <Text style={styles2.Singledescription}>{selectedPhoto?.description}</Text>
+                                                                    {selectedMaterial || materials.length > 0 ? (
+                                                                        <View style={styles.selectedMaterialContainer}>
+                                                                            <View style={styles.selectedMaterialContent}>
+                                                                                <Text style={styles.selectedMaterialText}>PRICE: ${materials[selectedMaterialIndex]?.price}</Text>
+                                                                                <Text style={styles.selectedMaterialText}>STOCK: {materials[selectedMaterialIndex]?.countInStock}</Text>
+                                                                            </View>
+                                                                        </View>
+                                                                    ) : null}
+                                                                </View>
 
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                {materials.map((item, index) => (
-                    <TouchableOpacity
-                        key={item._id}
-                        onPress={() => handleMaterialPress(item, index)}
-                        style={[
-                            styles.materialContainer,
-                            index === selectedMaterialIndex && styles.selectedMaterialIndicator // Apply indicator style for selected material
-                        ]}
-                    >
-                        <Text style={styles.materialName}>{item.name}</Text>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
+                                                                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                                                                    {materials.map((item, index) => (
+                                                                        <TouchableOpacity
+                                                                            key={item._id}
+                                                                            onPress={() => handleMaterialPress(item, index)}
+                                                                            style={[
+                                                                                styles.materialContainer,
+                                                                                index === selectedMaterialIndex && styles.selectedMaterialIndicator // Apply indicator style for selected material
+                                                                            ]}
+                                                                        >
+                                                                            <Text style={styles.materialName}>{item.name}</Text>
+                                                                        </TouchableOpacity>
+                                                                    ))}
+                                                                </ScrollView>
 
+                                                                <EasyButton
+    primary
+    medium
+    onPress={() => handleAddToCart(selectedPhoto?._id, selectedMaterial?._id)}
+    style={[
+        styles.cartButton,
+        selectedMaterial && selectedMaterial.countInStock === 0 && {
+            backgroundColor: 'lightgray',
+            borderColor: 'black',
+        },
+    ]}
+    disabled={!selectedMaterial || selectedMaterial.countInStock === 0}
+>
+    <Text style={[
+        styles.cartButtonText,
+        selectedMaterial && selectedMaterial.countInStock === 0 && { color: 'red' }
+    ]}>
+        ADD TO CART
+    </Text>
+</EasyButton>
 
-            <EasyButton
-                primary
-                medium
-                onPress={() => handleAddToCart(selectedPhoto?._id, selectedMaterial?._id)}
-                style={styles.cartButton}
-            >
-                <Text style={styles.cartButtonText}>ADD TO CART</Text>
-            </EasyButton>
+                                                                <View>
+                                                                <View>
+    {/* Display first two reviews */}
+    {reviews.slice(0, 2).map(review => (
+        <View key={review.id} style={styles.reviewItem}>
+            <Text>User: {review.user}</Text>
+            <Text>Rating: {review.rating}/5</Text>
+            <Text>Comment: {review.comment}</Text>
         </View>
-                     
+    ))}
+
+    {/* Button to see more reviews */}
+    <TouchableOpacity onPress={navigateToAllReviews} style={styles.seeMoreButton}>
+        <Text style={styles.seeMoreButtonText}>See More Reviews</Text>
+    </TouchableOpacity>
+</View>
+
+        </View>
+ 
+                                                            </View>
+
                                                         </ScrollView>
                                                     </Center>
                                                 </BlurView>
@@ -544,8 +617,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width:300,
-        marginLeft:30,
+        width: 300,
+        marginLeft: 30,
         marginTop: 10, // Adjust spacing as needed
     },
     cartButtonText: {
@@ -560,8 +633,9 @@ const styles = StyleSheet.create({
     selectedMaterialIndicator: {
         borderWidth: 2,
         borderColor: 'black',
-    
-        backgroundColor: 'lightgray'  },
+ 
+        backgroundColor: 'lightgray'
+    },
     boldText: {
         fontWeight: 'bold',
         fontSize: 20,
@@ -570,7 +644,6 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginTop: 10,
         textTransform: 'uppercase', // Transform text to uppercase
-
     },
     description: {
         fontSize: 14,
@@ -598,6 +671,16 @@ const styles = StyleSheet.create({
     Singledescription: {
         fontSize: 20,
         color: '#555',
+    },
+    seeMoreButton: {
+        backgroundColor: 'gray',
+        padding: 10,
+        borderRadius: 20,
+        marginTop: 10,marginBottom:20,
+    },
+    seeMoreButtonText: {
+        color: 'white',
+        textAlign: 'center',
     },
     materialContainer: {
         width: 150,

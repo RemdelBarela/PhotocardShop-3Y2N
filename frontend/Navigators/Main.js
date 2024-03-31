@@ -15,7 +15,7 @@ const Tab = createBottomTabNavigator();
 const Main = () => {
   const cartItems = useSelector((state) => state.cartItems); // Access cartItems from Redux state
 
-  // Calculate cartItemsCount dynamically
+  // Calculate total number of items in the cart
   const cartItemsCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   return (
@@ -31,24 +31,24 @@ const Main = () => {
         activeTintColor: "black",
       }}
     >
-     <Tab.Screen
-  name="Cart"
-  component={CartNavigator}
-  options={{
-    tabBarIcon: ({ color }) => (
-      <View>
-        <Icon name="shopping-cart" style={{ position: "relative" }} color={color} size={30} />
-        {cartItemsCount > 0 && (
-          <Badge style={styles.badge} size={20}>
-            {cartItemsCount}
-          </Badge>
-        )}
-      </View>
-    ),
-    tabBarLabel: '', // Hide the name from the tab
-    headerShown: false // Hide header for the Cart screen
-  }}
-/>
+      <Tab.Screen
+        name="Cart"
+        component={CartNavigator}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <View>
+              <Icon name="shopping-cart" style={{ position: "relative" }} color={color} size={30} />
+              {cartItemsCount > 0 && (
+                <Badge style={styles.badge} size={20}>
+                  {cartItemsCount}
+                </Badge>
+              )}
+            </View>
+          ),
+          tabBarLabel: '', // Hide the name from the tab
+          headerShown: false // Hide header for the Cart screen
+        }}
+      />
 
       <Tab.Screen
         name="Home"
@@ -56,10 +56,10 @@ const Main = () => {
         options={{
           tabBarIcon: ({ color, focused }) => (
             <CustomTabBarIcon focused={focused} />
-            ),
-            tabBarLabel: '', // Hide the name from the tab
-            headerShown: false // Hide header for the Cart screen
-           }}
+          ),
+          tabBarLabel: '', // Hide the name from the tab
+          headerShown: false // Hide header for the Cart screen
+        }}
       />
       <Tab.Screen
         name="User"
@@ -67,10 +67,10 @@ const Main = () => {
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="user" style={{ position: "relative" }} color={color} size={30} />
-            ),
-            tabBarLabel: '', // Hide the name from the tab
-            headerShown: false // Hide header for the Cart screen
-           }}
+          ),
+          tabBarLabel: '', // Hide the name from the tab
+          headerShown: false // Hide header for the Cart screen
+        }}
       />
     </Tab.Navigator>
   );

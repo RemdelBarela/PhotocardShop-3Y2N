@@ -13,6 +13,10 @@ const MaterialNavigator= () => {
              <Stack.Screen 
                 name="Materials"
                 component={Materials}
+                options={{
+                    tabBarLabel: '', // Hide the name from the tab
+                    headerShown: false // Hide header for the Cart screen
+                   }}
             />
             <Stack.Screen name="MaterialForm" component={MaterialForm} />
 
