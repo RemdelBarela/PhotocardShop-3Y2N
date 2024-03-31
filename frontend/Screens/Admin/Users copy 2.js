@@ -114,35 +114,23 @@ const Users = (props) => {
         setImageModalVisible(true);
     };
     const renderGallery = () => {
-        if (selectedPhoto) {
+        // Check if selectedPhoto is defined and has image property
+        if (selectedPhoto && selectedPhoto.image && Array.isArray(selectedPhoto.image)) {
             return (
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                    {Array.isArray(selectedPhoto.image) ? (
-                        selectedPhoto.image.map((imageUrl, idx) => (
-                            <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
-                                <Image
-                                    key={idx}
-                                    source={{
-                                        uri: imageUrl ? imageUrl : null
-                                    }}
-                                    resizeMode="cover"
-                                    style={{ width: width, height: width / 2, marginVertical: 5 }}
-                                    onError={() => console.log("Error loading image")}
-                                />
-                            </TouchableOpacity>
-                        ))
-                    ) : (
-                        <TouchableOpacity onPress={() => handleImagePress(selectedPhoto.image)}>
+                    {/* Map over the image array */}
+                    {selectedPhoto.image.map((imageUrl, idx) => (
+                        <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
                             <Image
                                 source={{
-                                    uri: selectedPhoto.image ? selectedPhoto.image : null
+                                    uri: imageUrl || null, // Ensure imageUrl is not undefined
                                 }}
                                 resizeMode="cover"
                                 style={{ width: width, height: width / 2, marginVertical: 5 }}
-                                onError={() => console.log("Error loading image")}
+                                onError={() => console.log('Error loading image')}
                             />
                         </TouchableOpacity>
-                    )}
+                    ))}
                 </ScrollView>
             );
         } else {

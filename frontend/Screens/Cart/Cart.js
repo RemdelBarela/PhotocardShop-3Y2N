@@ -50,17 +50,16 @@ const Cart = () => {
         const materialPrice = cart?.newData?.material?.price || 0; // Ensure material exists and price is available
         return acc + materialPrice * cart.quantity;
     }, 0);
-
     const renderItem = ({ item, index }) => {
-        
         const photoImage = item.newData.photo.image[0];
         const photoName = item.newData.photo.name;
         const materialName = item.newData.material.name;
         const materialPrice = item.newData.material.price;
         const materialImage = item.newData.material.image[0];
-
-        console.log("photoImage: ", photoImage)
-        // Accessing nested data using array notation for image array
+        
+        // Determine if the plus button should be disabled
+        const isDisabled = item.quantity >= item.newData.material.stock;
+        
         return (
             <TouchableHighlight
                 _dark={{
@@ -69,7 +68,6 @@ const Cart = () => {
                 _light={{
                     bg: 'white'
                 }}
-    
             >
                 <Box pl="4" pr="5" py="2" bg="coolGray.200" borderColor="black" borderWidth={1} borderRadius={10} keyExtractor={item => item.id} margin={15} shadow={5} shadowColor="rgba(0, 0, 0, 0.6)">
                     <HStack alignItems="center" justifyContent="space-between">
@@ -86,24 +84,22 @@ const Cart = () => {
                             <Text fontSize="sm" color="coolGray.800" _dark={{
                                 color: 'warmGray.50'
                             }} alignSelf="flex-start">
-                                $ {materialPrice}
+                                {materialName} - $ {materialPrice}
                             </Text>
                         </VStack>
                         <HStack alignItems="center">
-    
-    
                             <TouchableOpacity onPress={() => handleCountChange(item, -1)}>
-                                <Icon name="minus" size={20} color="white" style={{backgroundColor: 'black', padding: 5, borderRadius: 5}} />
+                                <Icon name="minus" size={20} color="white" style={{ backgroundColor: 'black', padding: 5, borderRadius: 5 }} />
                             </TouchableOpacity>
                             <Text fontSize="sm" color="coolGray.800" _dark={{
                                 color: 'warmGray.50'
-                            }} alignSelf="center" style={{marginHorizontal: 5}}>
-                                {/* Display item count */}
-                                {/* {count} */}
+                            }} alignSelf="center" style={{ marginHorizontal: 5 }}>
                                 {item.quantity}
                             </Text>
-                            <TouchableOpacity onPress={() => handleCountChange(item, 1)}>
-                                <Icon name="plus" size={20} color="white" style={{backgroundColor: 'black', padding: 5, borderRadius: 5}} />
+                            <TouchableOpacity onPress={() => handleCountChange(item, 1)} disabled={isDisabled}>
+                                <View style={{ backgroundColor: 'black', padding: 5, borderRadius: 5 }}>
+                                    <Icon name="plus" size={20} color={isDisabled ? "gray" : "white"} />
+                                </View>
                             </TouchableOpacity>
                         </HStack>
                     </HStack>
@@ -111,7 +107,6 @@ const Cart = () => {
             </TouchableHighlight>
         );
     };
-    
     
     
     const renderHiddenItem = (cartItems) =>
