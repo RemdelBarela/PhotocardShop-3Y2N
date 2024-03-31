@@ -157,21 +157,23 @@ const Users = (props) => {
 
     return (
         <Box flex={1}>
-            <View style={styles.buttonContainer}>
-                <EasyButton
-                    secondary
-                    medium
-                    onPress={() => navigation.navigate("PhotoForm")}
-                >
-                    <Icon name="plus" size={18} color="white" />
-                    <Text style={styles.buttonText}> ADD</Text>
-                </EasyButton>
-            </View>
-
-            <Searchbar width="80%"
-                placeholder="Search Photo Name"
-                onChangeText={(text) => searchPhoto(text)}
-            />
+                 <View style={styles.buttonContainer}>
+     <Searchbar
+        placeholder="Search Photo Name"
+        onChangeText={(text) => searchPhoto(text)}
+        style={{ flex: 1 }} // Allow the search bar to take remaining space
+    /> 
+      <EasyButton
+        secondary
+        medium
+        onPress={() => navigation.navigate("PhotoForm")}
+        style={{ marginRight: 10 ,backgroundColor: 'black'}} // Add some right margin for spacing
+    >
+        <Icon name="plus" size={18} color="white" />
+        <Text style={[styles.buttonText, { color: 'white'   }]}> ADD</Text>
+    </EasyButton>
+  
+</View>
 
             <Modal
                 animationType="fade"
@@ -300,10 +302,20 @@ const Users = (props) => {
                                     <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.isAdmin}</DataTable.Cell>
                                   
                            
-                               
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ textDecorationLine: 'underline' }}>View</Text>
-                                </DataTable.Cell>
+                                                
+    <DataTable.Cell 
+    style={{
+        width: 40,
+        height: 40,
+        marginRight: 10,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 20 // Half of width or height to make it circular
+    }}
+>     
+    <Icon name="eye" size={18} color="white" />
+</DataTable.Cell>
                             </DataTable.Row>
                         </TouchableOpacity>
                     ))}
