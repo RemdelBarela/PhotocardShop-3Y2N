@@ -2,9 +2,15 @@ const { Photocard } = require('../models/photocard');
 const { Photo } = require('../models/photo');
 const { Material } = require('../models/material');
 const { Order } = require('../models/order');
+const { User } = require('../models/user');
+const nodemailer = require('nodemailer');
+
+const sendTransactionEmail = require('../utils/sendTransactionEmail');
+
 const express = require('express');
 const { OrderItem } = require('../models/order-item');
 const router = express.Router();
+
 
 router.get(`/`, async (req, res) => {
     const orderList = await Order.find().populate('user', 'name').sort({ 'dateOrdered': -1 });
@@ -114,74 +120,74 @@ router.get(`/photocard/:id`, async (req, res) => {
     res.send(photocard);
 })
 
-router.post('/', async (req, res) => {
-    try {
-        const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
-            let newOrderItem = new OrderItem({
-                quantity: orderItem.quantity,
-                photocard: orderItem.newData._id
-            });
+// router.post('/', async (req, res) => {
+//     try {
+//         const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
+//             let newOrderItem = new OrderItem({
+//                 quantity: orderItem.quantity,
+//                 photocard: orderItem.newData._id
+//             });
 
-            newOrderItem = await newOrderItem.save();
+//             newOrderItem = await newOrderItem.save();
 
-            console.log(newOrderItem);
-            return newOrderItem._id; // Return the ID of the newly created OrderItem
-        });
+//             console.log(newOrderItem);
+//             return newOrderItem._id; // Return the ID of the newly created OrderItem
+//         });
 
-        const orderItemsIds = await Promise.all(orderItemsPromises); // Wait for all promises to resolve
+//         const orderItemsIds = await Promise.all(orderItemsPromises); // Wait for all promises to resolve
 
-        console.log(orderItemsIds);
+//         console.log(orderItemsIds);
 
-        const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
-            path: 'photocard',
-            populate: {
-                path: 'material',
-                model: 'Material'
-            }
-        });
+//         const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
+//             path: 'photocard',
+//             populate: {
+//                 path: 'material',
+//                 model: 'Material'
+//             }
+//         });
 
-        let totalPrice = 0;
+//         let totalPrice = 0;
 
-        for (const orderItem of orderItems) {
-            const photocard = orderItem.photocard;
-            const material = photocard.material;
-            const itemPrice = material.price * orderItem.quantity;
+//         for (const orderItem of orderItems) {
+//             const photocard = orderItem.photocard;
+//             const material = photocard.material;
+//             const itemPrice = material.price * orderItem.quantity;
 
-            // Update total price
-            totalPrice += itemPrice;
+//             // Update total price
+//             totalPrice += itemPrice;
 
-            // Update material countInStock
-            const updatedCountInStock = material.countInStock - orderItem.quantity;
-            material.countInStock = updatedCountInStock;
-            await material.save();
+//             // Update material countInStock
+//             const updatedCountInStock = material.countInStock - orderItem.quantity;
+//             material.countInStock = updatedCountInStock;
+//             await material.save();
 
-            console.log(`Material ${material.name}: Count in stock updated to ${updatedCountInStock}`);
-        }
+//             console.log(`Material ${material.name}: Count in stock updated to ${updatedCountInStock}`);
+//         }
 
-        let order = new Order({
-            orderItems: orderItemsIds,
-            shippingAddress1: req.body.shippingAddress1,
-            shippingAddress2: req.body.shippingAddress2,
-            city: req.body.city,
-            zip: req.body.zip,
-            country: req.body.country,
-            phone: req.body.phone,
-            status: 'Pending',
-            totalPrice: totalPrice,
-            user: req.body.user
-        });
+//         let order = new Order({
+//             orderItems: orderItemsIds,
+//             shippingAddress1: req.body.shippingAddress1,
+//             shippingAddress2: req.body.shippingAddress2,
+//             city: req.body.city,
+//             zip: req.body.zip,
+//             country: req.body.country,
+//             phone: req.body.phone,
+//             status: 'Pending',
+//             totalPrice: totalPrice,
+//             user: req.body.user
+//         });
 
-        order = await order.save();
+//         order = await order.save();
 
-        if (!order)
-            return res.status(400).send('The order cannot be created!');
+//         if (!order)
+//             return res.status(400).send('The order cannot be created!');
 
-        res.send(order);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal server error');
-    }    
-});
+//         res.send(order);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Internal server error');
+//     }    
+// });
 
 
 // router.post('/', async (req, res) => {
@@ -257,8 +263,198 @@ router.post('/', async (req, res) => {
 //     }    
 // });
 
+// router.post('/', async (req, res) => {
+//     try {
+//         const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
+//             let newOrderItem = new OrderItem({
+//                 quantity: orderItem.quantity,
+//                 photocard: orderItem.newData._id
+//             });
+
+//             newOrderItem = await newOrderItem.save();
+//             return newOrderItem._id; // Return the ID of the newly created OrderItem
+//         });
+
+//         const orderItemsIds = await Promise.all(orderItemsPromises);
+
+//         const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
+//             path: 'photocard',
+//             populate: {
+//                 path: 'material',
+//                 model: 'Material'
+//             },
+
+//         });
+
+//         let totalPrice = 0;
+
+//         for (const orderItem of orderItems) {
+//             const photocard = orderItem.photocard;
+//             const material = photocard.material;
+//             const itemPrice = material.price * orderItem.quantity;
+
+//             // Update total price
+//             totalPrice += itemPrice;
+
+//             // Update material countInStock
+//             const updatedCountInStock = material.countInStock - orderItem.quantity;
+//             material.countInStock = updatedCountInStock;
+//             await material.save();
+
+//             console.log(`Material ${material.name}: Count in stock updated to ${updatedCountInStock}`);
+//         }
+
+//         let order = new Order({
+//             orderItems: orderItemsIds,
+//             shippingAddress1: req.body.shippingAddress1,
+//             shippingAddress2: req.body.shippingAddress2,
+//             city: req.body.city,
+//             zip: req.body.zip,
+//             country: req.body.country,
+//             phone: req.body.phone,
+//             status: 'Pending',
+//             totalPrice: totalPrice,
+//             user: req.body.user
+//         });
+
+//         order = await order.save();
+
+//         if (!order)
+//             return res.status(400).send('The order cannot be created!');
+
+//         // Send email to user
+//         const user = await User.findById(req.body.user);
+//         if (user) {
+//             // Prepare order details for the email
+//             const orderDetails = orderItems.map(orderItem => ({
+//                 productName: orderItem.photocard.material.name,
+//                 quantity: orderItem.quantity,
+//                 price: orderItem.photocard.material.price
+//             }));
+
+//             // Send order confirmation email to the user
+//             await sendTransactionEmail({
+//                 email: user.email,
+//                 subject: 'Order Confirmation',
+//                 orderDetails: orderDetails
+//             });
+//         }
+
+//         res.send(order);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Internal server error');
+//     }
+// });
+
+router.post('/', async (req, res) => {
+    try {
+        const orderItemsPromises = req.body.orderItems.map(async (orderItem) => {
+            let newOrderItem = new OrderItem({
+                quantity: orderItem.quantity,
+                photocard: orderItem.newData._id
+            });
+
+            newOrderItem = await newOrderItem.save();
+            return newOrderItem._id; // Return the ID of the newly created OrderItem
+        });
+
+        const orderItemsIds = await Promise.all(orderItemsPromises);
+
+        // Populate related models while fetching order items
+        const orderItems = await OrderItem.find({_id: {$in: orderItemsIds}}).populate({
+            path: 'photocard',
+            populate: {
+                path: 'material',
+                model: 'Material'
+            }
+        });
+
+        let totalPrice = 0;
+
+        for (const orderItem of orderItems) {
+            const photocard = orderItem.photocard;
+            const material = photocard.material;
+            const itemPrice = material.price * orderItem.quantity;
+
+            // Update total price
+            totalPrice += itemPrice;
+
+            // Update material countInStock
+            const updatedCountInStock = material.countInStock - orderItem.quantity;
+            material.countInStock = updatedCountInStock;
+            await material.save();
+
+            console.log(`Material ${material.name}: Count in stock updated to ${updatedCountInStock}`);
+        }
+
+        let order = new Order({
+            orderItems: orderItemsIds,
+            shippingAddress1: req.body.shippingAddress1,
+            shippingAddress2: req.body.shippingAddress2,
+            city: req.body.city,
+            zip: req.body.zip,
+            country: req.body.country,
+            phone: req.body.phone,
+            status: 'Pending',
+            totalPrice: totalPrice,
+            user: req.body.user
+        });
+
+        // Save the order
+        order = await order.save();
+
+        if (!order)
+            return res.status(400).send('The order cannot be created!');
+
+        // Populate related models in the saved order
+       // Populate related models in the saved order
+       await order.populate({
+        path: 'orderItems',
+        populate: [
+            {
+                path: 'photocard',
+                populate: [
+                    {
+                        path: 'material',
+                        model: 'Material'
+                    },
+                    {
+                        path: 'photo',
+                        model: 'Photo'
+                    }
+                ]
+            }
+        ]
+    });
 
 
+        // Send email to user
+        const user = await User.findById(req.body.user);
+        if (user) {
+            // Prepare order details for the email
+            const orderDetails = order.orderItems.map(orderItem => ({
+                photo: orderItem.photocard.photo.name,
+                material: orderItem.photocard.material.name,
+                quantity: orderItem.quantity,
+                price: orderItem.photocard.material.price,
+            }));
+
+            // Send order confirmation email to the user
+            await sendTransactionEmail({
+                email: user.email,
+                name: user.name,
+                subject: 'ORDER CONFIRMATION',
+                orderDetails: orderDetails
+            });
+        }
+
+        res.send(order);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+});
 
 router.put('/:id', async (req, res) => {
     const order = await Order.findByIdAndUpdate(

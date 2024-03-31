@@ -20,17 +20,6 @@ const Cart = () => {
     const cartItems = useSelector(state => state.cartItems)
     const context = useContext(AuthGlobal)
 
-    // const handleCountChange = (item, change) => {
-    //     const updatedCartItems = cartItems.map(cartItem => {
-    //         if (cartItem.newData._id === item.newData._id) {
-    //             const newQuantity = Math.max(cartItem.quantity + change, 1);
-    //             return { ...cartItem, quantity: newQuantity };
-    //         }
-    //         return cartItem;
-    //     });
-    //     dispatch(updateCart(updatedCartItems));
-    // };
-
     const handleCountChange = (item, change) => {
         const updatedCartItems = cartItems.map(cartItem => {
             if (cartItem.newData._id === item.newData._id) {
@@ -45,7 +34,8 @@ const Cart = () => {
         }).filter(Boolean); // Remove null values from the updated array
         dispatch(updateCart(updatedCartItems));
     };
-    
+
+
     const total = cartItems.reduce((acc, cart) => {
         const materialPrice = cart?.newData?.material?.price || 0; // Ensure material exists and price is available
         return acc + materialPrice * cart.quantity;
