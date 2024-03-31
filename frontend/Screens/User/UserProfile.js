@@ -76,20 +76,31 @@ const UserProfile = (props) => {
                     <Text style={styles.userInfoText}>
                         Phone: {userProfile ? userProfile.phone : ""}
                     </Text>
-                    {/* <Text style={styles.userInfoText}>
-                        Address: {userProfile ? userProfile.address : ""}
-                    </Text> */}
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Button title={"Update Profile"} onPress={handleUpdateProfile} color="#888" />
-                    <Button title={"Sign Out"} onPress={handleSignOut} color="#888" />
+                <View style={styles.button}>
+                <View style={styles.topButton}>
+                    <Button
+                    title="Update Profile"
+                    onPress={handleUpdateProfile}
+                    color="#888"
+                    />
+                </View>
+                <View style={styles.bottomButton}>
+                    <Button
+                    title="Sign Out"
+                    onPress={handleSignOut}
+                    color="black"
+                    />
+                </View>
+                </View>
                 </View>
                 <View style={styles.orderContainer}>
                     <Text style={styles.orderHeader}>MY ORDERS</Text>
                     <View>
                         {orders ? (
                             orders.map((order) => {
-                                return <OrderCard key={order.id} item={order} select="false" />;
+                                return <OrderCard key={order.id} item={order} select={false} />;
                             })
                         ) : (
                             <View style={styles.noOrderContainer}>
@@ -109,6 +120,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         paddingHorizontal: 20,
         paddingTop: 40,
+        paddingBottom: 20,
         width: "100%"
     },
     subContainer: {
@@ -149,11 +161,10 @@ const styles = StyleSheet.create({
     },
     orderContainer: {
         alignItems: "center",
-        marginBottom: 20,
     },
     orderHeader: {
         fontSize: 20,
-        marginBottom: 20,
+        marginBottom:3,
         fontWeight: "bold",
         color: "#333",
         textAlign: "center",
@@ -165,7 +176,19 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#555",
         textAlign: "center",
-    }
+    },
+    buttonContainer: {
+        flexDirection: "column",
+        marginBottom: 30,
+        marginHorizontal: "5%",
+        width: "80%",
+      },
+      topButton: {
+        marginBottom: 15,
+      },
+      bottomButton: {
+        marginBottom: 10,
+      },
 })
 
 export default UserProfile;

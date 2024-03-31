@@ -195,8 +195,12 @@ const Users = (props) => {
                         </TouchableOpacity>
                         {selectedPhoto && (
                             <>
+<<<<<<< HEAD
                                 <Text>{selectedPhoto.name}</Text>
                                 {renderGallery()}
+=======
+                                {/* <Text>{selectedUser.name}</Text> */}
+>>>>>>> b07932cd117b865bf0128968d37ab96e19903b71
                                 <EasyButton
                                     medium
                                     secondary
@@ -267,6 +271,7 @@ const Users = (props) => {
                 </View>
             ) : (
                 <DataTable>
+<<<<<<< HEAD
                     <DataTable.Header style={{ backgroundColor: 'black' }}>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
                       
@@ -338,6 +343,68 @@ const styles = StyleSheet.create({
         shadowOffset: {
             width: 0,
             height: 2
+=======
+                    <DataTable.Header>
+                        <DataTable.Title>NAME</DataTable.Title>
+                        <DataTable.Title>EMAIL</DataTable.Title>
+                        <DataTable.Title>PASSWORD</DataTable.Title>
+                        <DataTable.Title>PHONE</DataTable.Title>
+                        <DataTable.Title>ROLE</DataTable.Title>
+                        <DataTable.Title>IMAGES</DataTable.Title>
+                    </DataTable.Header>
+                    {userFilter.map((item, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={() => handleRowPress(item)}
+                            style={[styles.container, {
+                                backgroundColor: index % 2 == 0 ? "white" : "gainsboro"
+                            }]}
+                            >
+                                <DataTable.Row>
+                                    <DataTable.Cell>{item.name}</DataTable.Cell>
+                                    <DataTable.Cell>{item.email}</DataTable.Cell>
+                                    <DataTable.Cell>{item.passwordHash}</DataTable.Cell>
+                                    <DataTable.Cell>{item.phone}</DataTable.Cell>
+                                    <DataTable.Cell>{item.isAdmin}</DataTable.Cell>
+                                    <DataTable.Cell>
+    {Array.isArray(item.image) ? (
+        item.image.map((imageUrl, idx) => (
+            <Image
+                key={idx}
+                source={{
+                    uri: imageUrl ? imageUrl : null
+                }}
+                resizeMode="contain"
+                style={styles.image}
+                onError={() => console.log("Error loading image")}
+            />
+        ))
+    ) : (
+        <Image
+            source={{
+                uri: item.image ? item.image : null
+            }}
+            resizeMode="contain"
+            style={styles.image}
+            onError={() => console.log("Error loading image")}
+        />
+    )}
+</DataTable.Cell>
+                                </DataTable.Row>
+                            </TouchableOpacity>
+                        ))}
+                    </DataTable>
+                )}
+            </Box>
+        );
+    }
+    
+    const styles = StyleSheet.create({
+        listHeader: {
+            flexDirection: 'row',
+            padding: 5,
+            backgroundColor: 'gainsboro'
+>>>>>>> b07932cd117b865bf0128968d37ab96e19903b71
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
