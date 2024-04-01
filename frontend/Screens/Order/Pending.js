@@ -6,6 +6,7 @@ import axios from "axios"
 import baseURL from "../../assets/common/baseurl"
 import AuthGlobal from "../../Context/Store/AuthGlobal"
 import { logoutUser } from "../../Context/Actions/Auth.actions"
+import OrderCard from './OrderCard';
 
 const UserProfile = (props) => {
     const context = useContext(AuthGlobal)
@@ -60,31 +61,19 @@ const UserProfile = (props) => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.userInfoContainer}>
-                {userProfile && userProfile.image &&
-                    <Image style={styles.profileImage} source={{ uri: userProfile.image }} />
-                }
-                <Text style={styles.header}>
-                    {userProfile ? userProfile.name : ""}
-                </Text>
-                <Text style={styles.userInfoText}>
-                    Email: {userProfile ? userProfile.email : ""}
-                </Text>
-                <Text style={styles.userInfoText}>
-                    Phone: {userProfile ? userProfile.phone : ""}
-                </Text>
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    title="Update Profile"
-                    onPress={handleUpdateProfile}
-                    color="#888"
-                />
-                <Button
-                    title="Sign Out"
-                    onPress={handleSignOut}
-                    color="black"
-                />
+            <View style={styles.orderContainer}>
+                <Text style={styles.orderHeader}>MY ORDERS</Text>
+                <View>
+                    {orders ? (
+                        orders.map((order) => {
+                            return <OrderCard key={order.id} item={order} select={false} />;
+                        })
+                    ) : (
+                        <View style={styles.noOrderContainer}>
+                            <Text style={styles.noOrderText}>YOU HAVE NO ORDERS</Text>
+                        </View>
+                    )}
+                </View>
             </View>
         </ScrollView>
     )

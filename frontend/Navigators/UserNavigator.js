@@ -26,14 +26,15 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
+
            <Stack.Screen
-    name="User Profile"
-    component={UserProfile}
-    options={{
-        headerShown: false,
-        cardStyle: { backgroundColor: '#CCCCCC' }  
-    }}
-/>
+                name="User Profile"
+                component={UserProfile}
+                options={{
+                    headerShown: false,
+                    cardStyle: { backgroundColor: '#CCCCCC' }  
+                }}
+            />
 
              <Stack.Screen
                 name="Update Profile"
@@ -44,6 +45,7 @@ const UserNavigator = (props) => {
    
                 }}
             />
+            
             <Stack.Screen
                 name="Review Form"
                 component={ReviewForm}

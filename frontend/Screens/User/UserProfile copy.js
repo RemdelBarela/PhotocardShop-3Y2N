@@ -1,11 +1,13 @@
 import React, { useContext, useState, useCallback } from 'react';
 import { View, Text, ScrollView, Button, StyleSheet, Image } from 'react-native';
+import { Container } from "native-base"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from "axios"
 import baseURL from "../../assets/common/baseurl"
 import AuthGlobal from "../../Context/Store/AuthGlobal"
 import { logoutUser } from "../../Context/Actions/Auth.actions"
+import OrderCard from '../Order/OrderCard';
 
 const UserProfile = (props) => {
     const context = useContext(AuthGlobal)
@@ -59,44 +61,71 @@ const UserProfile = (props) => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.userInfoContainer}>
-                {userProfile && userProfile.image &&
-                    <Image style={styles.profileImage} source={{ uri: userProfile.image }} />
-                }
-                <Text style={styles.header}>
-                    {userProfile ? userProfile.name : ""}
-                </Text>
-                <Text style={styles.userInfoText}>
-                    Email: {userProfile ? userProfile.email : ""}
-                </Text>
-                <Text style={styles.userInfoText}>
-                    Phone: {userProfile ? userProfile.phone : ""}
-                </Text>
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
+        <Container  style={styles.container}>
+            <ScrollView contentContainerStyle={styles.subContainer}>
+                <View style={styles.userInfoContainer}>
+                    {userProfile && userProfile.image &&
+                        <Image style={styles.profileImage} source={{ uri: userProfile.image }} />
+                    }
+                    <Text style={styles.header}>
+                        {userProfile ? userProfile.name : ""}
+                    </Text>
+                    <Text style={styles.userInfoText}>
+                        Email: {userProfile ? userProfile.email : ""}
+                    </Text>
+                    <Text style={styles.userInfoText}>
+                        Phone: {userProfile ? userProfile.phone : ""}
+                    </Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                <View style={styles.button}>
+                <View style={styles.topButton}>
+                    <Button
                     title="Update Profile"
                     onPress={handleUpdateProfile}
                     color="#888"
-                />
-                <Button
+                    />
+                </View>
+                <View style={styles.bottomButton}>
+                    <Button
                     title="Sign Out"
                     onPress={handleSignOut}
                     color="black"
-                />
-            </View>
-        </ScrollView>
+                    />
+                </View>
+                </View>
+                </View>
+                <View style={styles.orderContainer}>
+                    <Text style={styles.orderHeader}>MY ORDERS</Text>
+                    <View>
+                        {orders ? (
+                            orders.map((order) => {
+                                return <OrderCard key={order.id} item={order} select={false} />;
+                            })
+                        ) : (
+                            <View style={styles.noOrderContainer}>
+                                <Text style={styles.noOrderText}>YOU HAVE NO ORDERS</Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
+            </ScrollView>
+        </Container>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
+        margin: 35,
         backgroundColor: '#fff',
         paddingHorizontal: 20,
         paddingTop: 40,
         paddingBottom: 20,
+        width: "100%",
+        margin: 'auto'
+    },
+    subContainer: {
+        alignItems: "center"
     },
     profileImage: {
         width: 100,
@@ -126,15 +155,17 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
-        marginBottom: 30,
+        justifyContent: "space-between",
+        marginBottom: 30, 
+        marginHorizontal: "5%",
+        width: "80%"
     },
     orderContainer: {
         alignItems: "center",
     },
     orderHeader: {
         fontSize: 20,
-        marginBottom: 3,
+        marginBottom:3,
         fontWeight: "bold",
         color: "#333",
         textAlign: "center",
@@ -147,6 +178,18 @@ const styles = StyleSheet.create({
         color: "#555",
         textAlign: "center",
     },
+    buttonContainer: {
+        flexDirection: "column",
+        marginBottom: 30,
+        marginHorizontal: "5%",
+        width: "80%",
+      },
+      topButton: {
+        marginBottom: 15,
+      },
+      bottomButton: {
+        marginBottom: 10,
+      },
 })
 
 export default UserProfile;
