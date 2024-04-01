@@ -29,7 +29,7 @@ const materialsRoutes = require("./routes/materials");
 
 const ordersRoutes = require("./routes/orders");
 const reviewsRoutes = require("./routes/reviews");
-
+// const chartsRoutes = require("./routes/charts");
 
 const api = process.env.API_URL;
 
@@ -42,7 +42,7 @@ app.use(`${api}/materials`, materialsRoutes);
 
 app.use(`${api}/orders`, ordersRoutes);
 app.use(`${api}/reviews`, reviewsRoutes);
-
+// app.use(`${api}/charts`, chartsRoutes);
 
 //Database
 mongoose

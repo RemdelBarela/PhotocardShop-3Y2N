@@ -24,6 +24,175 @@ router.get(`/`, async (req, res) => {
     res.status(201).json(orderList)
 })
 
+// router.get(`/get/photoMaterialOrders`, async (req, res) => {
+//     try {
+//         const photoOrders = await OrderItem.aggregate([
+//             {
+//                 $lookup: {
+//                     from: "photocards",
+//                     localField: "photocard",
+//                     foreignField: "_id",
+//                     as: "photocard"
+//                 }
+//             },
+//             {
+//                 $unwind: "$photocard"
+//             },
+//             {
+//                 $lookup: {
+//                     from: "photos",
+//                     localField: "photocard.photo",
+//                     foreignField: "_id",
+//                     as: "photocard.photo"
+//                 }
+//             },
+//             {
+//                 $unwind: "$photocard.photo"
+//             },
+//             {
+//                 $group: {
+//                     _id: "$photocard",
+//                     totalOrders: { $sum: 1 },
+//                     photoName: { $first: "$photocard.photo.name" },
+//                     materialName: { $first: "$photocard.material.name" }
+//                 }
+//             },
+//             {
+//                 $project: {
+//                     "_id": "$_id._id",
+//                     "photoName": 1,
+//                     "materialName": 1,
+//                     "totalOrders": 1
+//                 }
+//             }
+//         ]);
+
+//         const materialOrders = await OrderItem.aggregate([
+//             {
+//                 $lookup: {
+//                     from: "photocards",
+//                     localField: "photocard",
+//                     foreignField: "_id",
+//                     as: "photocard"
+//                 }
+//             },
+//             {
+//                 $unwind: "$photocard"
+//             },
+//             {
+//                 $lookup: {
+//                     from: "photos",
+//                     localField: "photocard.photo",
+//                     foreignField: "_id",
+//                     as: "photocard.photo"
+//                 }
+//             },
+//             {
+//                 $unwind: "$photocard.photo"
+//             },
+//             {
+//                 $group: {
+//                     _id: "$photocard",
+//                     totalOrders: { $sum: 1 },
+//                     photoName: { $first: "$photocard.photo.name" },
+//                     materialName: { $first: "$photocard.material.name" }
+//                 }
+//             },
+//             {
+//                 $project: {
+//                     "_id": "$_id._id",
+//                     "photoName": 1,
+//                     "materialName": 1,
+//                     "totalOrders": 1
+//                 }
+//             }
+//         ]);
+
+//         res.status(200).json({ photoOrders, materialOrders });
+//     } catch (error) {
+//         console.error("Error fetching total orders for each photo and material:", error);
+//         res.status(500).json({ success: false, message: "Internal server error" });
+//     }
+// });
+
+router.get(`/get/photoMaterialOrders`, async (req, res) => {
+    try {
+        const photoMaterialOrders = await OrderItem.aggregate([
+            {
+                $group: {
+                    _id: "$photocard",
+                    totalOrders: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                    from: "photocards",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "photocard"
+                }
+            },
+            {
+                $unwind: "$photocard"
+            },
+            {
+                $lookup: {
+                    from: "photos",
+                    localField: "photocard.photo",
+                    foreignField: "_id",
+                    as: "photocard.photo"
+                }
+            },
+            {
+                $unwind: "$photocard.photo"
+            },
+            {
+                $lookup: {
+                    from: "materials",
+                    localField: "photocard.material",
+                    foreignField: "_id",
+                    as: "photocard.material"
+                }
+            },
+            {
+                $unwind: "$photocard.material"
+            },
+            {
+                $project: {
+                    "_id": "$photocard._id",
+                    "photoName": "$photocard.photo.name",
+                    "materialName": "$photocard.material.name",
+                    "totalOrders": 1
+                }
+            }
+        ]);
+
+        res.status(200).json(photoMaterialOrders);
+    } catch (error) {
+        console.error("Error fetching total orders for each photo and material:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
+router.get(`/get/totalsales`, async (req, res) => {
+    try {
+        const totalSalesPerDay = await Order.aggregate([
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$dateOrdered" } },
+                    totalSales: { $sum: "$totalPrice" }
+                }
+            },
+            { $sort: { "_id": 1 } }
+        ]);
+
+        res.status(200).json(totalSalesPerDay);
+    } catch (error) {
+        console.error("Error fetching total sales per day:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
+
 // router.get(`/:id`, async (req, res) => {
 //     const order = await Order.findById(req.params.id)
 //         .populate('user', 'name')

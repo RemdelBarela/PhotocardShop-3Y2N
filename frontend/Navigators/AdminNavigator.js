@@ -8,6 +8,7 @@ import Photos from "../Screens/Admin/Photo/Photos"
 import Categories from "../Screens/Admin/Categories"
 import Materials from "../Screens/Admin/Material/Materials"
 import Users from "../Screens/Admin/Users"
+// import Charts from "../Screens/Admin/Chart/PhotoChart"
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,13 @@ const AdminNavigator= () => {
                     title: "Users"
                 }}
             />
+            {/* <Stack.Screen 
+                name="Charts"
+                component={Charts}
+                options={{
+                    title: "Charts"
+                }}
+            /> */}
             <Stack.Screen name="Categories" component={Categories} />
             <Stack.Screen name="Orders" component={Orders} />
             <Stack.Screen name="ProductForm" component={ProductForm} />
