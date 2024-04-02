@@ -46,9 +46,9 @@ const getIcon = (screenName) => {
     case "USERS":
       return "account-group-outline";
     case "ORDERS":
-      return "chart-line"; 
-      case "ORDERS":
-        return "chart-line"; 
+      return "shopping-outline"; 
+      case "REVIEWS":
+        return "star-outline"; 
       case "CHARTS":
         return "chart-line"; 
     default:

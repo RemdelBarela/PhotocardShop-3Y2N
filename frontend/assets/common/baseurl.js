@@ -3,8 +3,8 @@
 
 let baseURL = '';
 
-{Platform.OS == 'ios'
-? baseURL = 'http://192.168.68.128:4000/api/v1/'
+{Platform.OS == 'android'
+? baseURL = 'http://192.168.100.11:4000/api/v1/'
 : baseURL = 'http://192.168.68.150:4000/api/v1/'
 }
 

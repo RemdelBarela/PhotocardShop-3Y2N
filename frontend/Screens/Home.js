@@ -5,7 +5,6 @@ import {
     Image, Modal
 } from "react-native"; import { Alert } from 'react-native';
 
-
 import {
     VStack, Input, Icon, HStack, Container,
     Avatar, Box, Spacer, Center, Heading
@@ -20,12 +19,13 @@ import axios from "axios";
 
 import baseURL from "../assets/common/baseurl";
 import EasyButton from "../Shared/StyledComponents/EasyButton";
+// import { images } from "./Product/constants";
+
 const { width, height } = Dimensions.get("window");
 
 const Home = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState('');
-
     const [selectedPhoto, setSelectedPhoto] = useState(null);
     const [materials, setMaterials] = useState([]);
     const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -36,16 +36,47 @@ const Home = () => {
     const [photoFilter, setPhotoFilter] = useState([]);
     const [token, setToken] = useState();
     const [selectedMaterialIndex, setSelectedMaterialIndex] = useState(0);
+    const [reviews, setReviews] = useState([]);
 
     const dispatch = useDispatch()
 
     const [backgroundColor, setBackgroundColor] = useState('lightgray');
 
+    const [showAllReviews, setShowAllReviews] = useState(false);
+
+    const handleToggleReviews = () => {
+        setShowAllReviews(!showAllReviews);
+    };
+    
     useEffect(() => {
-        if (selectedPhoto) {
-            setBackgroundColor(generateBackgroundColor());
-        }
-    }, [selectedPhoto]);
+        // Fetch all reviews from backend
+        axios
+          .get(`${baseURL}reviews`)
+          .then((response) => {
+            setReviews(response.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching reviews:", error);
+          });
+      }, []);
+      
+    // useEffect(() => {
+    //     if (selectedPhoto) {
+    //         axios.get(`${baseURL}photos/${selectedPhoto._id}/reviews`)
+    //             .then(response => {
+    //                 // Populate the 'user' field to fetch the name of the user who made the review
+    //                 const populatedReviews = response.data.map(review => ({
+    //                     ...review,
+    //                     userName: review.user.name // Assuming 'name' is the field containing the user's name
+    //                 }));
+    //                 setReviews(populatedReviews);
+    //             })
+    //             .catch(error => {
+    //                 console.log('Error fetching reviews:', error);
+    //             });
+    //     }
+    // }, [selectedPhoto]);
+    
 
     const generateBackgroundColor = () => {
         // Generate a random value between 180 and 230 to produce light shades of gray
@@ -55,7 +86,48 @@ const Home = () => {
         // Return a hexadecimal color in the range of light gray
         return `#${randomColor}${randomColor}${randomColor}`;
     };
+    
+    // const fetchAllReviews = (photoId) => {
+    //     axios.get(`${baseURL}reviews/photo/${photoId}`)
+    //         .then(response => {
+    //             setReviews(response.data); // Update reviews state with fetched data
+    //         })
+    //         .catch(error => {
+    //             console.log('Error fetching reviews:', error);
+    //         });
+    // };
 
+    // const fetchReviewsForSelectedPhoto = () => {
+    //     if (selectedPhoto) {
+    //         axios.get(`${baseURL}photos/${selectedPhoto._id}/reviews`)
+    //             .then(response => {
+    //                 // Populate the 'user' field to fetch the name of the user who made the review
+    //                 const populatedReviews = response.data.map(review => ({
+    //                     ...review,
+    //                     userName: review.user.name // Assuming 'name' is the field containing the user's name
+    //                 }));
+    //                 setReviews(populatedReviews);
+    //             })
+    //             .catch(error => {
+    //                 console.log('Error fetching reviews:', error);
+    //             });
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     fetchReviewsForSelectedPhoto();
+    // }, [selectedPhoto]);
+    
+    // const handleSeeMoreReviewsButtonClick = () => {
+    //     fetchReviewsForSelectedPhoto();
+    //     // Additional logic for displaying more reviews if needed
+    // };
+
+    // useEffect(() => {
+    //     if (selectedPhoto) {
+    //         fetchAllReviews(selectedPhoto._id);
+    //     }
+    // }, [selectedPhoto]);
 
     const styles2 = StyleSheet.create({
         container: {
@@ -136,8 +208,6 @@ const Home = () => {
         setSelectedImage(image);
         setModalVisible(true);
     };
-
-
 
     useFocusEffect(
         useCallback(() => {
@@ -271,38 +341,54 @@ const Home = () => {
         setSelectedMaterial(null);
         setShowAddToCartModal(false);
     };
-    const renderStars = (rating, userRating) => {
+
+    // const renderStars = (rating, userRating) => {
+    //     const stars = [];
+    //     // Push filled stars
+    //     for (let i = 1; i <= userRating; i++) {
+    //         stars.push('★');
+    //     }
+    //     // Push empty stars
+    //     for (let i = userRating + 1; i <= 5; i++) {
+    //         stars.push('☆');
+    //     }
+    //     return (
+    //         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    //             {stars.map((star, index) => (
+    //                 <Text key={index} style={{ color: 'gray', fontSize: 16 }}>{star}</Text>
+    //             ))}
+    //         </View>
+    //     );
+    // };
+
+    const renderStars = (rating) => {
         const stars = [];
-        // Push filled stars
-        for (let i = 1; i <= userRating; i++) {
-            stars.push('★');
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                <Ionicons
+                    key={i}
+                    name={i <= rating ? 'star' : 'star-outline'}
+                    size={20}
+                    color={i <= rating ? 'black' : 'darkgray'}
+                />
+            );
         }
-        // Push empty stars
-        for (let i = userRating + 1; i <= 5; i++) {
-            stars.push('☆');
-        }
-        return (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {stars.map((star, index) => (
-                    <Text key={index} style={{ color: 'gray', fontSize: 16 }}>{star}</Text>
-                ))}
-            </View>
-        );
+        return stars;
     };
 
 
-    const reviews = [
-        { id: 1, user: 'User1', comment: 'Great product!', rating: 5 },
-        { id: 2, user: 'User2', comment: 'Could be better.', rating: 3 },
-        // Add more reviews as needed
-    ];
+    // const reviews = [
+    //     { id: 1, user: 'User1', comment: 'Great product!', rating: 5 },
+    //     { id: 2, user: 'User2', comment: 'Could be better.', rating: 3 },
+    //     // Add more reviews as needed
+    // ];
 
-    const navigation = useNavigation();
+    // const navigation = useNavigation();
 
-    const navigateToAllReviews = () => {
-        // Navigate to a new page/component where all reviews are displayed
-        navigation.navigate('AllReviewsPage', { reviews });
-    };
+    // const navigateToAllReviews = () => {
+    //     // Navigate to AllReviewsPage and pass the reviews as a parameter
+    //     navigation.navigate('AllReviewsPage', { reviews });
+    // };
 
 
     return (
@@ -394,7 +480,7 @@ const Home = () => {
                                                 <View style={{ flex: 1.5, justifyContent: 'center' }}>
                                                     <Text style={styles.boldText}>{item.name}</Text>
                                                     <Text style={styles.description}>{item.description}</Text>
-                                                    <Text>   {renderStars(item.rating, item.userRating)} {/* Assuming each item has a 'rating' and 'userRating' property */}
+                                                    <Text>   {renderStars(item.rating, item.userRating)}
                                                     </Text>
 
                                                 </View>
@@ -448,11 +534,7 @@ const Home = () => {
                                                                 autoplayInterval={5000}
                                                             />
                                                             
-                                                            
                                                             */}
-
-
-
                                                             <Carousel
                                                                 data={selectedPhoto.image}
                                                                 renderItem={({ item }) => (
@@ -495,7 +577,7 @@ const Home = () => {
                                                                     {selectedMaterial || materials.length > 0 ? (
                                                                         <View style={styles.selectedMaterialContainer}>
                                                                             <View style={styles.selectedMaterialContent}>
-                                                                                <Text style={styles.selectedMaterialText}>PRICE: ${materials[selectedMaterialIndex]?.price}</Text>
+                                                                                <Text style={styles.selectedMaterialText}>PRICE: ₱{materials[selectedMaterialIndex]?.price}</Text>
                                                                                 <Text style={styles.selectedMaterialText}>STOCK: {materials[selectedMaterialIndex]?.countInStock}</Text>
                                                                             </View>
                                                                         </View>
@@ -535,27 +617,34 @@ const Home = () => {
                                                                     </Text>
                                                                 </EasyButton>
 
-                                                                <View>
-                                                                    <View>
-                                                                        {/* Display first two reviews */}
-                                                                        {reviews.slice(0, 2).map(review => (
-                                                                            <View key={review.id} style={styles.reviewItem}>
-                                                                                <Text>User: {review.user}</Text>
-                                                                                <Text>Rating: {review.rating}/5</Text>
-                                                                                <Text>Comment: {review.comment}</Text>
+                                                                <View style={styles.container}>
+                                                                        <ScrollView style={styles.scrollView} nestedScrollEnabled={true}>
+                                                                            <View style={styles.reviewsContainer}>
+                                                                                {/* Display all reviews if showAllReviews is true */}
+                                                                                {showAllReviews && (
+                                                                                    <View style={styles.reviewsBox}>
+                                                                                    <Text style={styles.reviewHeader}>PHOTO REVIEWS</Text>
+                                                                                    {reviews.map(review => (
+                                                                                        <View key={review.id} style={styles.reviewItem}>
+                                                                                            {/* <Text style={styles.reviewUser}>User: {review.userName}</Text> */}
+                                                                                            <View style={styles.ratingContainer}>
+                                                                                                <Text style={styles.reviewRating}>Rating: </Text>
+                                                                                                <View style={styles.starsContainer}>{renderStars(review.rating)}</View>
+                                                                                            </View>
+                                                                                            <Text style={styles.reviewComment}>Comment: {review.comment}</Text>
+                                                                                        </View>
+                                                                                    ))}
+                                                                                </View>
+                                                                                )}
+
+                                                                                {/* Button to toggle between displaying all reviews and hiding them */}
+                                                                                <TouchableOpacity onPress={handleToggleReviews} style={styles.seeMoreButton}>
+                                                                                    <Text style={styles.seeMoreButtonText}>{showAllReviews ? 'HIDE REVIEWS' : 'SEE REVIEWS'}</Text>
+                                                                                </TouchableOpacity>
                                                                             </View>
-                                                                        ))}
-
-                                                                        {/* Button to see more reviews */}
-                                                                        <TouchableOpacity onPress={navigateToAllReviews} style={styles.seeMoreButton}>
-                                                                            <Text style={styles.seeMoreButtonText}>See More Reviews</Text>
-                                                                        </TouchableOpacity>
+                                                                        </ScrollView>
                                                                     </View>
-
                                                                 </View>
-
-                                                            </View>
-
                                                         </ScrollView>
                                                     </Center>
                                                 </BlurView>
@@ -612,13 +701,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: 300,
-        marginLeft: 30,
-        marginTop: 10, // Adjust spacing as needed
+        marginLeft: 55,
+        marginTop: 25, 
     },
     cartButtonText: {
         color: 'white',
-        fontSize: 16, // Adjust font size as needed
-        fontWeight: 'bold', // Adjust font weight as needed
+        fontSize: 16, 
+        fontWeight: 'bold',
     },
 
     image: {
@@ -667,14 +756,14 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     seeMoreButton: {
-        backgroundColor: 'gray',
+        backgroundColor: 'black',
         padding: 10,
-        borderRadius: 20,
-        marginTop: 10, marginBottom: 20,
+        borderRadius: 5,
     },
     seeMoreButtonText: {
         color: 'white',
-        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     materialContainer: {
         width: 150,
@@ -687,10 +776,63 @@ const styles = StyleSheet.create({
     },
     materialName: {
         textAlign: 'center',
-        // Define other styles for material name if needed
+    },
+    container: {
+        flex: 1,
+    },
+    scrollView: {
+        flex: 1,
+    },
+    reviewsContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 20,
+    },
+    reviewsBox: {
+        width: '80%',
+        backgroundColor: '#f0f0f0',
+        padding: 20,
+        borderRadius: 10,
+    },
+    reviewItem: {
+        marginBottom: 40,
+    },
+    reviewUser: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    reviewRating: {
+        marginRight: 5,
+        fontWeight: 'bold',
+    },
+    starsContainer: {
+        flexDirection: 'row',
+    },
+    reviewComment: {
+        fontStyle: 'italic',
+    },
+    seeMoreButton: {
+        backgroundColor: 'blue',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    seeMoreButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    reviewHeader: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 10,
     },
 });
-
-
 
 export default Home;
