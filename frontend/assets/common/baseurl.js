@@ -3,7 +3,7 @@ import { Platform } from 'react-native'
 
 let baseURL = '';
 
-{Platform.OS == 'ios'
+{Platform.OS == 'android'
 ? baseURL = 'http://192.168.68.113:4000/api/v1/'
 : baseURL = 'http://192.168.68.150:4000/api/v1/'
 }

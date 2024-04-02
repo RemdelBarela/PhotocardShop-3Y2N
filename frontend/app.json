@@ -5,6 +5,17 @@
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
+    "plugins": [
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "1458840288339509",
+          "clientToken": "64f285405dc8450200ebd73dbb7a0579",
+          "displayName": "photocardshop3y2n"
+        }
+      ],
+      "expo-build-properties"
+    ],
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/icon.png",
@@ -15,17 +26,36 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
+      },
+      "bundleIdentifier": "n"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.melfx.rn2024s"
+      "package": "com.melfx.rn2024s",
+      "permissions": [
+        "android.permission.INTERNET"
+      ]
     },
     "web": {
       "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "39462bbb-e1a2-43ac-8b02-aa2adb0f2b7b"
+      }
     }
   }
 }
