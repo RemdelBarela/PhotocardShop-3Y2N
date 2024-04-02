@@ -54,9 +54,23 @@ export const getUserProfile = (id) => {
     .then((data) => console.log(data));
 }
 
+// export const logoutUser = (dispatch) => {
+//     AsyncStorage.removeItem("jwt");
+//     dispatch(setCurrentUser({}))
+// }
+
 export const logoutUser = (dispatch) => {
     AsyncStorage.removeItem("jwt");
-    dispatch(setCurrentUser({}))
+    dispatch(setCurrentUser({}));
+    dispatch(resetFormFields()); 
+}
+
+export const RESET_FORM_FIELDS = "RESET_FORM_FIELDS";
+
+export const resetFormFields = () => {
+    return {
+        type: RESET_FORM_FIELDS
+    }
 }
 
 export const setCurrentUser = (decoded, user) => {

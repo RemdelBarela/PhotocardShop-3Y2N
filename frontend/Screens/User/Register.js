@@ -45,7 +45,7 @@ const Register = () => {
     const register = () => {
         console.log()
         if (email === "" || name === "" || phone === "" || password === "") {
-            setError("Please fill in the form correctly");
+            setError("KINDLY COMPLETE THE FORM ACCURATELY");
         }
         // let user = {
         //     name: name,

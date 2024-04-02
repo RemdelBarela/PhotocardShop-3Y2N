@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
         if (isValid) {
             uploadError = null;
         }
-        cb(uploadError, 'public/uploads/users');
+        cb(uploadError, 'public/uploads/users/');
     },
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-');
@@ -107,7 +107,8 @@ router.put('/user/:id', async (req, res) => {
     res.send(user);
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/updateProfile/:id', uploadOptions.single('image'), async (req, res) => {
+    console.log(req.body)
 
     const userExist = await User.findById(req.params.id);
     let newPassword
@@ -117,11 +118,17 @@ router.put('/:id', async (req, res) => {
         newPassword = userExist.passwordHash;
     }
 
+    const file = req.file;
+    const fileName = file.filename;
+    if (!file) return res.status(400).send('No image in the request');
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/users/`;
+
     const updateProfile = await User.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             email: req.body.email,
+            image: `${basePath}${fileName}`,
             passwordHash: newPassword,
             phone: req.body.phone,
             isAdmin: req.body.isAdmin,
@@ -162,7 +169,7 @@ router.post('/register', uploadOptions.single('image'), async (req, res) => {
     const file = req.file;
     const fileName = file.filename;
     if (!file) return res.status(400).send('No image in the request');
-    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/users`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/users/`;
     let user = new User({
         name: req.body.name,
         email: req.body.email,

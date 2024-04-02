@@ -3,11 +3,15 @@ import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Toast from "react-native-toast-message";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Input from "../../Shared/Form/Input";
 import Error from "../../Shared/Error";
 import EasyButton from "../../Shared/StyledComponents/EasyButton";
 import axios from "axios";
 import baseURL from "../../assets/common/baseurl";
+import mime from "mime";
 
 const UpdateProfile = ({ route }) => {
     const navigation = useNavigation();
@@ -19,49 +23,13 @@ const UpdateProfile = ({ route }) => {
     const [error, setError] = useState("");
     const [image, setImage] = useState(null);
     const [mainImage, setMainImage] = useState(user.image);
-
-    const updateProfile = () => {
-        console.log("Updating profile...");
-        let formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("phone", phone);
-        if (password) {
-            formData.append("password", password);
-        }
-        
-        if (image) {
-            formData.append("image", {
-                uri: image,
-                name: "profile_image.jpg", // Change the name as per your server's requirements
-                type: "image/jpeg", // Change the type if needed
-            });
-        }
-    
-        const config = {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        };
-    
-        axios.put(`${baseURL}users/${user._id}`, formData, config)
-    .then((res) => {
-        if (res.status === 200) {
-            console.log("Profile updated successfully");
-            navigation.goBack(); // Navigate back to the previous screen after successful update
-        }
-    })
-    .catch((error) => {
-        console.log("Error updating profile:", error);
-        setError("Something went wrong. Please try again.");
-    });
-    };
+    const [token, setToken] = useState();
 
     useEffect(() => {
         (async () => {
             const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
             if (status !== "granted") {
-                alert("Permission to access media library is required!");
+                alert("Apologies, but in order to proceed, we require permission to access your camera roll!");
             }
         })();
     }, []);
@@ -73,12 +41,89 @@ const UpdateProfile = ({ route }) => {
             aspect: [1, 1],
             quality: 1,
         });
-
-        if (!result.cancelled) {
-            setImage(result.uri);
-            setMainImage(result.uri);
+    
+        if (!result.canceled) {
+            console.log(result.assets)
+            setMainImage(result.assets[0].uri);
+            setImage(result.assets[0].uri);
         }
     };
+
+
+    const updateProfile = () => {
+        if (email === "" || name === "" || phone === "") {
+            setError("KINDLY COMPLETE THE FORM ACCURATELY");
+        }
+
+        let formData = new FormData();
+        const newImageUri = "file:///" + image.split("file:/").join("");
+
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("isAdmin", false);
+        if (password) {
+            formData.append("password", password);
+        }
+        
+        if (image) {
+            formData.append("image", {
+                uri: newImageUri,
+                type: mime.getType(newImageUri),
+                name: newImageUri.split("/").pop()
+            });
+        }
+    
+        const getToken = async () => {
+            try {
+                const token = await AsyncStorage.getItem("jwt");
+                setToken(token);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        
+        getToken();
+        console.log(formData)
+        console.log('tokenss: ', token)
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`
+            },
+        };
+    
+        axios.put(`${baseURL}users/updateProfile/${user._id}`, formData, config)
+            .then((res) => {
+                console.log('user', user._id)
+
+                if (res.status === 200 || res.status === 201) {
+                    Toast.show({
+                        topOffset: 60,
+                        type: "success",
+                        text1: "PROFILE UPDATED SUCCESSFULLY",
+                    });
+                    setTimeout(() => {
+                        navigation.navigate("User Profile");
+                    }, 500);
+                }
+            })
+            .catch((error) => {
+                Toast.show({
+                    position: 'bottom',
+                    bottomOffset: 20,
+                    type: "error",
+                    text1: "ERROR!",
+                    text2: "PLEASE TRY AGAIN",
+                });
+                console.log(error.message)
+            });
+            };
+
+  
+
+    
 
     return (
         <KeyboardAwareScrollView>
@@ -108,6 +153,7 @@ const UpdateProfile = ({ route }) => {
                 <Input
                     placeholder={"Password"}
                     value={password}
+                    secureTextEntry={true}
                     onChangeText={(text) => setPassword(text)}
                     style={styles.userInfoText}
                 />
