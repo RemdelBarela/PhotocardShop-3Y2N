@@ -27,7 +27,7 @@ import Photos from "./PhotoNavigator"
 import Users from "./UsersNavigator"
 import Orders from "./OrderNavigator";
 import Charts from "../Screens/Admin/Chart/OrderChart";
-
+import Reviews from "../Screens/Admin/Review/Reviews"
 
 global.__reanimatedWorkletInit = () => { };
 const Drawer = createDrawerNavigator();
@@ -47,6 +47,8 @@ const getIcon = (screenName) => {
       return "account-group-outline";
     case "ORDERS":
       return "chart-line"; 
+      case "ORDERS":
+        return "chart-line"; 
       case "CHARTS":
         return "chart-line"; 
     default:
@@ -127,6 +129,8 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
         <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
         <Drawer.Screen name="ORDERS" component={Orders} initialParams={{ screen: 'Orders' }} /> 
+        <Drawer.Screen name="REVIEWS" component={Reviews} initialParams={{ screen: 'Reviews' }} /> 
+
         <Drawer.Screen name="CHARTS" component={Charts}  initialParams={{ screen: 'Charts' }}/>
       </Drawer.Navigator>
     </Box>

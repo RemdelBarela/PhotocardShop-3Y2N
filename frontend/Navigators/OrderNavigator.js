@@ -6,7 +6,7 @@ import SingleAdminOrder from "../Screens/Admin/Order/SingleOrder"
 
 const Stack = createStackNavigator();
 
-const PhotoNavigator= () => {
+const OrderNavigator= () => {
     
     return (
         <Stack.Navigator>
@@ -29,4 +29,4 @@ const PhotoNavigator= () => {
         </Stack.Navigator>
     )
 }
-export default  PhotoNavigator
+export default  OrderNavigator

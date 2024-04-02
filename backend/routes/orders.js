@@ -827,9 +827,8 @@ router.put('/shipped/:id', async (req, res) => {
     res.send(order);
 });
 
-
-
 router.delete('/:id', (req, res) => {
+    console.log(req.params.id)
     Order.findByIdAndRemove(req.params.id).then(async order => {
         if (order) {
             await order.orderItems.map(async orderItem => {

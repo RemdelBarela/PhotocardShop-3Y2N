@@ -6,7 +6,7 @@ import ReviewForm from "../Screens/Review/ReviewForm"
 
 const Stack = createStackNavigator();
 
-const PhotoNavigator= () => {
+const ReviewNavigator= () => {
     
     return (
         <Stack.Navigator>
@@ -26,4 +26,4 @@ const PhotoNavigator= () => {
         </Stack.Navigator>
     )
 }
-export default  PhotoNavigator
+export default  ReviewNavigator

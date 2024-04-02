@@ -39,17 +39,58 @@ const SingleOrder = () => {
         }
     };
 
-    const handleStatus = (orderID) => {
+    // const handleStatus = (orderID) => {
 
+    //     const config = {
+    //         headers: {
+    //             "Authorization": `Bearer ${token}`
+    //         }
+    //     };
+
+
+    //     axios
+    //         .put(`${baseURL}orders/shipped/${orderID}`, config)
+    //         .then((res) => {
+    //             if (res.status === 200 || res.status === 201) {
+    //                 Toast.show({
+    //                     topOffset: 60,
+    //                     type: "success",
+    //                     text1: "ORDER IS SHIPPED SUCCESSFULLY",
+    //                     text2: ""
+    //                 });
+    //                 setTimeout(() => {
+    //                     navigation.navigate("ORDERS");
+    //                 }, 500)
+    //                 onRefresh()
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.log(error)
+    //             Toast.show({
+    //                 topOffset: 60,
+    //                 type: "error",
+    //                 text1: "SOMETHING WENT WRONG",
+    //                 text2: "PLEASE TRY AGAIN"
+    //             })
+    //         })
+
+    // };
+
+    const handleStatus = (orderID) => {
+        AsyncStorage.getItem("jwt")
+        .then((res) => {
+            setToken(res)
+        })
+        .catch((error) => console.log(error))
+        console.log(token)
         const config = {
             headers: {
-                "Authorization": `Bearer ${token}`
+                Authorization: `Bearer ${token}` // Corrected to include Authorization header in the headers object
             }
         };
-
-
+    
         axios
-            .put(`${baseURL}orders/shipped/${orderID}`, config)
+            .put(`${baseURL}orders/shipped/${orderID}`, {}, config) // Corrected to pass an empty object as the second parameter
             .then((res) => {
                 if (res.status === 200 || res.status === 201) {
                     Toast.show({
@@ -61,33 +102,55 @@ const SingleOrder = () => {
                     setTimeout(() => {
                         navigation.navigate("ORDERS");
                     }, 500)
-                    onRefresh()
                 }
             })
             .catch((error) => {
+                console.log(error)
                 Toast.show({
                     topOffset: 60,
                     type: "error",
-                    text1: "SOMETHING WENT WRONG",
+                    text1: "ERROR!",
                     text2: "PLEASE TRY AGAIN"
                 })
-            })
-
+            });
     };
-
-
+    
     const deleteOrder = (id) => {
+        AsyncStorage.getItem("jwt")
+        .then((res) => {
+            setToken(res)
+        })
+        .catch((error) => console.log(error))
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}` // Corrected to include Authorization header in the headers object
+            }
+        };
         axios
-            .delete(`${baseURL}orders/${id}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            .delete(`${baseURL}orders/${id}`, config)
             .then((res) => {
-                const users = orderFilter.filter((item) => item.id !== id)
-                setOrderFilter(users)
-
-                onRefresh()
+                if (res.status === 200 || res.status === 201) {
+                    Toast.show({
+                        topOffset: 60,
+                        type: "success",
+                        text1: "ORDER IS DELETED SUCCESSFULLY",
+                        text2: ""
+                    });
+                    setTimeout(() => {
+                        navigation.navigate("ORDERS");
+                    }, 500)
+                    
+                }
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {
+                console.log(error)
+                Toast.show({
+                    topOffset: 60,
+                    type: "error",
+                    text1: "ERROR!",
+                    text2: "PLEASE TRY AGAIN"
+                })
+            });
     }
 
 
