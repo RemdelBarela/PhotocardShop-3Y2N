@@ -22,7 +22,7 @@ const Input = (props) => {
 const styles = StyleSheet.create({
     input: {
         fontSize: 15,
-        color: '#fff',
+        color: 'black',
         width: '100%',
         padding: 14,
         marginBottom: 15,

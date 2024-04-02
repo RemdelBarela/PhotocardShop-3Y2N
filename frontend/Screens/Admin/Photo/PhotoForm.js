@@ -82,7 +82,7 @@ const PhotoForm = (props) => {
 
     const addPhoto = () => {
         if (name === '' || description === '') {
-            setError('Please complete the form accurately.');
+            setError('KINDLY COMPLETE THE FORM ACCURATELY.');
             return;
         }
 
@@ -138,7 +138,7 @@ const PhotoForm = (props) => {
                         Toast.show({
                             topOffset: 60,
                             type: "success",
-                            text1: "New photo added",
+                            text1: "NEW PHOTO ADDED",
                             text2: ""
                         });
                         setTimeout(() => {
@@ -205,6 +205,7 @@ const PhotoForm = (props) => {
                     large
                     primary
                     onPress={() => addPhoto()}
+                    style={{backgroundColor: "black"}}
                 >
                     <Text style={styles.buttonText}>CONFIRM</Text>
                 </EasyButton>

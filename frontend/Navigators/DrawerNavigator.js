@@ -42,9 +42,7 @@ const getIcon = (screenName) => {
       return "home-outline";
     case "PROFILE":
       return "account-outline";
-    case "CART":
-      return "cart-outline";
-    case "PHOTOS":
+        case "PHOTOS":
       return "image-outline";
     case "MATERIALS":
       return "file-document-outline";
@@ -128,7 +126,7 @@ const DrawerNavigator = () => {
         />
         {/* <Drawer.Screen name="Products" component={Main} initialParams={{ screen: 'Products' }} /> */}
         {/* <Drawer.Screen name="PROFILE" component={Main} initialParams={{ screen: 'User' }} /> */}
-        <Drawer.Screen name="CART" component={Main} initialParams={{ screen: 'Cart' }} />
+        {/* <Drawer.Screen name="CART" component={Main} initialParams={{ screen: 'Cart' }} /> */}
         {/* <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/> */}
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>

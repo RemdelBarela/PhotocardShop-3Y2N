@@ -77,6 +77,36 @@ router.post('/', async (req, res) => {
     res.send(user);
 })
 
+router.put('/admin/:id', async (req, res) => {
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            isAdmin: true,
+        },
+        { new: true }
+    )
+
+    if (!user)
+        return res.status(400).send('the user role cannot be update!')
+
+    res.send(user);
+})
+
+router.put('/user/:id', async (req, res) => {
+    const user = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+            isAdmin: false,
+        },
+        { new: true }
+    )
+
+    if (!user)
+        return res.status(400).send('the user role cannot be update!')
+
+    res.send(user);
+})
+
 router.put('/:id', async (req, res) => {
 
     const userExist = await User.findById(req.params.id);

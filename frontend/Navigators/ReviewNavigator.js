@@ -13,8 +13,15 @@ const PhotoNavigator= () => {
              <Stack.Screen 
                 name="Review"
                 component={Review}
+                options={{
+                    tabBarLabel: '', // Hide the name from the tab
+                    headerShown: false // Hide header for the Cart screen
+                   }}
             />
-            <Stack.Screen name="ReviewForm" component={ReviewForm} />
+            <Stack.Screen name="ReviewForm"      options={{
+                    tabBarLabel: '', // Hide the name from the tab
+                    headerShown: false // Hide header for the Cart screen
+                   }}component={ReviewForm} />
 
         </Stack.Navigator>
     )

@@ -15,6 +15,7 @@ import { DataTable, Searchbar } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome"
 import { useFocusEffect } from "@react-navigation/native"
 import axios from "axios"
+import Toast from "react-native-toast-message";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
 import { useNavigation } from "@react-navigation/native"
@@ -24,42 +25,114 @@ import EasyButton from "../../Shared/StyledComponents/EasyButton";
 
 const Users = (props) => {
 
-    const [photoList, setPhotoList] = useState([]);
-    const [photoFilter, setPhotoFilter] = useState([]);
+    const [photoList, setUserList] = useState([]);
+    const [photoFilter, setUserFilter] = useState([]);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedPhoto, setSelectedPhoto] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [imageModalVisible, setImageModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const navigation = useNavigation()
 
 
-    const searchPhoto = (text) => {
+    const searchUser = (text) => {
         if (text === "") {
-            setPhotoFilter(photoList)
+            setUserFilter(photoList)
         }
-        setPhotoFilter(
+        setUserFilter(
             photoList.filter((i) =>
                 i.name.toLowerCase().includes(text.toLowerCase())
             )
         )
     }
 
-    const deletePhoto = (id) => {
+    const deleteUser = (id) => {
         axios
             .delete(`${baseURL}users/${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
                 const users = photoFilter.filter((item) => item.id !== id)
-                setPhotoFilter(users)
+                setUserFilter(users)
 
                 onRefresh()
             })
             .catch((error) => console.log(error));
     }
+
+    const makeAdmin = (userID) => {
+
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        };
+
+
+        axios
+            .put(`${baseURL}users/admin/${userID}`, config)
+            .then((res) => {
+                if (res.status === 200 || res.status === 201) {
+                    Toast.show({
+                        topOffset: 60,
+                        type: "success",
+                        text1: "USER ROLE SUCCESSFULLY UPDATED",
+                        text2: ""
+                    });
+                    setTimeout(() => {
+                        navigation.navigate("Users");
+                    }, 500)
+                    onRefresh()
+                }
+            })
+            .catch((error) => {
+                Toast.show({
+                    topOffset: 60,
+                    type: "error",
+                    text1: "SOMETHING WENT WRONG",
+                    text2: "PLEASE TRY AGAIN"
+                })
+            })
+
+    };
+
+    const makeUser = (userID) => {
+
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        };
+
+
+        axios
+            .put(`${baseURL}users/user/${userID}`, config)
+            .then((res) => {
+                if (res.status === 200 || res.status === 201) {
+                    Toast.show({
+                        topOffset: 60,
+                        type: "success",
+                        text1: "USER ROLE SUCCESSFULLY UPDATED",
+                        text2: ""
+                    });
+                    setTimeout(() => {
+                        navigation.navigate("Users");
+                    }, 500)
+                    onRefresh()
+                }
+            })
+            .catch((error) => {
+                Toast.show({
+                    topOffset: 60,
+                    type: "error",
+                    text1: "SOMETHING WENT WRONG",
+                    text2: "PLEASE TRY AGAIN"
+                })
+            })
+
+    };
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -68,8 +141,8 @@ const Users = (props) => {
                 .get(`${baseURL}users`)
                 .then((res) => {
                     // console.log(res.data)
-                    setPhotoList(res.data);
-                    setPhotoFilter(res.data);
+                    setUserList(res.data);
+                    setUserFilter(res.data);
                     setLoading(false);
                 })
             setRefreshing(false);
@@ -89,14 +162,14 @@ const Users = (props) => {
                     .get(`${baseURL}users`)
                     .then((res) => {
                         console.log(res.data)
-                        setPhotoList(res.data);
-                        setPhotoFilter(res.data);
+                        setUserList(res.data);
+                        setUserFilter(res.data);
                         setLoading(false);
                     })
 
                 return () => {
-                    setPhotoList();
-                    setPhotoFilter();
+                    setUserList();
+                    setUserFilter();
                     setLoading(true);
                 }
             },
@@ -105,7 +178,7 @@ const Users = (props) => {
     )
 
     const handleRowPress = (photo) => {
-        setSelectedPhoto(photo);
+        setSelectedUser(photo);
         setModalVisible(true);
     };
 
@@ -114,14 +187,14 @@ const Users = (props) => {
         setImageModalVisible(true);
     };
     const renderGallery = () => {
-        // Check if selectedPhoto is defined and has image property
-        if (selectedPhoto && selectedPhoto.image) {
+        // Check if selectedUser is defined and has image property
+        if (selectedUser && selectedUser.image) {
             return (
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     {/* Check if image is an array */}
-                    {Array.isArray(selectedPhoto.image) ? (
+                    {Array.isArray(selectedUser.image) ? (
                         // Map over the image array
-                        selectedPhoto.image.map((imageUrl, idx) => (
+                        selectedUser.image.map((imageUrl, idx) => (
                             <TouchableOpacity key={idx} onPress={() => handleImagePress(imageUrl)}>
                                 <Image
                                     source={{
@@ -135,10 +208,10 @@ const Users = (props) => {
                         ))
                     ) : (
                         // Render a single image if not an array
-                        <TouchableOpacity onPress={() => handleImagePress(selectedPhoto.image)}>
+                        <TouchableOpacity onPress={() => handleImagePress(selectedUser.image)}>
                             <Image
                                 source={{
-                                    uri: selectedPhoto.image || null, // Ensure imageUrl is not undefined
+                                    uri: selectedUser.image || null, // Ensure imageUrl is not undefined
                                 }}
                                 resizeMode="cover"
                                 style={{ width: width, height: width / 2, marginVertical: 5 }}
@@ -152,28 +225,19 @@ const Users = (props) => {
             return <Text>No images available for this photo.</Text>;
         }
     };
-    
-    
+
+
 
     return (
         <Box flex={1}>
-                 <View style={styles.buttonContainer}>
-     <Searchbar
-        placeholder="Search Photo Name"
-        onChangeText={(text) => searchPhoto(text)}
-        style={{ flex: 1 }} // Allow the search bar to take remaining space
-    /> 
-      <EasyButton
-        secondary
-        medium
-        onPress={() => navigation.navigate("PhotoForm")}
-        style={{ marginRight: 10 ,backgroundColor: 'black'}} // Add some right margin for spacing
-    >
-        <Icon name="plus" size={18} color="white" />
-        <Text style={[styles.buttonText, { color: 'white'   }]}> ADD</Text>
-    </EasyButton>
-  
-</View>
+            <View style={styles.buttonContainer}>
+                <Searchbar
+                    placeholder="Search User Name"
+                    onChangeText={(text) => searchUser(text)}
+                    style={{ flex: 1 }} // Allow the search bar to take remaining space
+                />
+
+            </View>
 
             <Modal
                 animationType="fade"
@@ -197,28 +261,45 @@ const Users = (props) => {
                                 right: 10
                             }}
                         >
-                            <Icon name="close" size={20} />
+                            <Icon name="close" size={50} />
                         </TouchableOpacity>
-                        {selectedPhoto && (
+                        {selectedUser && (
                             <>
-                                <Text>{selectedPhoto.name}</Text>
+                                <Text style={styles.header}>{selectedUser.name}</Text>
                                 {renderGallery()}
+                                {selectedUser.isAdmin === false && (
                                 <EasyButton
                                     medium
-                                    secondary
+                                    style={{ backgroundColor: "black" }}
+
                                     onPress={() => {
-                                        navigation.navigate("PhotoForm", { item: selectedPhoto });
+                                        makeAdmin(selectedUser._id)
                                         setModalVisible(false);
                                     }}
-                                    title="Edit"
+                                    title="ADMIN"
                                 >
-                                    <Text style={styles.textStyle}>EDIT</Text>
+                                    <Text style={{ color: "white", letterSpacing: 2 }}>ADMIN</Text>
                                 </EasyButton>
+                                 )}
+                                 {selectedUser.isAdmin === true && (
+                                <EasyButton
+                                    medium
+                                    style={{ backgroundColor: "black" }}
+
+                                    onPress={() => {
+                                        makeUser(selectedUser._id)
+                                        setModalVisible(false);
+                                    }}
+                                    title="USER"
+                                >
+                                    <Text style={{ color: "white", letterSpacing: 2 }}>USER</Text>
+                                </EasyButton>
+                                 )}
                                 <EasyButton
                                     medium
                                     danger
                                     onPress={() => {
-                                        deletePhoto(selectedPhoto.id);
+                                        deleteUser(selectedUser.id);
                                         setModalVisible(false);
                                     }}
                                     title="Delete"
@@ -275,17 +356,16 @@ const Users = (props) => {
                 <DataTable>
                     <DataTable.Header style={{ backgroundColor: 'black' }}>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }} ><Text style={{ color: 'white' }}>NAME</Text></DataTable.Title>
-                      
-                 
-                             <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>EMAIL</Text></DataTable.Title>
-                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>PASSWORD</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHONE</Text></DataTable.Title>
-                 
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text  style={{ color: 'white' }}>ROLE</Text></DataTable.Title>
-                          <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
-                 
-                      
-                         </DataTable.Header>
+
+
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>EMAIL</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHONE</Text></DataTable.Title>
+
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>ROLE</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
+
+
+                    </DataTable.Header>
                     {photoFilter.map((item, index) => (
                         <TouchableOpacity
                             key={index}
@@ -295,27 +375,28 @@ const Users = (props) => {
                             }}>
                             <DataTable.Row>
                                 <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.email}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.password}</DataTable.Cell>
-                                  
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.phone}</DataTable.Cell>
-                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.isAdmin}</DataTable.Cell>
-                                  
-                           
-                                                
-    <DataTable.Cell 
-    style={{
-        width: 40,
-        height: 40,
-        marginRight: 10,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20 // Half of width or height to make it circular
-    }}
->     
-    <Icon name="eye" size={18} color="white" />
-</DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.email}</DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.phone}</DataTable.Cell>
+                                {item.isAdmin === false && (
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>USER</DataTable.Cell>
+                                )}
+                                {item.isAdmin === true && (
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>ADMIN</DataTable.Cell>
+
+                                )}
+                                <DataTable.Cell
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        marginRight: 10,
+                                        backgroundColor: 'black',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: 20 // Half of width or height to make it circular
+                                    }}
+                                >
+                                    <Icon name="eye" size={18} color="white" />
+                                </DataTable.Cell>
                             </DataTable.Row>
                         </TouchableOpacity>
                     ))}
@@ -364,6 +445,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginTop: 22
+    }, header: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
     },
 });
 
