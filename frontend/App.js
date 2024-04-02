@@ -5,8 +5,6 @@ import React from 'react';
  
 import { NativeBaseProvider, extendTheme, } from "native-base";
 import { NavigationContainer } from '@react-navigation/native'
-import Main from './Navigators/Main';
-
 import { Provider } from "react-redux";
 import store from "./Redux/store";
 import Toast from "react-native-toast-message"

@@ -20,20 +20,14 @@ import {
   Divider,
   Icon,
 } from "native-base";
-import ProductContainer from "../Screens/Product/ProductContainer";
 import 'react-native-gesture-handler';
-import Login from "../Screens/User/Login";
 import Main from "./Main";
 import Materials from "./MaterialNavigator"
 import Photos from "./PhotoNavigator"
 import Users from "./UsersNavigator"
-import OrderChart from "../Screens/Admin/Chart/OrderChart";
-
-import Cart from "../Screens/Cart/Cart";
-import Products from "../Screens/Admin/Products";
-import AdminNavigator from "./AdminNavigator";
-import ProductList from "../Screens/Product/ProductList";
-
+import Orders from "./OrderNavigator";
+import Charts from "../Screens/Admin/Chart/OrderChart";
+import Reviews from "../Screens/Admin/Review/Reviews"
 
 global.__reanimatedWorkletInit = () => { };
 const Drawer = createDrawerNavigator();
@@ -51,8 +45,12 @@ const getIcon = (screenName) => {
       return "file-document-outline";
     case "USERS":
       return "account-group-outline";
-    case "CHARTS":
+    case "ORDERS":
       return "chart-line"; 
+      case "ORDERS":
+        return "chart-line"; 
+      case "CHARTS":
+        return "chart-line"; 
     default:
       return undefined;
   }
@@ -127,14 +125,13 @@ const DrawerNavigator = () => {
           name="HOME"
           component={Main}
         />
-        {/* <Drawer.Screen name="Products" component={Main} initialParams={{ screen: 'Products' }} /> */}
-        {/* <Drawer.Screen name="PROFILE" component={Main} initialParams={{ screen: 'User' }} /> */}
-        {/* <Drawer.Screen name="CART" component={Main} initialParams={{ screen: 'Cart' }} /> */}
-        {/* <Drawer.Screen name="Product List" component={Main}  initialParams={{ screen: 'Admin' }}/> */}
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
         <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
-        <Drawer.Screen name="CHARTS" component={OrderChart}  initialParams={{ screen: 'OrderChart' }}/>
+        <Drawer.Screen name="ORDERS" component={Orders} initialParams={{ screen: 'Orders' }} /> 
+        <Drawer.Screen name="REVIEWS" component={Reviews} initialParams={{ screen: 'Reviews' }} /> 
+
+        <Drawer.Screen name="CHARTS" component={Charts}  initialParams={{ screen: 'Charts' }}/>
       </Drawer.Navigator>
     </Box>
   );

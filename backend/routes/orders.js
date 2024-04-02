@@ -811,8 +811,24 @@ router.put('/status/:id', async (req, res) => {
     res.send(order);
 })
 
+router.put('/shipped/:id', async (req, res) => {
+    const order = await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+            status: 'Shipped',
+            dateOrdered: Date.now() // Corrected to call Date.now() as a function
+        },
+        { new: true }
+    );
+
+    if (!order)
+        return res.status(400).send('The order cannot be updated!');
+
+    res.send(order);
+});
 
 router.delete('/:id', (req, res) => {
+    console.log(req.params.id)
     Order.findByIdAndRemove(req.params.id).then(async order => {
         if (order) {
             await order.orderItems.map(async orderItem => {
