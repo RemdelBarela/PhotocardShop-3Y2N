@@ -22,11 +22,11 @@ const Input = (props) => {
 const styles = StyleSheet.create({
     input: {
         fontSize: 15,
-        color: '#fff',
+        color: 'black',
         width: '100%',
         padding: 14,
         marginBottom: 15,
-        backgroundColor: 'rgba(255,255,255,.25)',
+        backgroundColor: 'gainsboro',
         borderRadius: 8,
     },
 });

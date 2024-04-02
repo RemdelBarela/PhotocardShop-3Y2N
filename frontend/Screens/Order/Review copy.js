@@ -24,7 +24,7 @@ const Pending = (props) => {
     const [comment, setComment] = useState('');
     const [rating, setRating] = useState('');
     const [loading, setLoading] = useState(true);
-    const [token, setToken] = useState('');
+    const [token, setToken] = useState();
     const [error, setError] = useState('');
 
     useFocusEffect(
@@ -42,26 +42,8 @@ const Pending = (props) => {
                             headers: { Authorization: `Bearer ${res}` },
                         })
                         .then((user) => setUserProfile(user.data))
-                        .catch((error) => {
-                            console.log("Error fetching user data:", error);
-                            Toast.show({
-                                topOffset: 60,
-                                type: "error",
-                                text1: "Error!",
-                                text2: "Failed to fetch user data"
-                            });
-                        });
                 })
-                .catch((error) => {
-                    console.log("Error fetching JWT token:", error);
-                    Toast.show({
-                        topOffset: 60,
-                        type: "error",
-                        text1: "Error!",
-                        text2: "Failed to fetch JWT token"
-                    });
-                });
-
+                .catch((error) => console.log(error))
             axios
                 .get(`${baseURL}orders/filtered`)
                 .then(response => {
@@ -72,59 +54,15 @@ const Pending = (props) => {
                 })
                 .catch(error => {
                     console.error('Error fetching filtered orders:', error);
-                    Toast.show({
-                        topOffset: 60,
-                        type: "error",
-                        text1: "Error!",
-                        text2: "Failed to fetch orders"
-                    });
                 });
 
             return () => {
-                setUserProfile('');
-                setOrders([]);
+                setUserProfile();
+                setOrders()
             }
 
         }, [context.stateUser.isAuthenticated]));
 
-    useEffect(() => {
-        if (orders && orders.length > 0) {
-            // Initialize showReviewUpdate state with false for each order item ID
-            const initialShowReviewUpdate = {};
-            orders.forEach(order => {
-                order.orderItems.forEach(orderItem => {
-                    initialShowReviewUpdate[orderItem._id] = false;
-                });
-            });
-            setShowReviewUpdate(initialShowReviewUpdate);
-        }
-    }, [orders]);
-
-    useEffect(() => {
-        if (orders && orders.length > 0) {
-            const fetchComment = async () => {
-                try {
-                    const commentData = await fetchCommentDataForFirstOrderItem(orders[0].orderItems[0]._id);
-                    setComment(commentData.comment || '');
-                } catch (error) {
-                    console.error('Error fetching comment data:', error);
-                }
-            };
-    
-            fetchComment();
-        }
-    }, [orders]);
-
-    const fetchCommentDataForFirstOrderItem = async (orderItemId) => {
-        try {
-            const response = await axios.get(`${baseURL}reviews/${orderItemId}`);
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    };
-
-   
     const updateReview = (orderItemID) => {
 
         if (!comment) {
@@ -187,6 +125,13 @@ const Pending = (props) => {
             });
     };
 
+    const toggleUpdate = (orderItemID) => {
+        // Toggle the review update section for the selected order item
+        setShowReviewUpdate(prevState => ({
+            ...prevState,
+            [orderItemID]: !prevState[orderItemID]
+        }));
+    };
 
     const loadOrdersData = () => {
         axios
@@ -202,14 +147,42 @@ const Pending = (props) => {
             });
     };
 
-    const toggleUpdate = (orderItemID) => {
-        // Toggle the review update section for the selected order item
-        setShowReviewUpdate(prevState => ({
-            ...prevState,
-            [orderItemID]: !prevState[orderItemID]
-        }));
-    };
+    useEffect(() => {
+        if (orders.length > 0) {
+            // Initialize showReviewUpdate state with false for each order item ID
+            const initialShowReviewUpdate = {};
+            orders.forEach(order => {
+                order.orderItems.forEach(orderItem => {
+                    initialShowReviewUpdate[orderItem._id] = false;
+                });
+            });
+            setShowReviewUpdate(initialShowReviewUpdate);
+        }
+    }, [orders]);
 
+    useEffect(() => {
+        if (orders && orders.length > 0) {
+            const fetchComment = async () => {
+                try {
+                    const commentData = await fetchCommentDataForFirstOrderItem(orders[0].orderItems[0]._id);
+                    setComment(commentData.comment || '');
+                } catch (error) {
+                    console.error('Error fetching comment data:', error);
+                }
+            };
+    
+            fetchComment();
+        }
+    }, [orders]);
+
+    const fetchCommentDataForFirstOrderItem = async (orderItemId) => {
+        try {
+            const response = await axios.get(`${baseURL}reviews/${orderItemId}`);
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -257,12 +230,12 @@ const Pending = (props) => {
                                         </DataTable.Row>
                                     </DataTable>
                                     <Text style={styles.reviewLabel}>REVIEW:</Text>
-                                    <Text style={styles.commentLabel}>{orderItem.reviews.length > 0 ? orderItem.reviews[0].comment : ''}</Text>
+                                    <Text style={styles.commentLabel}>{orderItem.reviews[0].comment}</Text>
 
                                     <View style={styles.ratingContainer}>
                                         <DisabledStar
                                             maxStars={5}
-                                            rating={orderItem.reviews.length > 0 ? orderItem.reviews[0].rating : 0} // Set the rating directly
+                                            rating={orderItem.reviews[0].rating} // Set the rating directly
                                             disabled={true} // Make the stars readonly
                                             starSize={20} // Adjust the size of stars as needed
                                             fullStarColor={'pink'} // Customize the color of filled stars
@@ -279,19 +252,12 @@ const Pending = (props) => {
                                     </TouchableOpacity>
                                     {showReviewUpdate[orderItem._id] && (
                                         <View style={styles.input}>
-                                          <Input
-    style={{ color: 'black' }}
-    placeholder="Enter your comment"
-    value={comment === '' ? orderItem.reviews[0].comment : comment}
-    onChangeText={value => {
-        if (value.length > 0) {
-            setComment(value);
-        } else {   placeholder="Enter your comment"
-            setComment(" "); // Keep it as an empty string only if the length is empty
-        }
-    }}
-/>
-
+                                            <Input
+                                                style={{ color: 'black' }}
+                                                placeholder="Enter your comment"
+                                                value={orderItem.reviews[0].comment}
+                                                onChangeText={value => setComment(value)}
+                                            />
                                             <View style={styles.ratingContainer}>
                                                 <Text style={styles.ratingLabel}>RATING:</Text>
                                                 <StarRating

@@ -1,92 +1,25 @@
 const express = require('express');
 const { Review } = require('../models/review');
 const { OrderItem } = require('../models/order-item');
+const { Photocard } = require('../models/photocard');
 const { Order } = require('../models/order');
-
 
 const router = express.Router();
 const mongoose = require('mongoose');
 
-// router.get(`/`, async (req, res) =>{
-                     
-//     const reviewList = await Review.find()
-//     .populate({
-//         path: 'orderItem', 
-//         populate: {
-//             path: 'photocard',
-//             populate: {
-//                 path: 'photo',
-//                 model: 'Photo'
-//             }
-//         }
-//     })
-
-//     const orderItemIds = reviewList.map(review => review.orderItem);
+router.get(`/:id`, async (req, res) =>{
     
-//     console.log(orderItemIds)
-//     const orders = await Order.find({ _id: { $in: orderItemIds } });
+    console.log(req.query)
+       
+    const reviewList = await Review.find({orderItem: req.params.id});
 
-//     if(!reviewList) {
-//         res.status(500).json({success: false})
-//     } 
-//     res.send(orders);
-// })
+    if(!reviewList) {
+        res.status(500).json({success: false})
+    } 
+    res.send(reviewList);
+})
 
-// router.get(`/`, async (req, res) => {
-//     try {
-//         // Fetch all Review documents with populated orderItem
-//         const reviewList = await Review.find()
-//             .populate({
-//                 path: 'orderItem',
-//                 populate: {
-//                     path: 'photocard',
-//                     populate: {
-//                         path: 'photo',
-//                         model: 'Photo'
-//                     }
-//                 }
-//             });
-
-//         // Extract all orderItem IDs from reviewList
-//         const orderItemIds = reviewList.reduce((acc, review) => {
-//             if (Array.isArray(review.orderItem)) {
-//                 acc.push(...review.orderItem.map(item => item._id));
-//             } else {
-//                 acc.push(review.orderItem._id);
-//             }
-//             return acc;
-//         }, []);
-
-//         console.log(orderItemIds)
-
-//         // Find Orders where at least one orderItem._id matches the orderItemIds
-//         const orders = await Order.find({ 'orderItems._id': { $in: orderItemIds } });
-
-//         res.status(200).json({ success: true, data: orders });
-//     } catch (error) {
-//         console.error("Error fetching orders:", error);
-//         res.status(500).json({ success: false, error: "Internal server error" });
-//     }
-// });
-
-
-// router.get(`/`, async (req, res) => {
-//     try {
-//         // Fetch all Review documents
-//         const reviewList = await Review.find()
-
-//         const orderItemIds = reviewList.flatMap(review => review.orderItem);
-
-//         const orders = await Order.find({ 'orderItems': { $in: orderItemIds } });
-
-//         res.status(200).json({ success: true, data: orders });
-//     } catch (error) {
-//         console.error("Error fetching orders:", error);
-//         res.status(500).json({ success: false, error: "Internal server error" });
-//     }
-// });
-
-router.get(`/`, async (req, res) => {
+router.get(`/home`, async (req, res) => {
     try {
         // Fetch all Review documents
         const reviewList = await Review.find();
@@ -117,6 +50,22 @@ router.get(`/`, async (req, res) => {
         res.status(500).json({ success: false, error: "Internal server error" });
     }
 });
+
+
+router.get(`/photo/:id`, async (req, res) => {
+    const { photoId } = req.params;
+
+    try {
+        // Find all reviews with the given photoId
+        const reviews = await Review.find({ 'orderItem.photocard.photo._id': photoId });
+
+        res.json(reviews);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 
 
@@ -160,18 +109,25 @@ router.post(`/new/:id`, async (req, res) => {
 router.put('/:id', async (req, res) => {
     console.log(req.body);
     
-    const updatedReview = await Review.findByIdAndUpdate(
-        req.params.id,
-        {
-            review: req.body.review,
-            rating: req.body.rating,
-        },
-        { new: true }
-    );
+    try {
+        const updatedReview = await Review.findByIdAndUpdate(
+            req.params.id,
+            {
+                comment: req.body.comment,
+                rating: req.body.rating,
+            },
+            { new: true }
+        );
 
-    if (!updatedReview) return res.status(500).send('THE REVIEW CANNOT BE UPDATED!');
+        if (!updatedReview) {
+            return res.status(404).send('Review not found');
+        }
 
-    res.send(updatedReview);
+        res.send(updatedReview);
+    } catch (error) {
+        console.error('Error updating review:', error);
+        res.status(500).send('An error occurred while updating the review');
+    }
 });
 
 router.delete('/:id', (req, res)=>{
