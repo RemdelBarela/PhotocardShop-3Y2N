@@ -21,24 +21,17 @@ import {
   Icon,
 } from "native-base";
 import ProductContainer from "../Screens/Product/ProductContainer";
-import { useNavigation } from "@react-navigation/native";
-
 import 'react-native-gesture-handler';
 import Login from "../Screens/User/Login";
 import Main from "./Main";
 import Materials from "./MaterialNavigator"
 import Photos from "./PhotoNavigator"
 import Users from "./UsersNavigator"
-// import Charts from "./AdminNavigator"
-import OrderChart from "../Screens/Admin/Chart/OrderChart";
 
 import Cart from "../Screens/Cart/Cart";
 import Products from "../Screens/Admin/Products";
 import AdminNavigator from "./AdminNavigator";
 import ProductList from "../Screens/Product/ProductList";
-
-
-
 global.__reanimatedWorkletInit = () => { };
 const Drawer = createDrawerNavigator();
 
@@ -65,8 +58,6 @@ const getIcon = (screenName) => {
 };
 
 function CustomDrawerContent(props) {
-  const navigation = useNavigation();
-
   return (
     <DrawerContentScrollView {...props} safeArea>
       <VStack space="6" my="2" mx="1">
@@ -142,7 +133,7 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
         <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
-        <Drawer.Screen name="CHARTS" component={OrderChart} initialParams={{ screen: 'OrderChart' }}/>
+        <Drawer.Screen name="CHARTS" component={''}  initialParams={{ screen: '' }}/>
       </Drawer.Navigator>
     </Box>
   );

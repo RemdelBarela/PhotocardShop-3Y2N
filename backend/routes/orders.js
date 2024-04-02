@@ -24,6 +24,36 @@ router.get(`/`, async (req, res) => {
     res.status(201).json(orderList)
 })
 
+router.get(`/admin`, async (req, res) => {
+    const orderList = await Order.find()
+    .populate('user')
+    .populate({
+        path: 'orderItems', 
+        populate: {
+            path: 'photocard',
+            populate: {
+                path: 'photo',
+                model: 'Photo'
+            }
+        }
+    })
+    .populate({
+        path: 'orderItems',
+        populate: {
+            path: 'photocard',
+            populate: {
+                path: 'material',
+                model: 'Material'
+            }
+        }
+    });;
+
+    if (!orderList) {
+        res.status(500).json({ success: false })
+    }
+   
+    res.status(201).json(orderList)
+})
 
 // router.get('/filtered', async (req, res) => {
 //     try {
@@ -336,8 +366,6 @@ router.get('/filtered', async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
-
-
 
 router.get('/:id', async (req, res) => {
     try {
@@ -771,7 +799,8 @@ router.put('/status/:id', async (req, res) => {
     const order = await Order.findByIdAndUpdate(
         req.params.id,
         {
-            status: 'Delivered'
+            status: 'Delivered',
+            dateOrdered: Date.now
         },
         { new: true }
     )
