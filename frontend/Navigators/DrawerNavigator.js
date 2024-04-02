@@ -27,11 +27,14 @@ import Main from "./Main";
 import Materials from "./MaterialNavigator"
 import Photos from "./PhotoNavigator"
 import Users from "./UsersNavigator"
+import OrderChart from "../Screens/Admin/Chart/OrderChart";
 
 import Cart from "../Screens/Cart/Cart";
 import Products from "../Screens/Admin/Products";
 import AdminNavigator from "./AdminNavigator";
 import ProductList from "../Screens/Product/ProductList";
+
+
 global.__reanimatedWorkletInit = () => { };
 const Drawer = createDrawerNavigator();
 
@@ -131,7 +134,7 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
         <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
         <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
-        <Drawer.Screen name="CHARTS" component={''}  initialParams={{ screen: '' }}/>
+        <Drawer.Screen name="CHARTS" component={OrderChart}  initialParams={{ screen: 'OrderChart' }}/>
       </Drawer.Navigator>
     </Box>
   );

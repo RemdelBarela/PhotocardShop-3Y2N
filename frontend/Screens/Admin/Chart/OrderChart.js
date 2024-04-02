@@ -34,18 +34,17 @@ const OrderChart = () => {
     decimalPlaces: 0,
     pieRadius: 50,
     pieColors: [
-      "#000000",
-      "#262626", 
-      "#595959",
-      "#808080", 
-      "#A6A6A6", 
+      "#262626 ", 
       "#CCCCCC", 
-      "#E0E0E0", 
-      "#F2F2F2",
-      "#FFFFFF", 
-      "#0000FF", 
-      "#008000", 
-      "#FF0000" 
+      "#A6A6A6", 
+      "#808080", 
+      "#595959", 
+      "#262626",
+      "#000000",
+      "#6C7B8B", 
+      "#B0C4DE", 
+      "#778899", 
+      "#D3D3D3" 
     ]
   };
   
@@ -53,6 +52,30 @@ const OrderChart = () => {
     fetchOrderChartData();
     fetchTotalSalesPerDay();
   }, []);
+
+  const lineChartConfig = {
+    backgroundColor: "#ffffff",
+    backgroundGradientFrom: "#ffffff",
+    backgroundGradientTo: "#ffffff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16
+    },
+    propsForDots: {
+      r: "6",
+      strokeWidth: "3",
+      stroke: "#B0C4DE"
+    },
+    propsForLabels: {
+      fontSize: 12,
+      fontWeight: "bold",
+      fontFamily: 'Arial',
+      textAlign: 'center',
+      rotateLabels: 45 // Rotate the labels by 45 degrees for better readability
+    },
+    decimalPlaces: 0,
+  };
 
   // const fetchOrderChartData = async () => {
   //   try {
@@ -98,9 +121,8 @@ const OrderChart = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {error ? (
-          <Error message={error} />
-        ) : (
+        {error && <Error message={error} />}
+        {!error && (
           <>
             <View style={styles.chartContainer}>
               <Text style={styles.header}>TOTAL PHOTO ORDERS</Text>
@@ -120,28 +142,50 @@ const OrderChart = () => {
                 absolute
               />
             </View>
-            <View style={styles.chartContainer}>
+            {/* <View style={styles.chartContainer}>
               <Text style={styles.header}>TOTAL MATERIAL ORDERS</Text>
               <LineChart
-              data={{
-                labels: materialChartData.map((item) => item.materialName),
-                datasets: [
-                  {
-                    data: materialChartData.map((item) => item.totalOrders),
-                  },
-                ],
-              }}
-              width={400}
-              height={200} 
-              chartConfig={{
-                ...chartConfig,
-                propsForLabels: {
-                  ...chartConfig.propsForLabels,
-                  rotation: 45,
-                },
-              }}
-              style={styles.chart}
-            />
+                data={{
+                  labels: materialChartData.map(item => item.materialName),
+                  datasets: [
+                    {
+                      data: materialChartData.map(item => item.totalOrders),
+                    },
+                  ],
+                }}
+                width={400}
+                height={200}
+                chartConfig={chartConfig}
+                style={styles.chart}
+              />
+            </View> */}
+            <View style={styles.chartContainer}>
+              <Text style={styles.header}>TOTAL MATERIAL ORDERS</Text>
+              {materialChartData.length > 0 && ( // Check if materialChartData is not empty
+                <LineChart
+                  data={{
+                    labels: materialChartData.map(item => item.materialName),
+                    datasets: [
+                      {
+                        data: materialChartData.map(item => item.totalOrders),
+                      },
+                    ],
+                  }}
+                  width={400}
+                  height={250}
+                  chartConfig={{
+                    ...lineChartConfig ,
+                    propsForLabels: {
+                      ...lineChartConfig .propsForLabels,
+                      rotation: 45, // Rotate the labels by 45 degrees
+                    },
+                  }}
+                  style={styles.chart}
+                />
+              )}
+              {materialChartData.length === 0 && ( // Render a message if materialChartData is empty
+                <Text>NO DATA AVAILABLE FOR MATERIAL ORDERS</Text>
+              )}
             </View>
             <View style={styles.chartContainer}>
               <Text style={styles.header}>TOTAL DAILY SALES</Text>
@@ -155,7 +199,7 @@ const OrderChart = () => {
                   ],
                 }}
                 width={400}
-                height={200}
+                height={250}
                 chartConfig={chartConfig}
                 style={styles.chart}
               />
@@ -181,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: "30",
   },
   chartContainer: {
-    marginBottom: 30
+    marginBottom: 15,
   },
   chart: {
     borderRadius: 16
