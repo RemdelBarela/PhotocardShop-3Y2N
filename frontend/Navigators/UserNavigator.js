@@ -6,6 +6,8 @@ import Register from "../Screens/User/Register";
 import UserProfile from "../Screens/User/UserProfile";
 import UpdateProfile from "../Screens/User/UpdateProfile";
 import ReviewForm from "../Screens/Review/ReviewForm";
+import SingleOrder from "../Screens/Order/SingleOrder";
+import Transaction from "./TransactionNavigator";
 
 const Stack = createStackNavigator();
 
@@ -45,7 +47,25 @@ const UserNavigator = (props) => {
    
                 }}
             />
-            
+            <Stack.Screen
+                name="Transaction"
+                component={Transaction}
+                options={{
+                    headerShown: false,
+                    cardStyle: { backgroundColor: '#CCCCCC' } // Set background color here
+   
+                }}
+            />
+             <Stack.Screen
+                name="SingleOrder"
+                component={SingleOrder}
+                options={{
+                    headerShown: false,
+                    cardStyle: { backgroundColor: '#CCCCCC' } // Set background color here
+   
+                }}
+            />
+
             <Stack.Screen
                 name="Review Form"
                 component={ReviewForm}

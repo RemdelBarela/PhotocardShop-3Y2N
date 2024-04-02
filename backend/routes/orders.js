@@ -24,6 +24,35 @@ router.get(`/`, async (req, res) => {
     res.status(201).json(orderList)
 })
 
+
+// router.get('/filtered', async (req, res) => {
+//     try {
+//         // Find orders
+//         const orderList = await Order.find().populate('user', 'name').sort({ 'dateOrdered': -1 });
+
+//         if (!orderList) {
+//             return res.status(500).json({ success: false, message: 'Failed to retrieve orders' });
+//         }
+
+//         // Filter orders where at least one order item has a review
+//         const ordersWithReviews = await Promise.all(orderList.map(async order => {
+//             const orderItemsWithReviews = await Promise.all(order.orderItems.map(async orderItem => {
+//                 const reviewCount = await Review.countDocuments({ orderItem: orderItem._id });
+//                 return reviewCount > 0;
+//             }));
+//             return orderItemsWithReviews.some(reviewExist => reviewExist);
+//         }));
+
+//         const filteredOrders = orderList.filter((order, index) => ordersWithReviews[index]);
+
+//         res.status(200).json(filteredOrders);
+//     } catch (error) {
+//         console.error('Error fetching orders:', error);
+//         res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// });
+
+
 // router.get(`/:id`, async (req, res) => {
 //     const order = await Order.findById(req.params.id)
 //         .populate('user', 'name')
@@ -40,6 +69,108 @@ router.get(`/`, async (req, res) => {
 //     }
 //     res.send(order);
 // })
+
+// router.get('/filtered', async (req, res) => {
+//     try {
+//         // Find orders with populated user field
+//         const orderList = await Order.find()
+//         .populate('user', 'name')
+//         .populate({
+//             path: 'orderItems',
+//             populate: [
+//                 { path: 'photocard', populate: { path: 'material' } },
+//                 { path: 'photocard', populate: { path: 'photo' } }
+//             ]
+//         })
+//         .sort({ 'dateOrdered': -1 });
+//             if (!orderList) {
+//                 return res.status(500).json({ success: false, message: 'Failed to retrieve orders' });
+//             }
+
+//         // Filter orders where at least one order item has a review
+//         const ordersWithReviews = await Promise.all(orderList.map(async order => {
+//                         const orderItemsWithReviews = await Promise.all(order.orderItems.map(async orderItem => {
+//                             const reviewCount = await Review.countDocuments({ orderItem: orderItem._id });
+//                             return reviewCount > 0;
+//                         }));
+//                         return orderItemsWithReviews.some(reviewExist => reviewExist);
+//                     }));
+            
+//                     const filteredOrders = orderList.filter((order, index) => ordersWithReviews[index]);
+            
+//         res.status(200).json(filteredOrders);
+
+//     } catch (error) {
+//         console.error('Error fetching orders:', error);
+//         res.status(500).json({ success: false, message: 'Internal server error' });
+//     }
+// });
+
+router.get('/filtered', async (req, res) => {
+    try {
+        // Find orders with populated user field and orderItems with their related photocards
+        const orderList = await Order.find()
+            .populate('user', 'name')
+            .populate({
+                path: 'orderItems',
+                populate: [
+                    { path: 'photocard', populate: { path: 'material' } },
+                    { path: 'photocard', populate: { path: 'photo' } }
+                ]
+            })
+            .sort({ 'dateOrdered': -1 });
+
+        if (!orderList) {
+            return res.status(500).json({ success: false, message: 'Failed to retrieve orders' });
+        }
+
+        // Fetch reviews for each order item
+        for (const order of orderList) {
+            for (const orderItem of order.orderItems) {
+                orderItem.reviews = await Review.find({ orderItem: orderItem._id });
+            }
+        }
+
+        // Filter orders where at least one order item has a review
+        const ordersWithReviews = orderList.filter(order =>
+            order.orderItems.some(orderItem => orderItem.reviews.length > 0)
+        );
+
+        // Extract and return only the relevant data for the response
+        const responseOrders = ordersWithReviews.map(order => {
+            return {
+                _id: order._id,
+                user: order.user,
+                orderItems: order.orderItems.map(orderItem => {
+                    return {
+                        _id: orderItem._id,
+                        quantity: orderItem.quantity,
+                        photocard: orderItem.photocard,
+                        reviews: orderItem.reviews
+                    };
+                }),
+                street: order.street,
+                barangay: order.barangay,
+                city: order.city,
+                zip: order.zip,
+                country: order.country,
+                phone: order.phone,
+                status: order.status,
+                totalPrice: order.totalPrice,
+                dateOrdered: order.dateOrdered
+            };
+        });
+
+        res.status(200).json(responseOrders);
+
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+
+
 router.get('/:id', async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
@@ -468,11 +599,11 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/status/:id', async (req, res) => {
     const order = await Order.findByIdAndUpdate(
         req.params.id,
         {
-            status: req.body.status
+            status: 'Delivered'
         },
         { new: true }
     )

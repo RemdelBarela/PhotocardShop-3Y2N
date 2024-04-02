@@ -1,13 +1,19 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const StarRating = ({ rating, onChangeRating }) => {
+const StarRating = ({ rating, disabled }) => {
   const [selectedRating, setSelectedRating] = useState(rating);
 
+  // Update selectedRating when rating changes
+  useEffect(() => {
+    setSelectedRating(rating);
+  }, [rating]);
+
   const handleRatingPress = (newRating) => {
-    setSelectedRating(newRating);
-    onChangeRating(newRating);
+    if (!disabled) {
+      setSelectedRating(newRating);
+    }
   };
 
   return (
@@ -17,6 +23,7 @@ const StarRating = ({ rating, onChangeRating }) => {
           key={index}
           onPress={() => handleRatingPress(index)}
           style={styles.starButton}
+          disabled={disabled} // Disable TouchableOpacity if component is disabled
         >
           <Icon
             name={selectedRating >= index ? "star" : "star-o"}

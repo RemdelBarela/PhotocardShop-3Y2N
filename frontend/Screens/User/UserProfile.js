@@ -58,6 +58,11 @@ const UserProfile = (props) => {
         logoutUser(context.dispatch);
     };
 
+    const handleOrders = () => {
+        navigation.navigate("Transaction"); // Navigate to the Pending screen
+    };
+
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.userInfoContainer}>
@@ -73,6 +78,12 @@ const UserProfile = (props) => {
                 <Text style={styles.userInfoText}>
                     Phone: {userProfile ? userProfile.phone : ""}
                 </Text>
+                <Button
+                    title="Sign Out"
+                    onPress={handleSignOut}
+                    color="black"
+                    style={styles.signOut}
+                />
             </View>
             <View style={styles.buttonContainer}>
                 <Button
@@ -81,9 +92,9 @@ const UserProfile = (props) => {
                     color="#888"
                 />
                 <Button
-                    title="Sign Out"
-                    onPress={handleSignOut}
-                    color="black"
+                    title="ORDERS"
+                    onPress={handleOrders}
+                    color="#888"
                 />
             </View>
         </ScrollView>
@@ -147,6 +158,9 @@ const styles = StyleSheet.create({
         color: "#555",
         textAlign: "center",
     },
+    signOut: {
+        marginTop: 20,
+    }
 })
 
 export default UserProfile;

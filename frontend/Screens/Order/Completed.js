@@ -7,7 +7,7 @@ import axios from "axios"
 import baseURL from "../../assets/common/baseurl"
 import AuthGlobal from "../../Context/Store/AuthGlobal"
 
-const Pending = (props) => {
+const Completed = (props) => {
     const context = useContext(AuthGlobal)
     const [orders, setOrders] = useState([])
     const navigation = useNavigation()
@@ -38,7 +38,7 @@ const Pending = (props) => {
                         (order) =>
                             order.user ? (order.user._id === context.stateUser.user.userId) : false
                     );
-                    const pendingOrders = userOrders.filter(order => order.status === "Pending");
+                    const pendingOrders = userOrders.filter(order => order.status === "Delivered");
                     setOrders(pendingOrders);
                     console.log('O:', orders)
                 })
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
       },
 })
 
-export default Pending;
+export default Completed;

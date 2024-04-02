@@ -11,8 +11,16 @@ import axios from "axios";
 import baseURL from "../../assets/common/baseurl";
 import { useNavigation } from '@react-navigation/native'
 
+const codes = [
+  { name: "pending", code: "3" },
+  { name: "shipped", code: "2" },
+  { name: "delivered", code: "1" },
+];
 
 const OrderCard = ({ item, select }) => {
+  const [orderStatus, setOrderStatus] = useState();
+  const [statusText, setStatusText] = useState('');
+  const [statusChange, setStatusChange] = useState('');
   const [token, setToken] = useState('');
   const [cardColor, setCardColor] = useState('');
   const navigation = useNavigation()
@@ -96,14 +104,52 @@ const OrderCard = ({ item, select }) => {
       <View style={styles.orderInfo}>
         <Text style={styles.orderNumber}>Order Number:</Text>
         <Text style={styles.orderNumberValue}>#{item.id}</Text>
-        <Text>Phone Number: {item.phone}</Text>
-        <Text>Address: {item.street} {item.barangay}, {item.city}, {item.country} {item.zip}</Text>
+        <Text>
+          Status: {statusText} {orderStatus}
+        </Text>
+        <Text>
+          Address: {item.shippingAddress1} or {item.shippingAddress2}
+        </Text>
+        <Text>City: {item.city}</Text>
+        <Text>Country: {item.country}</Text>
         <Text>Date Ordered: {item.dateOrdered.split("T")[0]}</Text>
         <View style={styles.priceContainer}>
           <Text>Price: </Text>
           <Text style={styles.price}>₱<Text style={{ textDecorationLine: 'underline' }}>{item.totalPrice}</Text></Text>
         </View>
       </View>
+      {!select &&
+        <View style={styles.buttonContainer}>
+          <Select
+            width="80%"
+            iosIcon={<Icon name="arrow-down" color={"#007aff"} />}
+            style={{ width: undefined }}
+            selectedValue={statusChange}
+            color="black"
+            placeholder="Change Status"
+            placeholderTextColor="black"
+            placeholderStyle={{ color: '#FFFFFF' }}
+            placeholderIconColor="#007aff"
+            onValueChange={(e) => setStatusChange(e)}
+          >
+            {codes.map((c) => (
+              <Select.Item
+                key={c.code}
+                label={c.name}
+                value={c.code}
+              />
+            ))}
+          </Select>
+          <EasyButton
+            secondary
+            large
+            style={styles.updateButton} // Changed to gray
+            onPress={updateOrder}
+          >
+            <Text style={styles.buttonText}>Update</Text>
+          </EasyButton>
+        </View>
+      }
       <View style={styles.buttonContainer}>
         <EasyButton
           secondary

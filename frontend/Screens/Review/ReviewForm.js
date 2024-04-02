@@ -5,15 +5,12 @@ import {
     Image,
     StyleSheet,
     TouchableOpacity,
-    Modal,
     ScrollView,
     Dimensions,
 } from "react-native";
 import Carousel from 'react-native-snap-carousel';
 import { DataTable } from "react-native-paper";
-import FormContainer from "../../Shared/Form/FormContainer";
 import Input from "../../Shared/Form/Input";
-import EasyButton from "../../Shared/StyledComponents/EasyButton";
 import StarRating from "../../Shared/StarRating";
 
 import baseURL from "../../assets/common/baseurl";
@@ -23,7 +20,6 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,10 +29,10 @@ const ReviewForm = () => {
     const [rating, setRating] = useState('');
     const [error, setError] = useState('');
     const [order, setOrder] = useState(null);
+    const [hasReviews, setHasReviews] = useState([]);
+
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState();
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
 
     let navigation = useNavigation();
     let route = useRoute();
@@ -45,22 +41,11 @@ const ReviewForm = () => {
         fetchOrderDetails();
     }, []);
 
-    // const fetchOrderDetails = async () => {
-    //     try {
-    //         const response = await axios.get(`${baseURL}orders/${route.params.orderId}`);
-    //         setOrder(response.data.order);
-    //         setLoading(false);
-    //     } catch (error) {
-    //         console.error("Error fetching order details:", error);
-    //         setError('Error fetching order details');
-    //         setLoading(false);
-    //     }
-    // };
-
     const fetchOrderDetails = async () => {
         try {
             const response = await axios.get(`${baseURL}orders/${route.params.orderId}`);
             setOrder(response.data.order);
+            setHasReviews(response.data.hasReviews); // Set hasReviews array
             setLoading(false);
         } catch (error) {
             console.error("Error fetching order details:", error);
@@ -68,22 +53,6 @@ const ReviewForm = () => {
             setLoading(false);
         }
     };
-
-    const toggleModal = (orderItem) => {
-        
-        console.log('orderItem: ', orderItem)
-        setIsModalVisible(!isModalVisible);
-        axios.get(`${baseURL}reviews/order-item/${orderItem}`)
-            .then((res) => {
-                setSelectedItem(res.data)
-                console.log('Additional details for selected orderItem:', res.data);
-            })
-            .catch((error) => {
-                console.log('Error fetching additional details for selected orderItem:', error);
-            });
-    };
-
-    
 
     const addReview = (orderItemID) => {
 
@@ -129,7 +98,7 @@ const ReviewForm = () => {
                     text2: ""
                 });
                 setTimeout(() => {
-                    navigation.navigate("User Profile");
+                    navigation.navigate("Review Form");
                     console.log('Navigation complete');
                 }, 500);
             } else {
@@ -164,140 +133,116 @@ const ReviewForm = () => {
     }
 
     return (
-        <FormContainer title="REVIEW">
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <View style={styles.orderSummary}>
-                    <Text style={styles.heading}>ORDER SUMMARY</Text>
-                    <Text style={styles.summaryText}>Order ID: {order._id}</Text>
-                    <Text style={styles.summaryText}>Total Price: ₱{order.totalPrice.toFixed(2)}</Text>
-                </View>
-                {order.orderItems.map((item, index) => (
-                    <View key={index} style={styles.itemContainer}>
-                        <View style={styles.itemBox}>
-                            <View style={styles.productInfo}>
-                                <Text style={styles.heading}>{item.photocard.photo.name}</Text>
-                                <DataTable>
-                                    <DataTable.Header>
-                                        <DataTable.Title>Material</DataTable.Title>
-                                        <DataTable.Title>Quantity</DataTable.Title>
+            <View style={styles.container}>
+            <ScrollView>
+                <View>
+                    <Text style={styles.heading}>ORDER ID: {order._id}</Text>
+                    {order.orderItems.map((orderItem, index) => (
+                        <View key={index} style={styles.itemContainer}>
+                            <View>
+                                <Text style={styles.orderItemHeading}>ORDER ITEM: {orderItem._id}</Text>
+                                <Carousel
+                                    data={orderItem.photocard.photo.image}
+                                    renderItem={({ item }) => (
+                                        <Image
+                                            source={{ uri: item }}
+                                            resizeMode="contain"
+                                            style={styles.image}
+                                        />
+                                    )}
+                                    sliderWidth={width}
+                                    itemWidth={width * 0.8}
+                                    loop={true}
+                                    autoplay={true}
+                                    autoplayInterval={5000}
+                                />
+                                <DataTable style={styles.dataTableContainer}>
+                                    <DataTable.Header  style={styles.tableHeader}>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHOTO</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>MATERIAL</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>QUANTITY</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
                                     </DataTable.Header>
                                     <DataTable.Row>
-                                        <DataTable.Cell>{item.photocard.material.name}</DataTable.Cell>
-                                        <DataTable.Cell>{item.quantity}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{orderItem.photocard.photo.name}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{orderItem.photocard.material.name}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{orderItem.quantity}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{orderItem.photocard.material.price}</DataTable.Cell>
                                     </DataTable.Row>
                                 </DataTable>
+                                {!hasReviews[index] && ( // Conditionally render if the order item doesn't have a review
+                                    <View style={styles.reviewContainer}>
+                                        <Input
+                                            placeholder="Enter your comment"
+                                            value={comment}
+                                            onChangeText={text => setComment(text)}
+                                            style={{ color: 'black', borderColor: 'black', borderWidth: 1 }}
+                                            />
+                                        <View style={styles.ratingContainer}>
+                                            <Text style={styles.ratingLabel}>RATING:</Text>
+                                            <StarRating
+                                                maxStars={5}
+                                                rating={parseInt(rating) || 0}
+                                                onChangeRating={newRating => setRating(newRating.toString())}
+                                            />
+                                        </View>
+                                        <TouchableOpacity
+                                            onPress={() => addReview(orderItem._id, index)} // Pass index as argument
+                                            style={[styles.orderStatus, { backgroundColor: 'black' }]}
+                                        >
+                                            <Text style={{ color: 'white', textAlign: 'center', fontSize: 20 }}>ADD REVIEW</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
                             </View>
-                            {/* <TouchableOpacity onPress={() => toggleModal(item._id)}>
-                                <Text style={styles.heading}>MAKE REVIEW</Text>
-                            </TouchableOpacity> */}
-                            <TouchableOpacity onPress={() => toggleModal(item._id)}>
-                                <Text style={styles.heading}>
-                                    {item.hasReview ? "UPDATE REVIEW" : "MAKE REVIEW"}
-                                </Text>
-                            </TouchableOpacity>
                         </View>
-                    </View>
-                ))}
-                {selectedItem && (
-                <Modal
-                    visible={isModalVisible}
-                    animationType="slide"
-                    onRequestClose={() => setIsModalVisible(false)}
-                >
-                <BlurView
-                    style={styles.blur}
-                    tint="dark"
-                    intensity={50}
-                >
-                    <View style={styles.modalContainer}>
-                        <Text style={styles.heading}>MAKE REVIEW</Text>
-                        <Carousel
-                            data={selectedItem.photocard.photo.image}
-                            renderItem={({ item }) => (
-                                <Image
-                                    source={{ uri: item }}
-                                    resizeMode="contain"
-                                    style={styles.image}
-                                />
-                            )}
-                            sliderWidth={width}
-                            itemWidth={width * 0.8}
-                            loop={true}
-                            autoplay={true}
-                            autoplayInterval={5000}
-                        />
-                        <View style={styles.orderSummary}>
-                            <Text style={styles.heading}>{selectedItem.photocard.photo.name}</Text>
-                            <Text style={styles.summaryText}>MATERIAL: {selectedItem.photocard.material.name}</Text>
-                        </View>
-                        <Input
-                            placeholder="Enter your comment"
-                            value={comment}
-                            onChangeText={text => setComment(text)} // Update the comment state here
-                            style={{ color: 'black' }}
-                        />
-                        
-                        <View style={styles.ratingContainer}>
-                            <Text style={styles.ratingLabel}>Rating:</Text>
-                            <StarRating
-                                maxStars={5}
-                                rating={parseInt(rating) || 0}
-                                onChangeRating={newRating => setRating(newRating.toString())}
-                            />
-                        </View>
-                        <EasyButton
-                            large
-                            secondary
-                            primary={false}
-                            style={styles.blackButton}
-                            onPress={() => addReview(selectedItem?._id)}
-                        >
-                            <Text style={styles.buttonText}>CONFIRM</Text>
-                        </EasyButton>
-                    </View>
-                </BlurView>
-                </Modal>
-                )}
-                {error ? <Error message={error} /> : null}
-            </ScrollView>
-        </FormContainer>
+                    ))}
+                    {error ? <Error message={error} /> : null}
+                </View>
+            </ScrollView>      
+            </View> 
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        marginBottom: 5,
     },
-    scrollViewContent: {
-        flexGrow: 1,
-        paddingBottom: 100,
+
+    heading: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        marginTop: 30,
+
+        backgroundColor: 'gainsboro',
+        textAlign: 'center',
+        padding: 20
     },
-    orderSummary: {
-        marginBottom: 20,
-        marginTop: 10,
-    },
+
     itemContainer: {
-        marginBottom: 30,
+        padding: 20,
+        marginTop: 20,
+        marginLeft: 10,
+        marginRight: 10,
+        marginBottom: 10,
+        borderRadius: 10,
+        backgroundColor: 'gainsboro',
     },
+
     itemBox: {
         borderWidth: 1,
         borderColor: "#ddd",
         borderRadius: 10,
         padding: 10,
     },
-    heading: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 10,
-        textTransform: 'uppercase'
-    },
     summaryText: {
         fontSize: 16,
         marginBottom: 5,
     },
-    productInfo: {
-        marginBottom: 20,
+    reviewContainer: {
+        marginTop: 15,
     },
     reviewSection: {
         marginBottom: 20,
@@ -305,6 +250,7 @@ const styles = StyleSheet.create({
     ratingContainer: {
         flexDirection: "row",
         alignItems: "center",
+        marginBottom: 15
     },
     ratingLabel: {
         marginRight: 10,
@@ -315,25 +261,41 @@ const styles = StyleSheet.create({
         height: 100,
         marginRight: 5,
     },
-    modalContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        padding: 20,
-        width: Dimensions.get('window').width - 40,
-        maxHeight: Dimensions.get('window').height - 100, // Adjust height as needed
-        borderRadius: 10,
-        alignSelf: 'center',
+    
+    orderStatus: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        padding: 20
     },
-    blur: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
+
+    orderItemHeading: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'left',
+        marginBottom: 20
     },
     image: {
         aspectRatio: 5.5 / 8.5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 400,
+        padding: 10,
+        backgroundColor: 'lightgray',
+        borderWidth: 1,
+        borderRadius: 20,
+        marginLeft: 10
     },
-    
+
+    tableHeader: {
+        backgroundColor: 'black',
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        height: 45,
+        marginTop: 20
+    },
 });
 
 export default ReviewForm;
