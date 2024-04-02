@@ -186,22 +186,6 @@ const Pending = (props) => {
                 });
             });
     };
-
-
-    const loadOrdersData = () => {
-        axios
-            .get(`${baseURL}orders/filtered`)
-            .then(response => {
-                const filteredOrders = response.data;
-                const userOrders = filteredOrders.filter(order => order.user ? order.user._id === context.stateUser.user.userId : false);
-                setOrders(userOrders);
-                console.log('Filtered orders:', userOrders);
-            })
-            .catch(error => {
-                console.error('Error fetching filtered orders:', error);
-            });
-    };
-
     const toggleUpdate = (orderItemID) => {
         // Toggle the review update section for the selected order item
         setShowReviewUpdate(prevState => ({
@@ -279,19 +263,12 @@ const Pending = (props) => {
                                     </TouchableOpacity>
                                     {showReviewUpdate[orderItem._id] && (
                                         <View style={styles.input}>
-                                          <Input
-    style={{ color: 'black' }}
-    placeholder="Enter your comment"
-    value={comment === '' ? orderItem.reviews[0].comment : comment}
-    onChangeText={value => {
-        if (value.length > 0) {
-            setComment(value);
-        } else {   placeholder="Enter your comment"
-            setComment(" "); // Keep it as an empty string only if the length is empty
-        }
-    }}
-/>
-
+                                            <Input
+                                                style={{ color: 'black' }}
+                                                placeholder="Enter your comment"
+                                                value={orderItem.reviews[0].comment}
+                                                onChangeText={value => setComment(value)}
+                                            />
                                             <View style={styles.ratingContainer}>
                                                 <Text style={styles.ratingLabel}>RATING:</Text>
                                                 <StarRating
@@ -332,91 +309,76 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     noOrderContainer: {
-        alignItems: "center",
-        marginTop: 20
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     noOrderText: {
-        fontSize: 30,
-        color: "#555",
-        textAlign: "center",
+        fontSize: 20,
+        fontWeight: 'bold'
     },
     listContainer: {
-        marginBottom: 30,
-        borderRadius: 10,
-        backgroundColor: 'gainsboro',
-    },
-    orderInfo: {
-        marginBottom: 10,
+        marginTop: 10,
+        marginBottom: 20,
+        borderWidth: 2,
+        borderColor: '#dcdcdc',
+        borderRadius: 5,
         padding: 10
     },
-    orderStatus: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: 20
+    orderInfo: {
+        marginBottom: 10
     },
     orderNumber: {
-        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 10,
-        backgroundColor: 'white',
-        textAlign: 'center',
-        padding: 20
-    },
-    reviewLabel: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'left',
-        marginTop: 20,
-    },
-    commentLabel: {
-        fontSize: 15,
-        fontWeight: 'italic',
-        textAlign: 'left',
-        marginLeft: 5,
-        marginTop: 10,
-
+        fontSize: 18,
+        marginBottom: 5
     },
     itemContainer: {
-        marginBottom: 20,
-        padding: 10,
-        backgroundColor: 'white',
+        marginVertical: 10
     },
     orderItemHeading: {
-        fontSize: 20,
         fontWeight: 'bold',
-        textAlign: 'left',
-        marginBottom: 20
+        fontSize: 16,
+        marginBottom: 5
     },
     image: {
-        aspectRatio: 5.5 / 8.5,
-        height: 400,
-        padding: 10,
-        backgroundColor: 'lightgray',
-        borderWidth: 1,
-        borderRadius: 20,
-        marginLeft: 10
+        width: '100%',
+        height: 200,
+        marginBottom: 10
+    },
+    dataTableContainer: {
+        marginBottom: 10
     },
     tableHeader: {
-        marginTop: 20,
-        backgroundColor: 'black',
-        borderTopWidth: 1,
-        borderTopColor: '#ddd',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-        height: 45,
+        backgroundColor: 'black'
+    },
+    reviewLabel: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginTop: 10,
+        marginBottom: 5
+    },
+    commentLabel: {
+        marginBottom: 10
     },
     ratingContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 15,
-        marginTop: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10
+    },
+    ratingLabel: {
+        marginRight: 10,
+        fontWeight: 'bold',
+        fontSize: 16
+    },
+    orderStatus: {
+        paddingVertical: 10,
+        borderRadius: 5,
+        marginTop: 10
     },
     input: {
-        width: '100%',
-        marginBottom: 15,
-        marginTop: 15,
-    },
+        marginTop: 10
+    }
 });
 
 export default Pending;

@@ -23,7 +23,7 @@ const Confirm = (props) => {
     let navigation = useNavigation()
 
     const confirmOrder = () => {
-        const order = finalOrder.order.order;
+        const order = finalOrder.order;
 
         AsyncStorage.getItem("jwt")
             .then((res) => {

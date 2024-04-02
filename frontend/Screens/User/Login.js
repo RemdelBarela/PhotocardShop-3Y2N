@@ -1,6 +1,6 @@
 import Input from "../../Shared/Form/Input";
 import React, { useState, useContext, useEffect } from "react";
-import { View, Text, StyleSheet, KeyboardAvoidingView ,Switch, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, KeyboardAvoidingView, Switch, Dimensions } from 'react-native'
 import FormContainer from "../../Shared/Form/FormContainer";
 import Error from '../../Shared/Error'
 import { Button } from "native-base";
@@ -13,7 +13,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 const Login = (props) => {
     const [mode, setMode] = useState('login');
-   
+
     const context = useContext(AuthGlobal)
     const navigation = useNavigation()
     const [email, setEmail] = useState('')
@@ -33,7 +33,7 @@ const Login = (props) => {
         };
 
         if (email === "" || password === "") {
-            setError("Please fill in your credentials");
+            setError("INCORRECT PASSWORD OR EMAIL");
         } else {
             loginUser(user, context.dispatch);
             console.log("error")
@@ -55,50 +55,50 @@ const Login = (props) => {
 
     return (
         <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : null}
-        style={styles.container}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -500}
-    >
+            behavior={Platform.OS === "ios" ? "padding" : null}
+            style={styles.container}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : -500}
+        >
             <View style={styles.app}>
                 <View style={styles.formBlockWrapper} />
                 <View style={[styles.formBlock, mode === 'register' ? styles.isSignup : styles.isLogin]}>
                     <View style={styles.formBlockHeader}>
-                             <Input
-                                placeholder={"Enter Email"}
-                                name={"email"}
-                                id={"email"}
-                                value={email}
-                                onChangeText={(text) => setEmail(text.toLowerCase())}
-                            />
-                            <Input
-                                placeholder={"Enter Password"}
-                                name={"password"}
-                                id={"password"}
-                                secureTextEntry={true}
-                                value={password}
-                                onChangeText={(text) => setPassword(text)}
-                            /> 
-                        
-                             <EasyButton x-l primary onPress={() =>  handleSubmit()}  style={{ backgroundColor: '#3E424B' }}>
+                        <Input
+                            placeholder={"Enter Email"}
+                            name={"email"}
+                            id={"email"}
+                            value={email}
+                            onChangeText={(text) => setEmail(text.toLowerCase())}
+                        />
+                        <Input
+                            placeholder={"Enter Password"}
+                            name={"password"}
+                            id={"password"}
+                            secureTextEntry={true}
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
+                        />
+
+                        <EasyButton x-l primary onPress={() => handleSubmit()} style={{ backgroundColor: 'black' }}>
                             <Text style={{ color: 'white' }}>LOGIN</Text>
                         </EasyButton>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10,marginLeft : -10 }}>
-    <Text>Do not have an account? Register here</Text>
-    <Switch
-        trackColor={{ false: "#767577", true: "#81b0ff" }}
-        thumbColor={mode === 'register' ? "#f5dd4b" : "#f4f3f4"}
-        ios_backgroundColor="#3e3e3e"
-        onValueChange={toggleMode}
-        value={mode === 'register'}
-    />
-</View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, marginLeft: -10 }}>
+                            <Text>Do not have an account? Register here </Text>
+                            <Switch
+                                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                                thumbColor={mode === 'register' ? "#f5dd4b" : "#f4f3f4"}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleMode}
+                                value={mode === 'register'}
+                            />
+                        </View>
 
 
                     </View>
                 </View>
             </View>
-        
-            </KeyboardAvoidingView>
+
+        </KeyboardAvoidingView>
     )
 }
 

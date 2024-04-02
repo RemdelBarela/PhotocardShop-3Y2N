@@ -54,8 +54,9 @@ const UserProfile = (props) => {
     };
 
     const handleSignOut = () => {
-        AsyncStorage.removeItem("jwt");
-        logoutUser(context.dispatch);
+        AsyncStorage.removeItem("jwt").then(() => {
+            logoutUser(context.dispatch);
+        });
     };
 
     const handleOrders = () => {

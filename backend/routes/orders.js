@@ -800,7 +800,7 @@ router.put('/status/:id', async (req, res) => {
         req.params.id,
         {
             status: 'Delivered',
-            dateOrdered: Date.now() // Corrected to call Date.now() as a function
+            dateOrdered: Date.now()
         },
         { new: true }
     )

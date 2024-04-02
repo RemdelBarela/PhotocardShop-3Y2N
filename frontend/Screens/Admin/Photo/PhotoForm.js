@@ -61,11 +61,6 @@ const PhotoForm = (props) => {
             quality: 1,
         });
 
-        // if (!result.canceled) {
-        //     const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
-        //     setImages([...images, ...selectedImages]);
-        // }
-
         if (!result.canceled) {
             const selectedImages = result.assets.map((asset) => ({ id: images.length, uri: asset.uri }));
             const filteredImages = images.filter(image => image.uri !== undefined); // Filter out images with undefined uri

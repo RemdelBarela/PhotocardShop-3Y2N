@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, Dimensions, ScrollView, Button } from "react-native";
-import { Text, HStack, VStack, Avatar, Spacer, Center } from "native-base";
-
+import { View, StyleSheet, Dimensions, ScrollView, Button, Image } from "react-native";
+import { Text } from "native-base";
+import Carousel from 'react-native-snap-carousel';
+import { DataTable } from "react-native-paper";
 import { clearCart } from "../../../Redux/Actions/cartActions";
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Toast from "react-native-toast-message";
@@ -56,6 +57,7 @@ const Confirm = (props) => {
                 }
             })
             .catch((error) => {
+                console.log(error)
                 Toast.show({
                     topOffset: 60,
                     type: "error",
@@ -65,72 +67,71 @@ const Confirm = (props) => {
             });
     }
     return (
-        <ScrollView style={styles.container}>
-            <View style={[styles.listContainer]}>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>CONFIRM ORDER</Text>
-                {props.route.params ? (
-                    <View style={{ borderWidth: 1, borderColor: "orange" }}>
-                        <View style={styles.orderInfo}>
-                            <Text style={styles.orderNumber}>ORDER NUMBER: #{order._id}</Text>
-                            <Text>PHONE NUMBER: {finalOrder.order.order.phone}</Text>
-                            <Text>ADDRESS: {finalOrder.order.order.street} {finalOrder.order.order.barangay}, {finalOrder.order.order.city}, {finalOrder.order.order.country} {finalOrder.order.order.zip}</Text>
-                            <Text>DATE ORDERED: {finalOrder.order.order.dateOrdered.split("T")[0]}</Text>
-                        </View>
-                        <Text style={styles.orderItemHeading}>ORDER ITEMS:</Text>
 
-                        {finalOrder.order.order.orderItems.map((item) => {
-                             const photoImage = item.newData.photo.image;
-                             const photoName = item.newData.photo.name;
-                             const materialName = item.newData.material.name;
-                             const materialPrice = item.newData.material.price;
-                            return (
-                                <View key={item._id} style={styles.itemContainer}>
-                                    <Carousel
-                                        data={photoImage}
-                                        renderItem={({ item }) => (
-                                            <Image
-                                                source={{ uri: photoImage }}
-                                                resizeMode="contain"
-                                                style={styles.image}
-                                            />
-                                        )}
-                                        sliderWidth={width}
-                                        itemWidth={width * 0.8}
-                                        loop={true}
-                                        autoplay={true}
-                                        autoplayInterval={5000}
-                                    />
-                                    <DataTable style={styles.dataTableContainer}>
-                                        <DataTable.Header style={styles.tableHeader}>
-                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHOTO</Text></DataTable.Title>
-                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>MATERIAL</Text></DataTable.Title>
-                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>QUANTITY</Text></DataTable.Title>
-                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
-                                        </DataTable.Header>
-                                        <DataTable.Row>
-                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{photoName}</DataTable.Cell>
-                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialName}</DataTable.Cell>
-                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{quantity}</DataTable.Cell>
-                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialPrice}</DataTable.Cell>
-                                        </DataTable.Row>
-                                    </DataTable>
-                                    <View style={styles.priceContainer}>
-                                                <Text style={styles.price}>₱ {order.totalPrice}</Text>
-                                            </View>
-                                </View>
-                                    )
-                            })}     
-                            )
-                        </View>
-                ) : null}
-                <View style={{ alignItems: "center", margin: 20 }}>
-                    <Button
-                        title={"Place order"}
-                        onPress={confirmOrder}
-                    />
+        <ScrollView style={styles.container}>
+        <View>
+            {props.route.params ? (
+                <View style={{ borderWidth: 1, borderColor: "black" }}>
+                    <View style={styles.orderInfo}>
+                        <Text>PHONE NUMBER: {finalOrder.order.order.phone}</Text>
+                        <Text>ADDRESS: {finalOrder.order.order.street} {finalOrder.order.order.barangay}, {finalOrder.order.order.city}, {finalOrder.order.order.country} {finalOrder.order.order.zip}</Text>
+                    </View>
+                    <Text style={styles.orderItemHeading}>ORDER ITEMS:</Text>
+    
+                    {finalOrder.order.order.orderItems.map((item, index) => {
+                        console.log(item)
+                        const photoImage = item.newData.photo.image;
+                        const photoName = item.newData.photo.name;
+                        const materialName = item.newData.material.name;
+                        const materialPrice = item.newData.material.price;
+                        const quantityNum = item.quantity;
+    
+                        return (
+                            <View key={index} style={styles.itemContainer}>
+                                <Carousel
+                                    data={photoImage}
+                                    renderItem={({ item }) => (
+                                        <Image
+                                            source={{ uri: item }}
+                                            resizeMode="contain"
+                                            style={styles.image}
+                                        />
+                                    )}
+                                    sliderWidth={width}
+                                    itemWidth={width * 0.8}
+                                    loop={true}
+                                    autoplay={true}
+                                    autoplayInterval={5000}
+                                />
+                                <DataTable style={styles.dataTableContainer}>
+                                    <DataTable.Header style={styles.tableHeader}>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHOTO</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>MATERIAL</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>QUANTITY</Text></DataTable.Title>
+                                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
+                                    </DataTable.Header>
+                                    <DataTable.Row>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{photoName}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialName}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{quantityNum}</DataTable.Cell>
+                                        <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialPrice}</DataTable.Cell>
+                                    </DataTable.Row>
+                                </DataTable>
+                            </View>
+                        )
+                    })}
                 </View>
+            ) : null}
+            <View style={{ alignItems: "center", margin: 20 }}>
+                <Button
+                    title={"Place order"}
+                    onPress={confirmOrder}
+                />
             </View>
-        </ScrollView>
+        </View>
+    </ScrollView>
+    
+
     )
 
 }
@@ -181,6 +182,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignSelf: "flex-end",
         flexDirection: "row",
-      },
+    },
 });
 export default Confirm;
