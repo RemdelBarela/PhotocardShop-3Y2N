@@ -1,19 +1,125 @@
 const express = require('express');
 const { Review } = require('../models/review');
 const { OrderItem } = require('../models/order-item');
+const { Order } = require('../models/order');
+
 
 const router = express.Router();
 const mongoose = require('mongoose');
 
-router.get(`/`, async (req, res) =>{
-           
-    const reviewList = await Review.find();
+// router.get(`/`, async (req, res) =>{
+                     
+//     const reviewList = await Review.find()
+//     .populate({
+//         path: 'orderItem', 
+//         populate: {
+//             path: 'photocard',
+//             populate: {
+//                 path: 'photo',
+//                 model: 'Photo'
+//             }
+//         }
+//     })
 
-    if(!reviewList) {
-        res.status(500).json({success: false})
-    } 
-    res.send(reviewList);
-})
+//     const orderItemIds = reviewList.map(review => review.orderItem);
+    
+//     console.log(orderItemIds)
+//     const orders = await Order.find({ _id: { $in: orderItemIds } });
+
+//     if(!reviewList) {
+//         res.status(500).json({success: false})
+//     } 
+//     res.send(orders);
+// })
+
+// router.get(`/`, async (req, res) => {
+//     try {
+//         // Fetch all Review documents with populated orderItem
+//         const reviewList = await Review.find()
+//             .populate({
+//                 path: 'orderItem',
+//                 populate: {
+//                     path: 'photocard',
+//                     populate: {
+//                         path: 'photo',
+//                         model: 'Photo'
+//                     }
+//                 }
+//             });
+
+//         // Extract all orderItem IDs from reviewList
+//         const orderItemIds = reviewList.reduce((acc, review) => {
+//             if (Array.isArray(review.orderItem)) {
+//                 acc.push(...review.orderItem.map(item => item._id));
+//             } else {
+//                 acc.push(review.orderItem._id);
+//             }
+//             return acc;
+//         }, []);
+
+//         console.log(orderItemIds)
+
+//         // Find Orders where at least one orderItem._id matches the orderItemIds
+//         const orders = await Order.find({ 'orderItems._id': { $in: orderItemIds } });
+
+//         res.status(200).json({ success: true, data: orders });
+//     } catch (error) {
+//         console.error("Error fetching orders:", error);
+//         res.status(500).json({ success: false, error: "Internal server error" });
+//     }
+// });
+
+
+// router.get(`/`, async (req, res) => {
+//     try {
+//         // Fetch all Review documents
+//         const reviewList = await Review.find()
+
+//         const orderItemIds = reviewList.flatMap(review => review.orderItem);
+
+//         const orders = await Order.find({ 'orderItems': { $in: orderItemIds } });
+
+//         res.status(200).json({ success: true, data: orders });
+//     } catch (error) {
+//         console.error("Error fetching orders:", error);
+//         res.status(500).json({ success: false, error: "Internal server error" });
+//     }
+// });
+
+router.get(`/`, async (req, res) => {
+    try {
+        // Fetch all Review documents
+        const reviewList = await Review.find();
+
+        // Extract unique order item IDs from reviewList
+        const orderItemIds = [...new Set(reviewList.flatMap(review => review.orderItem))];
+
+        // Aggregate to find orders containing any of the extracted orderItemIds
+        const orders = await Order.aggregate([
+            {
+                $match: {
+                    "orderItems": { $in: orderItemIds }
+                }
+            },
+            {
+                $lookup: {
+                    from: "reviews",
+                    localField: "orderItems",
+                    foreignField: "orderItem",
+                    as: "reviews"
+                }
+            }
+        ]);
+
+        res.status(200).json({ success: true, data: orders });
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).json({ success: false, error: "Internal server error" });
+    }
+});
+
+
+
 
 router.get(`/select/:id`, async (req, res) =>{
     const review = await Review.findById(req.params.id);

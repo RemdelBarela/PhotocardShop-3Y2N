@@ -40,6 +40,7 @@ const MaterialForm = (props) => {
             const { item } = route.params;
             setName(item.name);
             setPrice(item.price.toString());
+            setCountInStock(item.countInStock);
             setImages(item.image);
             setMaterial(item); // Set the selected material
 ;

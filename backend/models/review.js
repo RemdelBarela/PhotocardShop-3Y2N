@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const reviewSchema = mongoose.Schema({
     orderItem: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'orderItem',
+        ref: 'OrderItem',
         required:true
     },
     comment: {
