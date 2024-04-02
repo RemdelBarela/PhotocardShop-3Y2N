@@ -139,23 +139,23 @@ const Photos = (props) => {
 
     return (
         <Box flex={1}>
-               <View style={styles.buttonContainer}>
-     <Searchbar
-        placeholder="Search Photo Name"
-        onChangeText={(text) => searchPhoto(text)}
-        style={{ flex: 1 }} // Allow the search bar to take remaining space
-    /> 
-      <EasyButton
-        secondary
-        medium
-        onPress={() => navigation.navigate("PhotoForm")}
-        style={{ marginRight: 10 ,backgroundColor: 'black'}} // Add some right margin for spacing
-    >
-        <Icon name="plus" size={18} color="white" />
-        <Text style={[styles.buttonText, { color: 'white'   }]}> ADD</Text>
-    </EasyButton>
-  
-</View>
+            <View style={styles.buttonContainer}>
+                <Searchbar
+                    placeholder="Search Photo Name"
+                    onChangeText={(text) => searchPhoto(text)}
+                    style={{ flex: 1 }} // Allow the search bar to take remaining space
+                />
+                <EasyButton
+                    secondary
+                    medium
+                    onPress={() => navigation.navigate("PhotoForm")}
+                    style={{ marginRight: 10, backgroundColor: 'black' }} // Add some right margin for spacing
+                >
+                    <Icon name="plus" size={18} color="white" />
+                    <Text style={[styles.buttonText, { color: 'white' }]}> ADD</Text>
+                </EasyButton>
+
+            </View>
 
             <Modal
                 animationType="fade"
@@ -179,22 +179,22 @@ const Photos = (props) => {
                                 right: 10
                             }}
                         >
-                            <Icon name="close" size={20} />
+                            <Icon name="close" size={50} />
                         </TouchableOpacity>
                         {selectedPhoto && (
                             <>
-                                <Text>{selectedPhoto.name}</Text>
+                                <Text style={styles.header}>{selectedPhoto.name}</Text>
                                 {renderGallery()}
                                 <EasyButton
                                     medium
-                                    secondary
+                                    style={{ backgroundColor: "black" }}
                                     onPress={() => {
                                         navigation.navigate("PhotoForm", { item: selectedPhoto });
                                         setModalVisible(false);
                                     }}
-                                    title="Edit"
+                                    title="EDIT"
                                 >
-                                    <Text style={styles.textStyle}>EDIT</Text>
+                                    <Text style={{ color: "white", letterSpacing: 2 }}>EDIT</Text>
                                 </EasyButton>
                                 <EasyButton
                                     medium
@@ -205,7 +205,7 @@ const Photos = (props) => {
                                     }}
                                     title="Delete"
                                 >
-                                    <Text style={styles.textStyle}>DELETE</Text>
+                                    <Text style={{ color: "white", letterSpacing: 2 }}>DELETE</Text>
                                 </EasyButton>
                             </>
                         )}
@@ -260,33 +260,37 @@ const Photos = (props) => {
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>DESCRIPTION</Text></DataTable.Title>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>VIEW</Text></DataTable.Title>
                     </DataTable.Header>
-                    {photoFilter.map((item, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            onPress={() => handleRowPress(item)}
-                            style={{
-                                backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
-                            }}>
-                            <DataTable.Row>
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
-                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.description}</DataTable.Cell>
-                                                
-    <DataTable.Cell 
-    style={{
-        width: 40,
-        height: 40,
-        marginRight: 10,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 20 // Half of width or height to make it circular
-    }}
->     
-    <Icon name="eye" size={18} color="white" />
-</DataTable.Cell>
-                            </DataTable.Row>
-                        </TouchableOpacity>
-                    ))}
+
+                    <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+
+                        {photoFilter.map((item, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                onPress={() => handleRowPress(item)}
+                                style={{
+                                    backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
+                                }}>
+                                <DataTable.Row>
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.name}</DataTable.Cell>
+                                    <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{item.description}</DataTable.Cell>
+
+                                    <DataTable.Cell
+                                        style={{
+                                            width: 40,
+                                            height: 40,
+                                            marginRight: 10,
+                                            backgroundColor: 'black',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            borderRadius: 20 // Half of width or height to make it circular
+                                        }}
+                                    >
+                                        <Icon name="eye" size={18} color="white" />
+                                    </DataTable.Cell>
+                                </DataTable.Row>
+                            </TouchableOpacity>
+                        ))}
+                        </ScrollView>
                 </DataTable>
             )}
         </Box>
@@ -311,6 +315,11 @@ const styles = StyleSheet.create({
     buttonText: {
         marginLeft: 4,
         color: 'white'
+    },
+    header: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
     },
     modalView: {
         margin: 20,

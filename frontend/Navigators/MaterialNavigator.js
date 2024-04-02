@@ -18,7 +18,10 @@ const MaterialNavigator= () => {
                     headerShown: false // Hide header for the Cart screen
                    }}
             />
-            <Stack.Screen name="MaterialForm" component={MaterialForm} />
+            <Stack.Screen name="MaterialForm"      options={{
+                    tabBarLabel: '', // Hide the name from the tab
+                    headerShown: false // Hide header for the Cart screen
+                   }} component={MaterialForm} />
 
         </Stack.Navigator>
     )
