@@ -37,8 +37,6 @@ const SingleProduct = ({ route }) => {
         }
     };
 
-    
-
     return (
         <Center flexGrow={1}>
             <ScrollView style={styles.container}>

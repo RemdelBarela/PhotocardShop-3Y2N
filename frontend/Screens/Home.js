@@ -20,9 +20,6 @@ import axios from "axios";
 
 import baseURL from "../assets/common/baseurl";
 import EasyButton from "../Shared/StyledComponents/EasyButton";
-
-import { images } from "./Product/constants";
-
 const { width, height } = Dimensions.get("window");
 
 const Home = () => {

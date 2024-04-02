@@ -73,7 +73,7 @@ const SingleOrder = () => {
                     text2: ""
                 });
                 setTimeout(() => {
-                    navigation.navigate("COMPLETED");
+                    navigation.navigate("REVIEW");
                     console.log('Navigation complete');
                 }, 500);
 

@@ -16,7 +16,7 @@ var { width, height } = Dimensions.get("window");
 
 const Confirm = (props) => {
     const [token, setToken] = useState();
-    // const confirm = props.route.params;
+
     const finalOrder = props.route.params;
     console.log("order", finalOrder)
     const dispatch = useDispatch()
@@ -43,7 +43,7 @@ const Confirm = (props) => {
                     Toast.show({
                         topOffset: 60,
                         type: "success",
-                        text1: "Order Completed",
+                        text1: "ORDER COMPLETED",
                         text2: "",
                     });
                     // dispatch(clearCart())
@@ -59,100 +59,128 @@ const Confirm = (props) => {
                 Toast.show({
                     topOffset: 60,
                     type: "error",
-                    text1: "Something went wrong",
-                    text2: "Please try again",
+                    text1: "ERROR!",
+                    text2: "PLEASE TRY AGAIN",
                 });
             });
     }
     return (
-        <Center>
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.titleContainer}>
-                    <Text style={{ fontSize: 20, fontWeight: "bold" }}>Confirm Order</Text>
-                    {props.route.params ? (
-                        <View style={{ borderWidth: 1, borderColor: "orange" }}>
-                            <Text style={styles.title}>Shipping to:</Text>
-                            <View style={{ padding: 8 }}>
-                                <Text>Street: {finalOrder.order.order.street}</Text>
-                                <Text>Barangay: {finalOrder.order.order.barangay}</Text>
-                                <Text>City: {finalOrder.order.order.city}</Text>
-                                <Text>Zip Code: {finalOrder.order.order.zip}</Text>
-                                <Text>Country: {finalOrder.order.order.country}</Text>
-                            </View>
-                            <Text style={styles.title}>items</Text>
-
-                            {finalOrder.order.order.orderItems.map((item) => {
-                                console.log(item)
-                                const photoImage = item.newData.photo.image[0];
-                                const photoName = item.newData.photo.name;
-                                const materialName = item.newData.material.name;
-                                const materialPrice = item.newData.material.price;
-                                return (
-                                    <HStack space={[2, 3]} justifyContent="space-between" key={item.id}>
-                                        <Avatar size="48px" source={{
-                                            uri: photoImage ?
-                                                photoImage : 'https://cdn.pixabay.com/photo/2012/04/01/17/29/box-23649_960_720.png'
-                                        }}
-                                        />
-                                        <VStack>
-                                            <Text _dark={{
-                                                color: "warmGray.50"
-                                            }} color="coolGray.800" bold>
-                                                {photoName}
-                                            </Text>
-
-                                        </VStack>
-                                        <Spacer />
-                                        <Text fontSize="xs" _dark={{
-                                            color: "warmGray.50"
-                                        }} color="coolGray.800" alignSelf="flex-start">
-                                            {materialPrice}
-                                        </Text>
-                                    </HStack>
-                                )
-                            })}
+        <ScrollView style={styles.container}>
+            <View style={[styles.listContainer]}>
+                <Text style={{ fontSize: 20, fontWeight: "bold" }}>CONFIRM ORDER</Text>
+                {props.route.params ? (
+                    <View style={{ borderWidth: 1, borderColor: "orange" }}>
+                        <View style={styles.orderInfo}>
+                            <Text style={styles.orderNumber}>ORDER NUMBER: #{order._id}</Text>
+                            <Text>PHONE NUMBER: {finalOrder.order.order.phone}</Text>
+                            <Text>ADDRESS: {finalOrder.order.order.street} {finalOrder.order.order.barangay}, {finalOrder.order.order.city}, {finalOrder.order.order.country} {finalOrder.order.order.zip}</Text>
+                            <Text>DATE ORDERED: {finalOrder.order.order.dateOrdered.split("T")[0]}</Text>
                         </View>
-                    ) : null}
-                    <View style={{ alignItems: "center", margin: 20 }}>
-                        <Button
-                            title={"Place order"}
-                            onPress={confirmOrder}
-                        />
-                    </View>
+                        <Text style={styles.orderItemHeading}>ORDER ITEMS:</Text>
+
+                        {finalOrder.order.order.orderItems.map((item) => {
+                             const photoImage = item.newData.photo.image;
+                             const photoName = item.newData.photo.name;
+                             const materialName = item.newData.material.name;
+                             const materialPrice = item.newData.material.price;
+                            return (
+                                <View key={item._id} style={styles.itemContainer}>
+                                    <Carousel
+                                        data={photoImage}
+                                        renderItem={({ item }) => (
+                                            <Image
+                                                source={{ uri: photoImage }}
+                                                resizeMode="contain"
+                                                style={styles.image}
+                                            />
+                                        )}
+                                        sliderWidth={width}
+                                        itemWidth={width * 0.8}
+                                        loop={true}
+                                        autoplay={true}
+                                        autoplayInterval={5000}
+                                    />
+                                    <DataTable style={styles.dataTableContainer}>
+                                        <DataTable.Header style={styles.tableHeader}>
+                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHOTO</Text></DataTable.Title>
+                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>MATERIAL</Text></DataTable.Title>
+                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>QUANTITY</Text></DataTable.Title>
+                                            <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PRICE</Text></DataTable.Title>
+                                        </DataTable.Header>
+                                        <DataTable.Row>
+                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{photoName}</DataTable.Cell>
+                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialName}</DataTable.Cell>
+                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{quantity}</DataTable.Cell>
+                                            <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>{materialPrice}</DataTable.Cell>
+                                        </DataTable.Row>
+                                    </DataTable>
+                                    <View style={styles.priceContainer}>
+                                                <Text style={styles.price}>₱ {order.totalPrice}</Text>
+                                            </View>
+                                </View>
+                                    )
+                            })}     
+                            )
+                        </View>
+                ) : null}
+                <View style={{ alignItems: "center", margin: 20 }}>
+                    <Button
+                        title={"Place order"}
+                        onPress={confirmOrder}
+                    />
                 </View>
-            </ScrollView>
-        </Center>
+            </View>
+        </ScrollView>
     )
 
 }
 const styles = StyleSheet.create({
     container: {
-        height: height,
-        padding: 8,
-        alignContent: "center",
-        backgroundColor: "white",
+        flex: 1,
+        padding: 10,
+        margin: 10
     },
-    titleContainer: {
-        justifyContent: "center",
-        alignItems: "center",
-        margin: 8,
+    listContainer: {
+        marginBottom: 30,
+        borderRadius: 10,
+        backgroundColor: 'gainsboro',
     },
-    title: {
-        alignSelf: "center",
-        margin: 8,
-        fontSize: 16,
-        fontWeight: "bold",
+    orderInfo: {
+        marginBottom: 10,
+        padding: 10
     },
-    listItem: {
-        alignItems: "center",
-        backgroundColor: "white",
-        justifyContent: "center",
-        width: width / 1.2,
+    orderNumber: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        backgroundColor: 'white',
+        textAlign: 'center',
+        padding: 20
     },
-    body: {
-        margin: 10,
-        alignItems: "center",
+    orderItemHeading: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'left',
+        marginBottom: 20
+    },
+    tableHeader: {
+        marginTop: 20,
+        backgroundColor: 'black',
+        borderTopWidth: 1,
+        borderTopColor: '#ddd',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        height: 45,
+    },
+    itemContainer: {
+        marginBottom: 20,
+        padding: 10,
+        backgroundColor: 'white',
+    },
+    priceContainer: {
+        marginTop: 10,
+        alignSelf: "flex-end",
         flexDirection: "row",
-    },
+      },
 });
 export default Confirm;

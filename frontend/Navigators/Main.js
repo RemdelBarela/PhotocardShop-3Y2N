@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Image, View } from "react-native";
 import { Badge } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
-import HomeNavigator from "./HomeNavigator";
 import CartIcon from "../Shared/CartIcon";
 import CartNavigator from "./CartNavigator";
 import UserNavigator from "./UserNavigator";
