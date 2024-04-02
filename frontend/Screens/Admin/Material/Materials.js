@@ -148,7 +148,7 @@ const Materials = (props) => {
       <EasyButton
         secondary
         medium
-        onPress={() => navigation.navigate("PhotoForm")}
+        onPress={() => navigation.navigate("MaterialForm")}
         style={{ marginRight: 10 ,backgroundColor: 'black'}} // Add some right margin for spacing
     >
         <Icon name="plus" size={18} color="white" />
@@ -190,7 +190,7 @@ const Materials = (props) => {
                                     medium
                                     secondary
                                     onPress={() => {
-                                        navigation.navigate("PhotoForm", { item: selectedPhoto });
+                                        navigation.navigate("MaterialForm", { item: selectedPhoto });
                                         setModalVisible(false);
                                     }}
                                     title="Edit"
