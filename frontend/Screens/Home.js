@@ -271,15 +271,28 @@ const Home = () => {
         setShowAddToCartModal(true);
         // Extract the ID of the selected photo and set it
         console.log('Selected Photo ID:', id);
+        
+        // Axios request to fetch additional details for the selected photo
         axios.get(`${baseURL}photos/select/${id}`)
             .then((res) => {
-                setSelectedPhoto(res.data)
+                setSelectedPhoto(res.data);
                 console.log('Additional details for selected photo:', res.data);
+    
+                // Axios request to fetch reviews for the selected photo
+                axios.get(`${baseURL}reviews/photo/${id}`)
+                    .then((res) => {
+                        console.log('Reviews for selected photo:', res.data);
+                        setReviews(res.data);
+                    })
+                    .catch((error) => {
+                        console.log('Error fetching reviews for selected photo:', error);
+                    });
             })
             .catch((error) => {
                 console.log('Error fetching additional details for selected photo:', error);
             });
     };
+    
 
 
     const handleMaterialPress = (item, index) => {
