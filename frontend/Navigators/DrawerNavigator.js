@@ -39,18 +39,18 @@ const getIcon = (screenName) => {
       return "home-outline";
     case "PROFILE":
       return "account-outline";
-        case "PHOTOS":
+    case "PHOTOS":
       return "image-outline";
     case "MATERIALS":
       return "file-document-outline";
     case "USERS":
       return "account-group-outline";
     case "ORDERS":
-      return "chart-line"; 
-      case "ORDERS":
-        return "chart-line"; 
-      case "CHARTS":
-        return "chart-line"; 
+      return "cart-outline";
+    case "REVIEWS":
+      return "star-outline";
+    case "CHARTS":
+      return "chart-line";
     default:
       return undefined;
   }
@@ -60,12 +60,12 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props} safeArea>
       <VStack space="6" my="2" mx="1">
-      <Box width={12} height={12} borderRadius="full" overflow="hidden" justifyContent="center" alignItems="center" marginLeft="110">
-        <Image
-          source={require("../assets/Logo.png")}
-          style={{ width: "100%", height: "100%" }}
-        />
-      </Box>
+        <Box width={12} height={12} borderRadius="full" overflow="hidden" justifyContent="center" alignItems="center" marginLeft="110">
+          <Image
+            source={require("../assets/Logo.png")}
+            style={{ width: "100%", height: "100%" }}
+          />
+        </Box>
         {/* <Box px="4">
           <Text bold color="gray.700">
             Mail
@@ -125,13 +125,13 @@ const DrawerNavigator = () => {
           name="HOME"
           component={Main}
         />
-        <Drawer.Screen name="PHOTOS" component={Photos}  initialParams={{ screen: 'Photos' }}/>
-        <Drawer.Screen name="MATERIALS" component={Materials}  initialParams={{ screen: 'Materials' }}/>
-        <Drawer.Screen name="USERS" component={Users}  initialParams={{ screen: 'Users' }}/>
-        <Drawer.Screen name="ORDERS" component={Orders} initialParams={{ screen: 'Orders' }} /> 
-        <Drawer.Screen name="REVIEWS" component={Reviews} initialParams={{ screen: 'Reviews' }} /> 
+        <Drawer.Screen name="PHOTOS" component={Photos} initialParams={{ screen: 'Photos' }} />
+        <Drawer.Screen name="MATERIALS" component={Materials} initialParams={{ screen: 'Materials' }} />
+        <Drawer.Screen name="USERS" component={Users} initialParams={{ screen: 'Users' }} />
+        <Drawer.Screen name="ORDERS" component={Orders} initialParams={{ screen: 'Orders' }} />
+        <Drawer.Screen name="REVIEWS" component={Reviews} initialParams={{ screen: 'Reviews' }} />
 
-        <Drawer.Screen name="CHARTS" component={Charts}  initialParams={{ screen: 'Charts' }}/>
+        <Drawer.Screen name="CHARTS" component={Charts} initialParams={{ screen: 'Charts' }} />
       </Drawer.Navigator>
     </Box>
   );
