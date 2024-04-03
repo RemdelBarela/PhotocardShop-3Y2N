@@ -8,6 +8,7 @@ import UpdateProfile from "../Screens/User/UpdateProfile";
 import ReviewForm from "../Screens/Review/ReviewForm";
 import SingleOrder from "../Screens/Order/SingleOrder";
 import Transaction from "./TransactionNavigator";
+import Reviews from "../Screens/Review/Reviews"
 
 const Stack = createStackNavigator();
 
@@ -28,7 +29,6 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
-
            <Stack.Screen
                 name="User Profile"
                 component={UserProfile}
@@ -37,7 +37,6 @@ const UserNavigator = (props) => {
                     cardStyle: { backgroundColor: '#CCCCCC' }  
                 }}
             />
-
              <Stack.Screen
                 name="Update Profile"
                 component={UpdateProfile}
@@ -65,7 +64,6 @@ const UserNavigator = (props) => {
    
                 }}
             />
-
             <Stack.Screen
                 name="Review Form"
                 component={ReviewForm}
@@ -73,6 +71,13 @@ const UserNavigator = (props) => {
                     headerShown: false
                 }}
             />
+            <Stack.Screen
+                name="Reviews"
+                component={Reviews}
+                options={{
+                    headerShown: false
+                }}
+            />     
         </Stack.Navigator>
     )
 }

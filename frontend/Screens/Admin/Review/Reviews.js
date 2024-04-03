@@ -19,6 +19,7 @@ import Toast from "react-native-toast-message";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 var { height, width } = Dimensions.get("window")
 import { useNavigation } from "@react-navigation/native"
+import EasyButton from "../../../Shared/StyledComponents/EasyButton";
 
 import DisableStar from "../../../Shared/DisabledStar"
 import baseURL from "../../../assets/common/baseurl"
@@ -59,6 +60,61 @@ const Reviews = (props) => {
         )
     )
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            axios
+                .get(`${baseURL}photos`)
+                .then((res) => {
+                    // console.log(res.data)
+                    setPhotoList(res.data);
+                    setPhotoFilter(res.data);
+                    setLoading(false);
+                })
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
+    const deleteReview = (id) => {
+        AsyncStorage.getItem("jwt")
+        .then((res) => {
+            setToken(res)
+        })
+        .catch((error) => console.log(error))
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}` // Corrected to include Authorization header in the headers object
+            }
+        };
+        axios
+            .delete(`${baseURL}reviews/${id}`, config)
+            .then((res) => {
+                if (res.status === 200 || res.status === 201) {
+                    Toast.show({
+                        topOffset: 60,
+                        type: "success",
+                        text1: "REVIEW IS DELETED SUCCESSFULLY",
+                        text2: ""
+                    });
+                    setTimeout(() => {
+                        navigation.navigate("REVIEWS");
+                    }, 500)
+                    onRefresh()
+
+                    
+                }
+            })
+            .catch((error) => {
+                console.log(error)
+                Toast.show({
+                    topOffset: 60,
+                    type: "error",
+                    text1: "ERROR!",
+                    text2: "PLEASE TRY AGAIN"
+                })
+            });
+    }
+
     return (
         <Box flex={1}>
             {loading ? (
@@ -72,6 +128,7 @@ const Reviews = (props) => {
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>COMMENT</Text></DataTable.Title>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>RATING</Text></DataTable.Title>
                         <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>PHOTO NAME</Text></DataTable.Title>
+                        <DataTable.Title style={{ justifyContent: 'center', alignItems: 'center' }}><Text style={{ color: 'white' }}>DELETE</Text></DataTable.Title>
                     </DataTable.Header>
                     {reviewList.map((item, index) => {
                         console.log('reviewlist: ', item)
@@ -95,6 +152,14 @@ const Reviews = (props) => {
                                 <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
                                     {item.orderItem.photocard.photo.name}
                                 </DataTable.Cell>
+                                <DataTable.Cell style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <EasyButton
+                                    onPress={() => deleteReview(item._id)}
+                                    style={{
+                                        backgroundColor: index % 2 === 0 ? 'lightgray' : 'gainsboro',
+                                    }} />
+                                        <Icon name="trash" size={18} color="white" backgroundColor="black" />
+                                    </DataTable.Cell>
                             </DataTable.Row>
                        
                     )})}

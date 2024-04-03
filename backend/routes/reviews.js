@@ -43,19 +43,19 @@ router.get(`/`, async (req, res) => {
 });
 
 
-// router.get(`/admin`, async (req, res) => {
-//     const { photoId } = req.params;
+router.get(`/photo/:id`, async (req, res) => {
+    const { photoId } = req.params;
 
-//     try {
-//         // Find all reviews with the given photoId
-//         const reviews = await Review.find({ 'orderItem.photocard.photo._id': photoId });
+    try {
+        // Find all reviews with the given photoId
+        const reviews = await Review.find({ 'orderItem.photocard.photo._id': photoId });
 
-//         res.json(reviews);
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: "Internal server error" });
-//     }
-// });
+        res.json(reviews);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 router.get(`/select/:id`, async (req, res) =>{
     const review = await Review.findById(req.params.id);
@@ -184,5 +184,14 @@ router.get(`/order-item/:id`, async (req, res) => {
 //     }
 // });
 
+router.get('/reviews', async (req, res) => {
+    try {
+        const reviews = await Review.find({}).populate('user').exec();
+        res.status(200).json(reviews);
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 module.exports=router;

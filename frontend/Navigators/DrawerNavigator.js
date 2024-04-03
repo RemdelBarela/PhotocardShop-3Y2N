@@ -130,7 +130,6 @@ const DrawerNavigator = () => {
         <Drawer.Screen name="USERS" component={Users} initialParams={{ screen: 'Users' }} />
         <Drawer.Screen name="ORDERS" component={Orders} initialParams={{ screen: 'Orders' }} />
         <Drawer.Screen name="REVIEWS" component={Reviews} initialParams={{ screen: 'Reviews' }} />
-
         <Drawer.Screen name="CHARTS" component={Charts} initialParams={{ screen: 'Charts' }} />
       </Drawer.Navigator>
     </Box>
