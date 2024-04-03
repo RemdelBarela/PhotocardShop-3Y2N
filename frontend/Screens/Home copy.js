@@ -16,7 +16,7 @@ import { addToCart } from '../Redux/Actions/cartActions'
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { BlurView } from "expo-blur";
 import axios from "axios";
-import DisabledStarWithRating from "../Shared/DisabledStarWithRating";
+
 import baseURL from "../assets/common/baseurl";
 import EasyButton from "../Shared/StyledComponents/EasyButton";
 // import { images } from "./Product/constants";
@@ -37,7 +37,6 @@ const Home = () => {
     const [token, setToken] = useState();
     const [selectedMaterialIndex, setSelectedMaterialIndex] = useState(0);
     const [reviews, setReviews] = useState([]);
-    
 
     const dispatch = useDispatch()
 
@@ -49,17 +48,17 @@ const Home = () => {
         setShowAllReviews(!showAllReviews);
     };
     
-    useEffect(() => {
-        // Fetch all reviews from backend
-        axios
-          .get(`${baseURL}reviews`)
-          .then((response) => {
-            setReviews(response.data);
-          })
-          .catch((error) => {
-            console.error("Error fetching reviews:", error);
-          });
-      }, []);
+    // useEffect(() => {
+    //     // Fetch all reviews from backend
+    //     axios
+    //       .get(`${baseURL}reviews`)
+    //       .then((response) => {
+    //         setReviews(response.data);
+    //       })
+    //       .catch((error) => {
+    //         console.error("Error fetching reviews:", error);
+    //       });
+    //   }, []);
       
     // useEffect(() => {
     //     if (selectedPhoto) {
@@ -375,20 +374,47 @@ const Home = () => {
     //     );
     // };
 
-    const renderStars = (rating) => {
+    const renderStars = (ratingId) => {
+        console.log('ratingId', ratingId)
+        axios.get(`${baseURL}reviews/photo/${ratingId}`)
+            .then((res) => {
+                console.log('Reviews for selected photo:', res.data);
+                // Calculate the average rating
+                const averageRating = calculateAverageRating(res.data);
+                console.log('Average rating:', averageRating);
+                setReviews(res.data);
+            })
+            .catch((error) => {
+                console.log('Error fetching reviews for selected photo:', error);
+            });
+    
+        const calculateAverageRating = (reviews) => {
+            if (reviews.length === 0) {
+                return 0;
+            }
+            const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+
+            console.log('totalRating: ', totalRating)
+            return totalRating / reviews.length;
+        };
+    
+        // Render stars based on average rating
         const stars = [];
+        const averageRating = calculateAverageRating(reviews);
         for (let i = 1; i <= 5; i++) {
             stars.push(
                 <Ionicons
                     key={i}
-                    name={i <= rating ? 'star' : 'star-outline'}
+                    name={i <= averageRating ? 'star' : i - 1 < averageRating ? 'star-half' : 'star-outline'}
                     size={20}
-                    color={i <= rating ? 'black' : 'darkgray'}
+                    color={i <= averageRating ? 'black' : 'darkgray'}
                 />
             );
         }
         return stars;
     };
+    
+    
 
 
     // const reviews = [
@@ -435,8 +461,7 @@ const Home = () => {
                                     <TouchableOpacity
                                         style={{ margin: 10, marginBottom: -10, flex: 1, flexDirection: "row" }}
                                         onPress={() => {
-                                            handlePhotoSelect(item._id);
-                                            setShowAddToCartModal(true);
+                                            // handle your logic here
                                         }}
                                     >
                                         <View style={styles.card}>
@@ -458,7 +483,8 @@ const Home = () => {
                             <Text style={{ alignSelf: 'center' }}>NO PHOTOS FOUND</Text>
                         </View>
                     )}
-                </Container>) : (
+                </Container>
+                ) : (
                 <ScrollView>
                     {photoFilter.length > 0 ? (
                         <View style={styles.listContainer}>
@@ -495,7 +521,8 @@ const Home = () => {
                                                 <View style={{ flex: 1.5, justifyContent: 'center' }}>
                                                     <Text style={styles.boldText}>{item.name}</Text>
                                                     <Text style={styles.description}>{item.description}</Text>
-                                                    <DisabledStarWithRating itemId={item._id} />
+                                                    <Text>{renderStars(item._id)}</Text>
+
                                                 </View>
                                             </View>
                                         </TouchableOpacity>

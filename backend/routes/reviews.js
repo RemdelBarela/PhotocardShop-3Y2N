@@ -2,6 +2,8 @@ const express = require('express');
 const { Review } = require('../models/review');
 const { OrderItem } = require('../models/order-item');
 const { Photocard } = require('../models/photocard');
+const { Photo } = require('../models/photo');
+
 const { Order } = require('../models/order');
 
 const router = express.Router();
@@ -43,12 +45,37 @@ router.get(`/`, async (req, res) => {
 });
 
 
+// router.get(`/photo/:id`, async (req, res) => {
+//     const { photoId } = req.params.id;
+
+//     try {
+//         // Find all reviews with the given photoId
+//         const reviews = await Review.find({ 'orderItem.photocard.photo': photoId });
+
+//         res.json(reviews);
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ message: "Internal server error" });
+//     }
+// });
 router.get(`/photo/:id`, async (req, res) => {
-    const { photoId } = req.params;
 
     try {
-        // Find all reviews with the given photoId
-        const reviews = await Review.find({ 'orderItem.photocard.photo._id': photoId });
+
+
+        const photo = await Photo.findById(req.params.id);
+
+        const photocard = await Photocard.find({'photo' :photo});
+      
+        const orderItem = await OrderItem.find({'photocard' : photocard});
+
+        console.log(orderItem)
+
+        // Extract the IDs of the order items
+        const orderItems = orderItem.map(item => item._id);
+
+        // Find reviews with orderItem IDs
+        const reviews = await Review.find({'orderItem' : orderItems});
 
         res.json(reviews);
     } catch (err) {
@@ -56,6 +83,10 @@ router.get(`/photo/:id`, async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
+
+
 
 router.get(`/select/:id`, async (req, res) =>{
     const review = await Review.findById(req.params.id);
